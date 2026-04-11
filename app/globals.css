@@ -1,0 +1,28 @@
+/* Tailwind CSS v3 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #f9fafb;
+  }
+
+  body {
+    @apply text-slate-900 antialiased;
+    background-color: #f9fafb;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.container-landing {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
