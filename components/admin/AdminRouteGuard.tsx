@@ -14,7 +14,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
       return;
     }
     let cancelled = false;
-    fetch("/api/auth/me", { credentials: "include" })
+    fetch("/api/auth/me?intent=admin", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
