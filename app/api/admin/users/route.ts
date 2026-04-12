@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getSessionFromCookies } from "@/lib/auth/session";
+import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await getSessionFromCookies();
-  if (!session || session.role !== "ADMIN") {
+  const session = await getAdminSessionFromCookies();
+  if (!session) {
     return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 403 });
   }
 

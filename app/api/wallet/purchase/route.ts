@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getSessionFromCookies } from "@/lib/auth/session";
+import { getStudentSessionFromCookies } from "@/lib/auth/session";
 import { purchaseOrEnrollPackageDb } from "@/lib/server-wallet";
 
 export async function POST(req: Request) {
-  const session = await getSessionFromCookies();
-  if (!session || session.role !== "STUDENT") {
+  const session = await getStudentSessionFromCookies();
+  if (!session) {
     return NextResponse.json({ ok: false, message: "يجب تسجيل الدخول لإتمام الشراء." }, { status: 401 });
   }
 

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth/password";
-import { clearSessionCookie, setSessionCookie } from "@/lib/auth/session";
+import {
+  setSessionCookie,
+  clearOtherSessionCookie,
+  clearAllSessionCookies,
+} from "@/lib/auth/session";
 import type { SessionPayload } from "@/lib/auth/jwt";
 
 export const runtime = "nodejs";
@@ -49,7 +53,7 @@ export async function POST(req: Request) {
         { ok: false, code: "ADMIN_PORTAL_STUDENT_ACCOUNT", message: "هذا الحساب ليس حساب إدارة" },
         { status: 403 },
       );
-      clearSessionCookie(res);
+      clearAllSessionCookies(res);
       return res;
     }
     if (intent === "student" && user.role !== "STUDENT") {
@@ -57,16 +61,14 @@ export async function POST(req: Request) {
         { ok: false, code: "STUDENT_PORTAL_ADMIN_ACCOUNT", message: "هذا الحساب خاص بالإدارة" },
         { status: 403 },
       );
-      clearSessionCookie(res);
+      clearAllSessionCookies(res);
       return res;
     }
 
     step = "create-session";
-    const session: SessionPayload = {
-      sub: user.id,
-      role: user.role === "ADMIN" ? "ADMIN" : "STUDENT",
-      email: user.email,
-    };
+    const role = user.role === "ADMIN" ? "ADMIN" as const : "STUDENT" as const;
+    const session: SessionPayload = { sub: user.id, role, email: user.email };
+
     const response = NextResponse.json({
       ok: true,
       user: {
@@ -79,7 +81,9 @@ export async function POST(req: Request) {
         walletBalance: user.walletBalance,
       },
     });
+
     await setSessionCookie(response, session);
+    clearOtherSessionCookie(response, role);
     return response;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

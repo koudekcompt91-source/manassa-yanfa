@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    fetch("/api/auth/me", { credentials: "include" })
+    fetch("/api/auth/me?intent=admin", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         if (data?.user?.role === "ADMIN") router.replace("/admin/dashboard");

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getSessionFromCookies } from "@/lib/auth/session";
+import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { rejectRechargeRequestDb } from "@/lib/server-wallet";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const session = await getSessionFromCookies();
-  if (!session || session.role !== "ADMIN") {
+  const session = await getAdminSessionFromCookies();
+  if (!session) {
     return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 403 });
   }
 
