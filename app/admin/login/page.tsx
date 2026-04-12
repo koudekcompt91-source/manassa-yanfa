@@ -28,21 +28,20 @@ export default function AdminLoginPage() {
     setShowStudentPortalLink(false);
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           email: form.email.trim(),
           password: form.password,
-          intent: "admin",
         }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        const studentPortal = data.code === "ADMIN_PORTAL_STUDENT_ACCOUNT";
-        setShowStudentPortalLink(studentPortal);
-        setError(studentPortal ? "هذا الحساب ليس حساب إدارة" : data.message || "بيانات الدخول غير صحيحة");
+        const notAdmin = data.code === "NOT_ADMIN";
+        setShowStudentPortalLink(notAdmin);
+        setError(data.message || "بيانات الدخول غير صحيحة");
         setLoading(false);
         return;
       }
