@@ -12,9 +12,22 @@ export const runtime = "nodejs";
 
 type Intent = "student" | "admin";
 
-function parseIntent(value: unknown): Intent {
+function parseIntent(value: unknown, req: Request): Intent {
   const s = String(value ?? "").trim().toLowerCase();
-  return s === "admin" ? "admin" : "student";
+  if (s === "admin") return "admin";
+  if (s === "student") return "student";
+
+  const referer = req.headers.get("referer") || "";
+  const pathname = (() => {
+    try {
+      return new URL(referer).pathname;
+    } catch {
+      return "";
+    }
+  })();
+
+  if (pathname.startsWith("/admin")) return "admin";
+  return "student";
 }
 
 export async function POST(req: Request) {
@@ -24,7 +37,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
-    const intent = parseIntent(body.intent);
+    const intent = parseIntent(body.intent, req);
 
     console.log(`[login] intent=${intent} email=${email}`);
 
