@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthPageShell, { inputFocus } from "@/components/auth/AuthPageShell";
 import { STUDENT_LEVEL_SELECT_OPTIONS } from "@/lib/student-level-codes";
-import { authStore } from "@/lib/auth";
 
 const fieldClass =
   `mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-start text-base text-slate-900 placeholder:text-slate-400 transition ${inputFocus}`;
@@ -20,11 +19,13 @@ export default function RegisterPage() {
     level: "",
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (form.password !== form.confirmPassword) {
       setError("كلمتا المرور غير متطابقتين.");
@@ -40,7 +41,6 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           fullName: form.fullName.trim(),
           email: form.email.trim(),
@@ -55,8 +55,8 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
-      if (data.user) authStore.saveUser(data.user);
-      router.push("/dashboard");
+      setSuccess("تم إنشاء الحساب بنجاح! جاري التحويل لتسجيل الدخول…");
+      setTimeout(() => router.push("/login"), 1200);
     } catch {
       setError("تعذّر الاتصال بالخادم.");
       setLoading(false);
@@ -179,13 +179,15 @@ export default function RegisterPage() {
             {error}
           </p>
         ) : null}
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          يُنشأ الحساب في قاعدة البيانات ويُسجَّل دخولك تلقائيًا بعد النجاح.
-        </p>
+        {success ? (
+          <p role="status" className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+            {success}
+          </p>
+        ) : null}
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !!success}
           className="w-full rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 py-3.5 text-base font-bold text-white shadow-lg shadow-brand-500/25 transition hover:opacity-[0.97] disabled:cursor-not-allowed disabled:opacity-55 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
         >
           {loading ? "جاري إنشاء الحساب…" : "إنشاء حساب"}

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
-import { setSessionCookie } from "@/lib/auth/session";
-import type { SessionPayload } from "@/lib/auth/jwt";
 import { isValidAcademicLevel } from "@/lib/academic-levels";
 import {
   isValidStudentLevelCode,
@@ -74,26 +72,10 @@ export async function POST(req: Request) {
       },
     });
 
-    step = "create-session";
-    const session: SessionPayload = {
-      sub: user.id,
-      role: "STUDENT",
-      email: user.email,
-    };
-    const response = NextResponse.json({
+    return NextResponse.json({
       ok: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-        level: user.level,
-        academicLevel: user.academicLevel,
-        walletBalance: user.walletBalance,
-      },
+      message: "تم إنشاء الحساب بنجاح. سجّل دخولك الآن.",
     });
-    await setSessionCookie(response, session);
-    return response;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error(`[register] FAILED at step="${step}":`, msg);
