@@ -10,8 +10,12 @@ import {
   mapStudentLevelCodeToArabic,
 } from "@/lib/student-level-codes";
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
+  let step = "init";
   try {
+    step = "parse-body";
     const body = await req.json();
     const fullName = String(body.fullName || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
@@ -20,6 +24,7 @@ export async function POST(req: Request) {
     const levelRaw = String(body.level || "").trim();
     const academicLevelLegacy = String(body.academicLevel || "").trim();
 
+    step = "validate";
     if (!fullName || !email) {
       return NextResponse.json({ ok: false, message: "البيانات غير مكتملة." }, { status: 400 });
     }
@@ -46,12 +51,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "مستوى غير صالح." }, { status: 400 });
     }
 
+    step = "check-existing";
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) {
       return NextResponse.json({ ok: false, message: "البريد مستخدم مسبقًا." }, { status: 409 });
     }
 
+    step = "hash-password";
     const passwordHash = await hashPassword(password);
+
+    step = "create-user";
     const user = await prisma.user.create({
       data: {
         email,
@@ -65,14 +74,13 @@ export async function POST(req: Request) {
       },
     });
 
+    step = "create-session";
     const session: SessionPayload = {
       sub: user.id,
       role: "STUDENT",
       email: user.email,
     };
-    await setSessionCookie(session);
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       user: {
         id: user.id,
@@ -84,8 +92,12 @@ export async function POST(req: Request) {
         walletBalance: user.walletBalance,
       },
     });
+    await setSessionCookie(response, session);
+    return response;
   } catch (e) {
-    console.error(e);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[register] FAILED at step="${step}":`, msg);
+    if (e instanceof Error && e.stack) console.error("[register] stack:", e.stack);
     return NextResponse.json({ ok: false, message: "تعذّر إنشاء الحساب." }, { status: 500 });
   }
 }

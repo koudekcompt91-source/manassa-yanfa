@@ -3,13 +3,13 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 
-function encodedSecret() {
+function encodedSecret(): Uint8Array | null {
   const s = process.env.AUTH_SECRET || "";
   if (s.length >= 32) return new TextEncoder().encode(s);
   if (process.env.NODE_ENV !== "production") {
     return new TextEncoder().encode("development-default-secret-32chars!!");
   }
-  return new TextEncoder().encode("fallback-invalid-use-AUTH_SECRET-32+");
+  return null;
 }
 
 export async function middleware(request: NextRequest) {
@@ -17,9 +17,10 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 
   let role: string | null = null;
-  if (token) {
+  const secret = encodedSecret();
+  if (token && secret) {
     try {
-      const { payload } = await jwtVerify(token, encodedSecret());
+      const { payload } = await jwtVerify(token, secret);
       role = String(payload.role || "");
     } catch {
       role = null;
