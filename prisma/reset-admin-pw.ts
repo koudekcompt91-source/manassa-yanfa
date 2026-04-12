@@ -5,21 +5,39 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = "admin@yanfa.app";
-  const newPassword = "Admin123456!";
+  const plainPassword = "Admin123456!";
+  const passwordHash = await bcrypt.hash(plainPassword, 10);
 
-  const hash = await bcrypt.hash(newPassword, 10);
-
-  const user = await prisma.user.update({
+  const admin = await prisma.user.upsert({
     where: { email },
-    data: { passwordHash: hash, role: "ADMIN", status: "ACTIVE" },
+    update: {
+      passwordHash,
+      role: "ADMIN",
+      status: "ACTIVE",
+      fullName: "Admin",
+    },
+    create: {
+      email,
+      passwordHash,
+      fullName: "Admin",
+      role: "ADMIN",
+      status: "ACTIVE",
+      level: "unknown",
+      academicLevel: "إدارة",
+      walletBalance: 0,
+    },
   });
 
-  console.log(`OK: password reset for ${user.email} (role=${user.role})`);
+  console.log("SUCCESS");
+  console.log("EMAIL:", admin.email);
+  console.log("PASSWORD:", plainPassword);
 }
 
 main()
   .catch((e) => {
-    console.error("FAILED:", e instanceof Error ? e.message : e);
+    console.error("FAILED:", e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
