@@ -142,7 +142,7 @@ export async function rejectRechargeRequestDb(requestId: string, rejectionNote: 
 
 export async function purchaseOrEnrollPackageDb(userId: string, packageRef: string) {
   const pkg = resolveCatalogPackage(packageRef);
-  if (!pkg?.id) return { ok: false as const, message: "الباقة غير موجودة." };
+  if (!pkg?.id) return { ok: false as const, message: "الدورة غير موجودة." };
 
   const canonicalPackageId = String(pkg.id);
   const price = getPackagePriceMad(pkg);
@@ -151,7 +151,7 @@ export async function purchaseOrEnrollPackageDb(userId: string, packageRef: stri
     const existing = await tx.enrollment.findUnique({
       where: { userId_packageId: { userId, packageId: canonicalPackageId } },
     });
-    if (existing) return { ok: false as const, code: "already_enrolled" as const, message: "أنت مسجّل في هذه الباقة مسبقًا." };
+    if (existing) return { ok: false as const, code: "already_enrolled" as const, message: "أنت مسجّل في هذه الدورة مسبقًا." };
 
     const user = await tx.user.findUnique({ where: { id: userId } });
     if (!user) return { ok: false as const, message: "المستخدم غير موجود." };
@@ -161,7 +161,7 @@ export async function purchaseOrEnrollPackageDb(userId: string, packageRef: stri
       if (pkgItemLevel) {
         const userCode = String(user.level ?? "").trim() || "unknown";
         if (userCode !== "unknown" && userCode !== pkgItemLevel) {
-          return { ok: false as const, code: "wrong_level" as const, message: "هذه الباقة لا تخص مستواك الدراسي." };
+          return { ok: false as const, code: "wrong_level" as const, message: "هذه الدورة لا تخص مستواك الدراسي." };
         }
       } else {
         const studentLevel = String(user.academicLevel ?? "").trim();
@@ -170,7 +170,7 @@ export async function purchaseOrEnrollPackageDb(userId: string, packageRef: stri
         }
         const pkgLevel = getPackageAcademicLevel(pkg);
         if (pkgLevel !== studentLevel) {
-          return { ok: false as const, code: "wrong_level" as const, message: "هذه الباقة لا تخص مستواك الدراسي." };
+          return { ok: false as const, code: "wrong_level" as const, message: "هذه الدورة لا تخص مستواك الدراسي." };
         }
       }
     }
@@ -215,7 +215,7 @@ export async function purchaseOrEnrollPackageDb(userId: string, packageRef: stri
         userId,
         type: "package_purchase",
         amount: -price,
-        labelAr: `شراء باقة: ${title}`,
+        labelAr: `شراء دورة: ${title}`,
         balanceAfter: nextBal,
         packageId: canonicalPackageId,
       },

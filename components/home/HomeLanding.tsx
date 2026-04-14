@@ -337,9 +337,9 @@ export default function HomeLanding() {
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
             <h2 id="pricing-title" className="text-2xl font-extrabold text-slate-900 sm:text-3xl md:text-4xl">
-              باقات الاشتراك
+              خطط الاشتراك
             </h2>
-            <p className="mt-3 text-slate-600 sm:text-lg">اختر باقة دراسية تناسب رحلتك في الأدب العربي.</p>
+            <p className="mt-3 text-slate-600 sm:text-lg">اختر دورة دراسية تناسب رحلتك في الأدب العربي.</p>
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             {[

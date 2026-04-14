@@ -6,14 +6,14 @@ import { useDemoSection } from "@/lib/demo-store";
 export default function AdminOverviewPage() {
   const [announcements] = useDemoSection("announcements");
   const [packages] = useDemoSection("packages");
-  const [lessons] = useDemoSection("lessons");
+  const [teachers] = useDemoSection("teachers");
   const [students] = useDemoSection("students");
   const [subscriptionPlans] = useDemoSection("plans");
 
   const cards = [
     { label: "إجمالي الطلاب", value: (students || []).length },
     { label: "إجمالي الدورات", value: (packages || []).length },
-    { label: "إجمالي الدروس", value: (lessons || []).length },
+    { label: "إجمالي الأساتذة", value: (teachers || []).length },
     { label: "الاشتراكات النشطة", value: (subscriptionPlans || []).filter((plan) => plan.active ?? plan.isActive).length },
   ];
 
