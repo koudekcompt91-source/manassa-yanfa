@@ -61,7 +61,7 @@ export default function ProfilePage() {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900">التسجيلات</h2>
-          <p className="mt-3 text-sm text-slate-700">عدد الباقات: {(meState?.enrollments || []).length}</p>
+          <p className="mt-3 text-sm text-slate-700">عدد الدورات: {(meState?.enrollments || []).length}</p>
           <Link href="/dashboard" className="mt-3 inline-block text-sm font-bold text-brand-700 underline">
             لوحة التحكم
           </Link>

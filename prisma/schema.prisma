@@ -10,11 +10,22 @@ datasource db {
 enum Role {
   STUDENT
   ADMIN
+  TEACHER
 }
 
 enum UserStatus {
   ACTIVE
   DISABLED
+}
+
+enum CourseAccessType {
+  FREE
+  PAID
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
 }
 
 model User {
@@ -80,4 +91,43 @@ model Enrollment {
   enrolledAt DateTime @default(now())
 
   @@unique([userId, packageId])
+}
+
+model Course {
+  id           String           @id @default(cuid())
+  slug         String           @unique
+  title        String
+  description  String           @default("")
+  accessType   CourseAccessType @default(FREE)
+  price        Int              @default(0)
+  status       CourseStatus     @default(DRAFT)
+  categoryId   String?
+  teacherId    String?
+  thumbnailUrl String?
+  isFeatured   Boolean          @default(false)
+  order        Int              @default(0)
+  academicLevel String?
+  level         String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  lessons      Lesson[]
+}
+
+model Lesson {
+  id            String   @id @default(cuid())
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title         String
+  youtubeUrl    String
+  youtubeVideoId String
+  description   String   @default("")
+  order         Int
+  isPublished   Boolean  @default(false)
+  durationSec   Int?
+  isFreePreview Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([courseId, order])
 }

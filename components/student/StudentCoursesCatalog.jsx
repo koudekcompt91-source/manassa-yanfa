@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { studentSeesLesson, studentSeesPackage } from "@/lib/academic-levels";
+import { studentSeesPackage } from "@/lib/academic-levels";
 import { useDemoSection } from "@/lib/demo-store";
-import { isLessonPublished } from "@/lib/lesson-utils";
-import { getPackagePriceMad } from "@/lib/wallet-ops";
 import { formatDzd } from "@/lib/format-money";
 
 function isRemoteCover(src) {
@@ -32,20 +30,44 @@ function CourseCover({ title, coverImage }) {
 
 export default function StudentCoursesCatalog() {
   const router = useRouter();
-  const [packages] = useDemoSection("packages");
+  const [packages, setPackages] = useState([]);
   const [categories] = useDemoSection("categories");
   const [teachers] = useDemoSection("teachers");
-  const [lessons] = useDemoSection("lessons");
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("الكل");
   const [meState, setMeState] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [loadingCourses, setLoadingCourses] = useState(true);
 
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
       .then((r) => r.json())
       .then(setMeState)
       .catch(() => setMeState({}));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingCourses(true);
+      try {
+        const res = await fetch("/api/courses", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok && data?.ok && Array.isArray(data.courses)) {
+          setPackages(data.courses);
+        } else {
+          setPackages([]);
+        }
+      } catch {
+        if (!cancelled) setPackages([]);
+      } finally {
+        if (!cancelled) setLoadingCourses(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const loadMe = useCallback(() => {
@@ -72,20 +94,12 @@ export default function StudentCoursesCatalog() {
       .filter((pkg) => pkg.isPublished)
       .filter((pkg) => studentSeesPackage(studentLevel || null, pkg, studentLevelCode || null))
       .map((pkg) => {
-        const pkgLessons = (lessons || [])
-          .filter((lesson) => {
-            if (lesson.packageId !== pkg.id || !isLessonPublished(lesson)) return false;
-            return studentSeesLesson(studentLevel || null, lesson, packages || [], studentLevelCode || null);
-          })
-          .slice()
-          .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
-        const firstLesson = pkgLessons[0];
         const categoryName = (categories || []).find((row) => row.id === pkg.categoryId)?.name || "-";
         const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "طاقم منصة ينفع";
         const slug = String(pkg.slug || pkg.id || "").trim();
         const detailHref = `/packages/${slug}`;
-        const firstLessonHref = firstLesson ? `/packages/${slug}/lesson/${firstLesson.id}` : detailHref;
-        const priceMad = getPackagePriceMad(pkg);
+        const firstLessonHref = detailHref;
+        const priceMad = Number(pkg.priceMad ?? pkg.price ?? 0) || 0;
         const owned = enrolledIds.has(pkg.id);
         const shortDesc = (() => {
           const d = (pkg.description || "").trim();
@@ -94,8 +108,6 @@ export default function StudentCoursesCatalog() {
         })();
         return {
           pkg,
-          pkgLessons,
-          firstLesson,
           categoryName,
           teacherName,
           slug,
@@ -117,7 +129,6 @@ export default function StudentCoursesCatalog() {
     packages,
     categories,
     teachers,
-    lessons,
     query,
     activeCategory,
     studentLevel,
@@ -274,7 +285,7 @@ export default function StudentCoursesCatalog() {
 
       {!decorated.length ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600 shadow-sm">
-          لا توجد دورات منشورة تطابق مستواك أو البحث الحالي.
+          {loadingCourses ? "جاري تحميل الدورات..." : "لا توجد دورات منشورة تطابق مستواك أو البحث الحالي."}
         </div>
       ) : (
         <>

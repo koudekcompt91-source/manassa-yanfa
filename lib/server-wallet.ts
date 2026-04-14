@@ -8,9 +8,50 @@ import { prisma } from "@/lib/prisma";
  * Resolve a package from the server catalog (bundled defaults — source of truth for pricing on the server).
  * Accepts canonical `id` or URL `slug` so purchases stay aligned with enrollments.
  */
-export function resolveCatalogPackage(packageRef: string) {
+export async function resolveCatalogPackage(packageRef: string) {
   const ref = String(packageRef ?? "").trim();
   if (!ref) return null;
+
+  const dbCourse = await prisma.course.findFirst({
+    where: {
+      OR: [{ id: ref }, { slug: decodeURIComponent(ref).trim() }],
+      status: "PUBLISHED",
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      categoryId: true,
+      teacherId: true,
+      thumbnailUrl: true,
+      isFeatured: true,
+      accessType: true,
+      price: true,
+      order: true,
+      academicLevel: true,
+      level: true,
+    },
+  });
+  if (dbCourse) {
+    return {
+      id: dbCourse.id,
+      slug: dbCourse.slug,
+      title: dbCourse.title,
+      description: dbCourse.description,
+      categoryId: dbCourse.categoryId,
+      teacherId: dbCourse.teacherId,
+      coverImage: dbCourse.thumbnailUrl,
+      isFeatured: dbCourse.isFeatured,
+      isPublished: true,
+      priceType: dbCourse.accessType === "PAID" ? "premium" : "free",
+      priceMad: dbCourse.price,
+      order: dbCourse.order,
+      academicLevel: dbCourse.academicLevel,
+      level: dbCourse.level,
+    };
+  }
+
   const list = defaultDemoData.packages || [];
   const decoded = decodeURIComponent(ref).trim();
   const byId = list.find((p) => String(p.id) === ref);
@@ -19,7 +60,7 @@ export function resolveCatalogPackage(packageRef: string) {
 }
 
 /** @deprecated use resolveCatalogPackage — kept for any external imports */
-export function getCatalogPackageById(packageId: string) {
+export async function getCatalogPackageById(packageId: string) {
   return resolveCatalogPackage(packageId);
 }
 
@@ -141,7 +182,7 @@ export async function rejectRechargeRequestDb(requestId: string, rejectionNote: 
 }
 
 export async function purchaseOrEnrollPackageDb(userId: string, packageRef: string) {
-  const pkg = resolveCatalogPackage(packageRef);
+  const pkg = await resolveCatalogPackage(packageRef);
   if (!pkg?.id) return { ok: false as const, message: "الدورة غير موجودة." };
 
   const canonicalPackageId = String(pkg.id);

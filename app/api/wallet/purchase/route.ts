@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const packageId = String(body.packageId || "");
     if (!packageId) {
-      return NextResponse.json({ ok: false, message: "معرّف الباقة مفقود." }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "معرّف الدورة مفقود." }, { status: 400 });
     }
 
     const res = await purchaseOrEnrollPackageDb(session.sub, packageId);

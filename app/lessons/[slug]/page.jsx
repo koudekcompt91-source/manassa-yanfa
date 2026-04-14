@@ -2,33 +2,38 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useDemoSection } from "@/lib/demo-store";
 
 export default function LessonAliasPage() {
   const router = useRouter();
   const { slug } = useParams();
-  const [packages] = useDemoSection("packages");
-  const [lessons] = useDemoSection("lessons");
 
   useEffect(() => {
-    const normalizedSlug = decodeURIComponent(String(slug || "")).trim();
-    const lesson = (lessons || []).find((row) => {
-      const rowSlug = decodeURIComponent(String(row.slug || "")).trim();
-      const rowId = String(row.id || "").trim();
-      const published = row.isPublished === true || row.isPublished === "published" || row.status === "published";
-      return (rowSlug === normalizedSlug || rowId === normalizedSlug || rowSlug === slug || rowId === slug) && published;
-    });
-    if (!lesson) {
+    (async () => {
+      const lessonRef = decodeURIComponent(String(slug || "")).trim();
+      try {
+        const coursesRes = await fetch("/api/courses", { cache: "no-store", credentials: "include" });
+        const coursesData = await coursesRes.json().catch(() => ({}));
+        const courses = Array.isArray(coursesData?.courses) ? coursesData.courses : [];
+
+        for (const course of courses) {
+          const detailsRes = await fetch(`/api/courses/${encodeURIComponent(course.slug || course.id)}`, {
+            cache: "no-store",
+            credentials: "include",
+          });
+          const detailsData = await detailsRes.json().catch(() => ({}));
+          if (!detailsRes.ok || !detailsData?.ok) continue;
+          const found = (detailsData.lessons || []).find((lesson) => String(lesson.id) === lessonRef);
+          if (found) {
+            router.replace(`/packages/${detailsData.course.slug}/lesson/${found.id}`);
+            return;
+          }
+        }
+      } catch {
+        // ignore and redirect
+      }
       router.replace("/packages");
-      return;
-    }
-    const pkg = (packages || []).find((row) => row.id === lesson.packageId);
-    if (!pkg) {
-      router.replace("/packages");
-      return;
-    }
-    router.replace(`/packages/${pkg.slug}/lesson/${lesson.id}`);
-  }, [slug, lessons, packages, router]);
+    })();
+  }, [slug, router]);
 
   return <div className="container-page py-8 text-center text-slate-600">جاري التحويل إلى الدرس...</div>;
 }
