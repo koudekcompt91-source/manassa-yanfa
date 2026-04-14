@@ -216,18 +216,24 @@ export default function AdminPackagesPage() {
     await loadCourses();
   }
 
-  async function toggleFeature(course) {
+  async function togglePriceType(course) {
+    const nextAccessType = course.accessType === "PAID" ? "FREE" : "PAID";
+    const nextPrice = nextAccessType === "FREE" ? 0 : Math.max(1, Number(course.price ?? course.priceMad ?? 100) || 100);
     const res = await fetch(`/api/admin/courses/${course.id}`, {
       method: "PATCH",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isFeatured: !course.isFeatured }),
+      body: JSON.stringify({ accessType: nextAccessType, price: nextPrice }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
-      setBanner({ type: "error", text: data?.message || "تعذّر تحديث حالة التمييز." });
+      setBanner({ type: "error", text: data?.message || "تعذّر تحديث نوع السعر." });
       return;
     }
+    setBanner({
+      type: "success",
+      text: nextAccessType === "FREE" ? "تم تحويل الدورة إلى مجانية (السعر = 0)." : `تم تحويل الدورة إلى مدفوعة بسعر ${nextPrice} دج.`,
+    });
     await loadCourses();
   }
 
@@ -378,7 +384,7 @@ export default function AdminPackagesPage() {
           </AdminSelect>
           {!showCourseForm ? (
             <AdminActionButton onClick={openCreateForm} tone="primary" className="rounded-xl px-4 py-2 text-sm font-bold">
-              إنشاء دورة جديدة
+              إضافة دورة جديدة
             </AdminActionButton>
           ) : (
             <span className="self-center text-xs font-semibold text-brand-700">{editingCourseId ? "تعديل الدورة" : "إضافة دورة جديدة"}</span>
@@ -386,7 +392,7 @@ export default function AdminPackagesPage() {
         </AdminToolbar>
 
         {showCourseForm ? (
-          <form className="mb-6 grid gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 md:grid-cols-2" onSubmit={saveCourse}>
+          <form className="mb-6 grid gap-4 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 md:grid-cols-2 xl:gap-5" onSubmit={saveCourse}>
             <AdminFormField label="عنوان الدورة">
               <AdminInput value={courseForm.title} onChange={(e) => setCourseForm((s) => ({ ...s, title: e.target.value }))} placeholder="عنوان الدورة" required />
             </AdminFormField>
@@ -422,7 +428,7 @@ export default function AdminPackagesPage() {
                 <option value="PUBLISHED">منشورة</option>
               </AdminSelect>
             </AdminFormField>
-            <AdminFormField label="نوع الوصول">
+            <AdminFormField label="نوع السعر">
               <AdminSelect
                 value={courseForm.accessType}
                 onChange={(e) =>
@@ -438,7 +444,7 @@ export default function AdminPackagesPage() {
               </AdminSelect>
             </AdminFormField>
             {courseForm.accessType === "PAID" ? (
-              <AdminFormField label="السعر (دج)">
+              <AdminFormField label="السعر">
                 <AdminInput
                   type="number"
                   min="1"
@@ -447,7 +453,11 @@ export default function AdminPackagesPage() {
                   required
                 />
               </AdminFormField>
-            ) : null}
+            ) : (
+              <AdminFormField label="السعر">
+                <AdminInput value="0" disabled readOnly />
+              </AdminFormField>
+            )}
             <AdminFormField label="المستوى الدراسي">
               <AdminSelect value={courseForm.academicLevel} onChange={(e) => setCourseForm((s) => ({ ...s, academicLevel: e.target.value }))}>
                 {ACADEMIC_LEVELS.map((level) => (
@@ -517,16 +527,20 @@ export default function AdminPackagesPage() {
                       <AdminBadge tone={course.status === "PUBLISHED" ? "success" : "warning"}>{course.status === "PUBLISHED" ? "منشورة" : "مسودة"}</AdminBadge>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <AdminActionButton onClick={() => openEditForm(course)}>تعديل</AdminActionButton>
-                        <AdminActionButton onClick={() => togglePublish(course)}>{course.status === "PUBLISHED" ? "إلغاء النشر" : "نشر"}</AdminActionButton>
-                        <AdminActionButton onClick={() => toggleFeature(course)}>{course.isFeatured ? "إلغاء التمييز" : "تمييز"}</AdminActionButton>
-                        <AdminActionButton onClick={() => openLessonsManager(course)} tone="primary">
-                          إدارة الدروس
-                        </AdminActionButton>
-                        <AdminActionButton onClick={() => deleteCourse(course.id)} tone="danger">
-                          حذف
-                        </AdminActionButton>
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap gap-2">
+                          <AdminActionButton onClick={() => openEditForm(course)}>تعديل</AdminActionButton>
+                          <AdminActionButton onClick={() => openLessonsManager(course)} tone="primary">
+                            إدارة الدروس
+                          </AdminActionButton>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <AdminActionButton onClick={() => togglePriceType(course)}>تغيير السعر</AdminActionButton>
+                          <AdminActionButton onClick={() => togglePublish(course)}>تغيير الحالة</AdminActionButton>
+                          <AdminActionButton onClick={() => deleteCourse(course.id)} tone="danger">
+                            حذف
+                          </AdminActionButton>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -606,8 +620,8 @@ export default function AdminPackagesPage() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <AdminActionButton onClick={() => moveLesson(lesson.id, "up")} disabled={idx === 0}>↑</AdminActionButton>
-                      <AdminActionButton onClick={() => moveLesson(lesson.id, "down")} disabled={idx === lessons.length - 1}>↓</AdminActionButton>
+                      <AdminActionButton onClick={() => moveLesson(lesson.id, "up")} disabled={idx === 0}>رفع</AdminActionButton>
+                      <AdminActionButton onClick={() => moveLesson(lesson.id, "down")} disabled={idx === lessons.length - 1}>خفض</AdminActionButton>
                       <AdminActionButton onClick={() => openLessonEdit(lesson)}>تعديل</AdminActionButton>
                       <AdminActionButton onClick={() => deleteLesson(lesson.id)} tone="danger">حذف</AdminActionButton>
                     </div>

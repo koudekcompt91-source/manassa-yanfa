@@ -189,21 +189,33 @@ export default function PackageLessonPage() {
           {packageLessons.map((lesson) => {
             const blocked = Boolean(lesson.locked);
             const done = pkg.id ? getCompletedSet(pkg.id).has(lesson.id) : false;
+            const isCurrent = current?.id === lesson.id;
             return (
               <button
                 key={lesson.id}
                 type="button"
                 onClick={() => {
-                  if (blocked) setLockOpen(true);
+                  if (blocked) {
+                    setLockOpen(true);
+                    return;
+                  }
                   router.push(`/packages/${pkg.slug}/lesson/${lesson.id}`);
                 }}
                 className={`w-full rounded-xl border p-2 text-right text-sm transition ${
-                  current?.id === lesson.id ? "border-brand-600 bg-brand-50" : "border-slate-200 hover:bg-slate-50"
+                  isCurrent ? "border-brand-600 bg-brand-50" : "border-slate-200 hover:bg-slate-50"
                 }`}
               >
-                <p className="font-medium">
-                  {lesson.order}. {lesson.title}
-                    {blocked ? (
+                <p className="flex flex-wrap items-center gap-1 font-medium">
+                  <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-md bg-slate-100 px-1 text-[10px] font-bold text-slate-700">
+                    {lesson.order}
+                  </span>
+                  <span>{lesson.title}</span>
+                  {isCurrent ? (
+                    <span className="me-1 inline-block rounded-full bg-brand-100 px-1.5 py-0.5 text-[10px] font-bold text-brand-800">
+                      الحالي
+                    </span>
+                  ) : null}
+                  {blocked ? (
                     <span className="me-2 inline-block rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-700">مدفوع</span>
                   ) : null}
                   {pageState.enrolled && done ? (
