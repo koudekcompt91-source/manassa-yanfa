@@ -149,22 +149,29 @@ export default function AdminTeachersPage() {
             إضافة أستاذ
           </AdminActionButton>
         </AdminToolbar>
+        <p className="mb-4 text-xs text-slate-500">
+          إجمالي الأساتذة: {rows.length} · النشطون: {rows.filter((row) => row.active).length}
+        </p>
 
-        {loading ? <p className="text-sm text-slate-600">جاري تحميل قائمة الأساتذة...</p> : null}
+        {loading ? <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">جاري تحميل قائمة الأساتذة...</p> : null}
         {!loading && !rows.length ? (
           <AdminEmptyState title="لا يوجد أساتذة مطابقون" description="أضف أستاذًا جديدًا أو عدّل البحث." />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {rows.map((teacher) => (
-              <AdminListCard key={teacher.id} className="rounded-2xl p-5">
+              <AdminListCard key={teacher.id} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
                 <div className="flex items-start justify-between gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">{teacher.name}</h2>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900">{teacher.name}</h2>
+                    <p className="mt-1 text-xs text-slate-500">{teacher.email}</p>
+                  </div>
                   <AdminBadge tone={teacher.active ? "success" : "slate"}>{teacher.active ? "نشط" : "غير نشط"}</AdminBadge>
                 </div>
-                <p className="mt-1 text-sm text-brand-700">{teacher.specialization}</p>
-                <p className="mt-3 text-sm text-slate-600">{teacher.bio}</p>
-                <p className="mt-3 text-xs text-slate-500">الدورات المسندة: {teacher.assignedPackages.length}</p>
-                <p className="mt-2 text-xs text-slate-500">البريد: {teacher.email}</p>
+                <p className="mt-3 text-sm text-brand-700">{teacher.specialization}</p>
+                <div className="mt-4 space-y-2 text-sm text-slate-600">
+                  <p>{teacher.bio}</p>
+                  <p className="text-xs text-slate-500">الدورات المسندة: {teacher.assignedPackages.length}</p>
+                </div>
               </AdminListCard>
             ))}
           </div>

@@ -16,7 +16,7 @@ export function AdminCard({ title, subtitle, action, children, className = "" })
 }
 
 export function AdminToolbar({ children }) {
-  return <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_auto_auto]">{children}</div>;
+  return <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto]">{children}</div>;
 }
 
 export function AdminInput(props) {
