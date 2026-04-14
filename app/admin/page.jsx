@@ -17,6 +17,9 @@ export default function AdminOverviewPage() {
     { label: "الاشتراكات النشطة", value: (subscriptionPlans || []).filter((plan) => plan.active ?? plan.isActive).length },
   ];
 
+  const featuredCourses = (packages || []).filter((item) => item.isFeatured);
+  const toCourseLabel = (value) => String(value || "").replace(/باقة/g, "دورة").replace(/الباقات/g, "الدورات");
+
   return (
     <AdminShell
       title="لوحة الإدارة"
@@ -58,15 +61,15 @@ export default function AdminOverviewPage() {
         <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900">أكثر الدورات ظهورًا</h2>
           <p className="mt-1 text-sm text-slate-400">الدورات الأكثر تمييزًا وظهورًا في واجهة المنصة.</p>
-          {!((packages || []).filter((item) => item.isFeatured).length) ? (
+          {!featuredCourses.length ? (
             <p className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/40 px-4 py-6 text-center text-sm text-slate-500">
               لا توجد دورات مميزة حاليًا.
             </p>
           ) : (
             <ul className="mt-6 space-y-3 text-sm text-slate-700">
-              {(packages || []).filter((item) => item.isFeatured).map((item) => (
+              {featuredCourses.map((item) => (
                 <li key={item.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 px-4 py-3">
-                  {item.title}
+                  {toCourseLabel(item.title)}
                 </li>
               ))}
             </ul>
