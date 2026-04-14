@@ -248,7 +248,7 @@ export default function AdminLessonsPage() {
               onChange={(e) => setForm((s) => ({ ...s, academicLevel: e.target.value }))}
               aria-label="المستوى الدراسي (اختياري)"
             >
-              <option value="">يستورث من الباقة</option>
+              <option value="">يستورث من الدورة</option>
               {ACADEMIC_LEVELS.map((level) => (
                 <option key={level} value={level}>
                   {level}
@@ -260,7 +260,7 @@ export default function AdminLessonsPage() {
               onChange={(e) => setForm((s) => ({ ...s, level: e.target.value }))}
               aria-label="رمز المستوى (اختياري)"
             >
-              <option value="">— بدون رمز (يستورث من الباقة)</option>
+              <option value="">— بدون رمز (يستورث من الدورة)</option>
               {STUDENT_LEVEL_SELECT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -283,7 +283,7 @@ export default function AdminLessonsPage() {
                   <div>
                     <p className="font-bold text-slate-900">{lesson.title}</p>
                     <p className="mt-1 text-slate-600">
-                      الباقة: {lesson.packageName} - النوع: {lesson.type} - المدة: {lesson.duration} دقيقة - الترتيب: {lesson.order} - المستوى الظاهر للطلاب:{" "}
+                      الدورة: {lesson.packageName} - النوع: {lesson.type} - المدة: {lesson.duration} دقيقة - الترتيب: {lesson.order} - المستوى الظاهر للطلاب:{" "}
                       {getLessonAcademicLevel(lesson, safePackages)}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">رابط يوتيوب: {lesson.youtubeUrl || "غير مضبوط"}</p>
@@ -338,7 +338,7 @@ export default function AdminLessonsPage() {
                     disabled={!safePackages.length}
                     className="rounded-lg border border-slate-200 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    تغيير الباقة
+                    تغيير الدورة
                   </button>
                   {(() => {
                     const packageRows = rows

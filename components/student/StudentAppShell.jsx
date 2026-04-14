@@ -44,7 +44,7 @@ function IconUser({ className }) {
 
 const NAV = [
   { href: "/dashboard", label: "الرئيسية", id: "home", Icon: IconHome },
-  { href: "/dashboard#my-courses", label: "دوراتي", id: "packages", Icon: IconBooks },
+  { href: "/dashboard#my-courses", label: "دوراتي", id: "my-courses", Icon: IconBooks },
   { href: "/courses", label: "الدورات", id: "explore", Icon: IconExplore },
   { href: "/dashboard#wallet", label: "المحفظة", id: "wallet", Icon: IconWallet },
   { href: "/profile", label: "حسابي", id: "account", Icon: IconUser },
@@ -66,7 +66,7 @@ function navActive(pathname, hash, item) {
     return pathname === "/courses" || pathname.startsWith("/courses/") || pathname === "/packages" || pathname.startsWith("/packages/");
   if (item.id === "account") return pathname.startsWith("/profile");
   if (item.id === "home") return pathname === "/dashboard" && (!hash || hash === "#");
-  if (item.id === "packages") return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
+  if (item.id === "my-courses") return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
   if (item.id === "wallet") return pathname === "/dashboard" && hash === "#wallet";
   return false;
 }

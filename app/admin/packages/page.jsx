@@ -115,7 +115,7 @@ export default function AdminPackagesPage() {
       id: `pkg-${Date.now()}`,
       slug: title.replace(/\s+/g, "-"),
       title,
-      description: form.description || "وصف مبدئي لباقة أدبية جديدة.",
+      description: form.description || "وصف مبدئي لدورة أدبية جديدة.",
       categoryId: form.categoryId || (categories || [])[0]?.id || defaultDemoData.categories[0].id,
       teacherId: form.teacherId || (teachers || [])[0]?.id || defaultDemoData.teachers[0].id,
       coverImage: "placeholder-new",
@@ -141,10 +141,10 @@ export default function AdminPackagesPage() {
   }
 
   return (
-    <AdminShell title="إدارة الباقات" subtitle="إدارة الباقات التعليمية وربطها بالتصنيفات والأساتذة.">
-      <AdminSectionCard title="لوحة الباقات" subtitle="إضافة وتعديل ونشر الباقات التعليمية بصورة عملية.">
+    <AdminShell title="إدارة الدورات" subtitle="إدارة الدورات التعليمية وربطها بالتصنيفات والأساتذة.">
+      <AdminSectionCard title="لوحة الدورات" subtitle="إضافة وتعديل ونشر الدورات التعليمية بصورة عملية.">
         <AdminToolbar>
-          <AdminInput type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث عن باقة..." />
+          <AdminInput type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث عن دورة..." />
           <AdminSelect value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
             <option value="الكل">الكل</option>
             {(categories || []).map((category) => (
@@ -160,10 +160,10 @@ export default function AdminPackagesPage() {
           </AdminSelect>
           {!showForm ? (
             <AdminActionButton onClick={openCreateForm} tone="primary" className="rounded-xl px-4 py-2 text-sm font-bold">
-              إضافة باقة
+              إضافة دورة
             </AdminActionButton>
           ) : (
-            <span className="text-xs font-semibold text-brand-700">{editingId ? "تعديل باقة" : "إضافة باقة جديدة"}</span>
+            <span className="text-xs font-semibold text-brand-700">{editingId ? "تعديل دورة" : "إضافة دورة جديدة"}</span>
           )}
         </AdminToolbar>
         {showForm ? (
@@ -177,13 +177,13 @@ export default function AdminPackagesPage() {
             <AdminInput
               value={form.title}
               onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
-              placeholder="عنوان الباقة"
+              placeholder="عنوان الدورة"
               required
             />
             <AdminInput
               value={form.description}
               onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
-              placeholder="وصف الباقة"
+              placeholder="وصف الدورة"
             />
             <AdminSelect
               value={form.categoryId}
@@ -250,13 +250,13 @@ export default function AdminPackagesPage() {
         ) : null}
 
         {!rows.length ? (
-          <AdminEmptyState title="لا توجد باقات مطابقة" description="أضف باقة جديدة أو عدّل الفلاتر." />
+          <AdminEmptyState title="لا توجد دورات مطابقة" description="أضف دورة جديدة أو عدّل الفلاتر." />
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b text-right text-slate-500">
-                  <th className="px-3 py-2">الباقة</th>
+                  <th className="px-3 py-2">الدورة</th>
                   <th className="px-3 py-2">التصنيف</th>
                   <th className="px-3 py-2">الأستاذ</th>
                   <th className="px-3 py-2">الدروس</th>

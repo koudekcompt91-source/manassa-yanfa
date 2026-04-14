@@ -163,7 +163,7 @@ export default function AdminTeachersPage() {
                 </div>
                 <p className="mt-1 text-sm text-brand-700">{teacher.specialization}</p>
                 <p className="mt-3 text-sm text-slate-600">{teacher.bio}</p>
-                <p className="mt-3 text-xs text-slate-500">الباقات المسندة: {teacher.assignedPackages.length}</p>
+                <p className="mt-3 text-xs text-slate-500">الدورات المسندة: {teacher.assignedPackages.length}</p>
                 <p className="mt-2 text-xs text-slate-500">البريد: {teacher.email}</p>
               </AdminListCard>
             ))}

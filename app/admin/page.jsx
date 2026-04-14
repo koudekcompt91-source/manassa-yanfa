@@ -14,7 +14,7 @@ export default function AdminOverviewPage() {
 
   const cards = [
     { label: "إجمالي الطلاب", value: (students || []).length },
-    { label: "إجمالي الباقات", value: (packages || []).length },
+    { label: "إجمالي الدورات", value: (packages || []).length },
     { label: "إجمالي الدروس", value: (lessons || []).length },
     { label: "الاشتراكات النشطة", value: (subscriptionPlans || []).filter((plan) => plan.active ?? plan.isActive).length },
   ];
@@ -32,7 +32,7 @@ export default function AdminOverviewPage() {
             <p className="mt-1 text-sm text-slate-600">يمكنك متابعة المحتوى، الطلاب، المسارات، والإعدادات من لوحة واحدة منظمة.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href="/admin/packages" className="rounded-xl bg-brand-600 px-3 py-2 text-xs font-bold text-white">إدارة الباقات</Link>
+            <Link href="/admin/courses" className="rounded-xl bg-brand-600 px-3 py-2 text-xs font-bold text-white">إدارة الدورات</Link>
             <Link href="/admin/messages" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700">إدارة الرسائل</Link>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function AdminOverviewPage() {
           </ul>
         </section>
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h2 className="text-lg font-bold text-slate-900">أكثر الباقات ظهورًا</h2>
+          <h2 className="text-lg font-bold text-slate-900">أكثر الدورات ظهورًا</h2>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {(packages || []).filter((item) => item.isFeatured).map((item) => (
               <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">

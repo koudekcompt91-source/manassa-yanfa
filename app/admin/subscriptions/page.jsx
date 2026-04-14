@@ -17,18 +17,18 @@ export default function AdminSubscriptionsPage() {
   );
 
   return (
-    <AdminShell title="إدارة الاشتراكات" subtitle="التحكم في الباقات الشهرية والفصلية والسنوية ومزاياها.">
-      <AdminSectionCard title="الباقات والاشتراكات" subtitle="إدارة خطط الاشتراك وتعيين الباقة المميزة.">
+    <AdminShell title="إدارة الاشتراكات" subtitle="التحكم في الخطط الشهرية والفصلية والسنوية ومزاياها.">
+      <AdminSectionCard title="الخطط والاشتراكات" subtitle="إدارة خطط الاشتراك وتعيين الخطة المميزة.">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <AdminInput
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ابحث عن باقة..."
+            placeholder="ابحث عن خطة..."
             className="sm:max-w-xs"
           />
           <div className="flex gap-2">
-            <AdminInput value={newPlanName} onChange={(e) => setNewPlanName(e.target.value)} placeholder="اسم باقة" className="min-w-[160px]" />
+            <AdminInput value={newPlanName} onChange={(e) => setNewPlanName(e.target.value)} placeholder="اسم الخطة" className="min-w-[160px]" />
             <AdminActionButton
               onClick={() => {
                 const name = newPlanName.trim();
@@ -42,12 +42,12 @@ export default function AdminSubscriptionsPage() {
               tone="primary"
               className="rounded-xl px-4 py-2 text-sm font-bold"
             >
-              إضافة باقة
+              إضافة خطة
             </AdminActionButton>
           </div>
         </div>
         {!plans.length ? (
-          <AdminEmptyState title="لا توجد باقات مطابقة" description="أضف باقة جديدة أو عدّل البحث." />
+          <AdminEmptyState title="لا توجد خطط مطابقة" description="أضف خطة جديدة أو عدّل البحث." />
         ) : (
           <div className="grid gap-4 lg:grid-cols-3">
             {plans.map((plan) => (
@@ -70,7 +70,7 @@ export default function AdminSubscriptionsPage() {
                     }}
                     className={`${featuredPlanId === plan.id ? "bg-brand-100 text-brand-700" : ""}`}
                   >
-                    {featuredPlanId === plan.id ? "الباقة المميزة" : "تعيين كمميزة"}
+                    {featuredPlanId === plan.id ? "الخطة المميزة" : "تعيين كمميزة"}
                   </AdminActionButton>
                 </div>
               </AdminListCard>

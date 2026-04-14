@@ -6,18 +6,27 @@ import { logoutSession } from "@/lib/admin-auth";
 
 const adminLinks = [
   { href: "/admin/dashboard", label: "لوحة التحكم" },
-  { href: "/admin/packages", label: "الباقات" },
-  { href: "/admin/lessons", label: "الدروس" },
+  { href: "/admin/courses", label: "الدورات" },
   { href: "/admin/teachers", label: "الأساتذة" },
   { href: "/admin/students", label: "الطلاب" },
   { href: "/admin/recharge-requests", label: "طلبات الشحن" },
   { href: "/admin/categories", label: "التصنيفات" },
-  { href: "/admin/plans", label: "الباقات" },
   { href: "/admin/pages", label: "الصفحات" },
   { href: "/admin/buttons", label: "الأزرار" },
   { href: "/admin/messages", label: "الرسائل" },
   { href: "/admin/settings", label: "الإعدادات" },
 ];
+
+function isActiveLink(pathname, href) {
+  if (href === "/admin/dashboard") {
+    return pathname === "/admin/dashboard" || pathname === "/admin";
+  }
+  if (href === "/admin/courses") {
+    // Keep old route compatibility while showing the new label.
+    return pathname === "/admin/courses" || pathname.startsWith("/admin/courses/") || pathname === "/admin/packages" || pathname.startsWith("/admin/packages/");
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function AdminShell({ title, subtitle, children }) {
   const pathname = usePathname();
@@ -36,7 +45,7 @@ export default function AdminShell({ title, subtitle, children }) {
         <p className="mb-3 text-xs text-slate-500">مركز تحكم أكاديمية الأدب العربي</p>
         <nav className="space-y-1">
           {adminLinks.map((link) => {
-            const active = pathname === link.href || (link.href === "/admin/dashboard" && pathname === "/admin");
+            const active = isActiveLink(pathname, link.href);
             return (
               <Link
                 key={link.href}

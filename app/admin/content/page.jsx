@@ -25,7 +25,7 @@ export default function AdminContentPage() {
   }
 
   return (
-    <AdminShell title="إدارة محتوى الموقع" subtitle="تعديل محتوى الواجهة العامة: الهيرو، الإعلانات، والباقات المميزة.">
+    <AdminShell title="إدارة محتوى الموقع" subtitle="تعديل محتوى الواجهة العامة: الهيرو، الإعلانات، والدورات المميزة.">
       <AdminCard title="Hero" subtitle="تحكم في نصوص الواجهة الرئيسية">
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
@@ -61,7 +61,7 @@ export default function AdminContentPage() {
         </div>
       </AdminCard>
 
-      <AdminCard title="Featured Packages" subtitle="التحكم بعرض الباقات المميزة">
+      <AdminCard title="Featured Courses" subtitle="التحكم بعرض الدورات المميزة">
         <div className="mt-3 space-y-2">
           {(packages || []).filter((item) => item.isFeatured).map((item) => (
             <div key={item.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
