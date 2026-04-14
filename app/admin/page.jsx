@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
-import { AdminCard } from "@/components/admin/AdminUI";
 import { useDemoSection } from "@/lib/demo-store";
 
 export default function AdminOverviewPage() {
@@ -22,47 +20,41 @@ export default function AdminOverviewPage() {
   return (
     <AdminShell
       title="لوحة الإدارة"
-      subtitle="نظرة شاملة على أداء المنصة ومتابعة التشغيل الأكاديمي لأقسام الأدب العربي."
+      subtitle="متابعة أداء المنصة وإدارة المحتوى التعليمي من لوحة موحدة."
     >
-      <AdminCard className="bg-gradient-to-l from-brand-50 to-indigo-50">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold text-brand-700">مركز التحكم الرئيسي</p>
-            <h2 className="mt-1 text-xl font-extrabold text-slate-900">إدارة أكاديمية منصة ينفع</h2>
-            <p className="mt-1 text-sm text-slate-600">يمكنك متابعة المحتوى، الطلاب، المسارات، والإعدادات من لوحة واحدة منظمة.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/admin/courses" className="rounded-xl bg-brand-600 px-3 py-2 text-xs font-bold text-white">إدارة الدورات</Link>
-            <Link href="/admin/messages" className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700">إدارة الرسائل</Link>
-          </div>
-        </div>
-      </AdminCard>
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-sm font-medium text-slate-400">لوحة التشغيل</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا بك في إدارة منصة ينفع</h2>
+        <p className="mt-2 text-base text-slate-500">تحكم في الدورات والأساتذة والطلاب ومحتوى المنصة بنفس تجربة الواجهة الموحدة.</p>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6" aria-label="مؤشرات لوحة الإدارة">
         {cards.map((card) => (
-          <article key={card.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-            <p className="text-sm text-slate-500">{card.label}</p>
-            <p className="mt-1 text-3xl font-black text-brand-700">{card.value}</p>
+          <article key={card.label} className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+            <p className="text-sm font-medium text-slate-400">{card.label}</p>
+            <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{card.value}</p>
           </article>
         ))}
-      </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900">أحدث الإعلانات</h2>
-          <ul className="mt-3 space-y-2 text-sm text-slate-700">
+          <p className="mt-1 text-sm text-slate-400">آخر التحديثات والتنبيهات المنشورة للإدارة والطلاب.</p>
+          <ul className="mt-6 space-y-3 text-sm text-slate-700">
             {(announcements || []).map((item) => (
-              <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <li key={item.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 px-4 py-3">
                 {item.title} - {item.date}
               </li>
             ))}
           </ul>
         </section>
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900">أكثر الدورات ظهورًا</h2>
-          <ul className="mt-3 space-y-2 text-sm text-slate-700">
+          <p className="mt-1 text-sm text-slate-400">الدورات الأكثر تمييزًا وظهورًا في واجهة المنصة.</p>
+          <ul className="mt-6 space-y-3 text-sm text-slate-700">
             {(packages || []).filter((item) => item.isFeatured).map((item) => (
-              <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <li key={item.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 px-4 py-3">
                 {item.title}
               </li>
             ))}
