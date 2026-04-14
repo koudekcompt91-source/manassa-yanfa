@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { Role } from "@prisma/client";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { validateTeacherCreateInput } from "@/lib/teacher-validation";
 
 export const runtime = "nodejs";
+
+function teacherRoleOrFallback(): Role {
+  const hasTeacherRole = Object.values(Role).includes("TEACHER" as Role);
+  return hasTeacherRole ? ("TEACHER" as Role) : Role.STUDENT;
+}
 
 function mapTeacher(user: {
   id: string;
@@ -35,8 +41,9 @@ export async function GET() {
     }
 
     step = "list-teachers";
+    const role = teacherRoleOrFallback();
     const teachers = await prisma.user.findMany({
-      where: { role: "TEACHER" },
+      where: { role },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -92,13 +99,14 @@ export async function POST(req: Request) {
     const passwordHash = await hashPassword(password);
 
     step = "create-teacher";
+    const role = teacherRoleOrFallback();
     const teacher = await prisma.user.create({
       data: {
         fullName,
         email,
         phone,
         passwordHash,
-        role: "TEACHER",
+        role,
         status: "ACTIVE",
       },
       select: {
