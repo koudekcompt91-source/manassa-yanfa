@@ -12,8 +12,13 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "منصة ينفع | أكاديمية الأدب العربي",
-  description: "منصة ينفع — أكاديمية عربية متخصصة في النحو والبلاغة والشعر والنقد وتحليل النصوص الأدبية.",
+  title: "yanfa3 Education | أكاديمية الأدب العربي",
+  description:
+    "yanfa3 Education — أكاديمية عربية متخصصة في النحو والبلاغة والشعر والنقد وتحليل النصوص الأدبية.",
+  icons: {
+    icon: [{ url: "/brand/yanfa-icon-mark.jpg", type: "image/jpeg" }],
+    apple: [{ url: "/brand/yanfa-icon-mark.jpg", type: "image/jpeg" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

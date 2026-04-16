@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { recordDailyLogin } from "@/lib/student-progress";
 import { formatDzd } from "@/lib/format-money";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
+import { BRAND_NAME } from "@/lib/brand";
 
 function IconHome({ className }) {
   return (
@@ -184,14 +187,18 @@ export default function StudentAppShell({ children }) {
 
   const sidebarBrand = (
     <div className="shrink-0 border-b border-slate-100 bg-white px-4 py-5">
-      <Link href="/" className="flex items-center gap-3 no-underline">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-sm font-extrabold text-white shadow-sm">
-          م
+      <Link
+        href="/"
+        aria-label={BRAND_NAME}
+        className="flex flex-col items-center justify-center no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl md:items-stretch"
+      >
+        <span className="md:hidden">
+          <BrandLogoIcon size="md" className="shadow-sm" />
         </span>
-        <div className="min-w-0">
-          <p className="text-xs font-medium text-slate-400">منصة</p>
-          <p className="truncate text-base font-bold text-slate-900">ينفع</p>
-        </div>
+        <span className="hidden md:flex md:justify-center">
+          <BrandLogoFull variant="sidebar" />
+        </span>
+        <span className="sr-only">{BRAND_NAME}</span>
       </Link>
     </div>
   );

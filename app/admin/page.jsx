@@ -27,7 +27,7 @@ export default function AdminOverviewPage() {
     >
       <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-medium text-slate-400">لوحة التشغيل</p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا بك في إدارة منصة ينفع</h2>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا بك في إدارة yanfa3 Education</h2>
         <p className="mt-2 text-base text-slate-500">تحكم في الدورات والأساتذة والطلاب ومحتوى المنصة بنفس تجربة الواجهة الموحدة.</p>
       </section>
 

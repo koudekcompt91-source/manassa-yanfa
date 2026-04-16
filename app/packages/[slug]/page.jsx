@@ -55,7 +55,7 @@ export default function PackageDetailsPage() {
   const priceMad = Number(course?.priceMad || course?.price || 0) || 0;
   const isPaid = course?.accessType === "PAID" || priceMad > 0;
   const categoryName = (categories || []).find((c) => c.id === course?.categoryId)?.name || "-";
-  const teacherName = (teachers || []).find((t) => t.id === course?.teacherId)?.name || "طاقم منصة ينفع";
+  const teacherName = (teachers || []).find((t) => t.id === course?.teacherId)?.name || "طاقم yanfa3 Education";
   const firstLesson = lessons[0];
   const firstLessonHref = firstLesson ? `/packages/${course?.slug}/lesson/${firstLesson.id}` : null;
   const freePreviewCount = lessons.filter((lesson) => lesson.isFreePreview).length;

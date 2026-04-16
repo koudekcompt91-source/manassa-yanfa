@@ -9,7 +9,7 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useDemoSection("settings");
   const [demoMode, setDemoMode] = useState(Boolean(settings?.demoMode));
   const [maintenanceMode, setMaintenanceMode] = useState(Boolean(settings?.maintenanceMode));
-  const [platformName, setPlatformName] = useState(settings?.platformName || "منصة ينفع");
+  const [platformName, setPlatformName] = useState(settings?.platformName || "yanfa3 Education");
   const [supportEmail, setSupportEmail] = useState(settings?.supportEmail || "");
   const [footerText, setFooterText] = useState(settings?.footerText || "");
   const [maintenanceBanner, setMaintenanceBanner] = useState(settings?.maintenanceBanner || "");

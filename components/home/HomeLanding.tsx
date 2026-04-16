@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoSection } from "@/lib/demo-store";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
 
@@ -236,6 +238,19 @@ export default function HomeLanding() {
           aria-hidden
         />
 
+        {/* Brand corner: physical top-right in RTL = inline-start */}
+        <div className={`${container} pointer-events-none absolute start-0 top-4 z-20 sm:top-6`}>
+          <div className="pointer-events-auto flex justify-start">
+            <Link
+              href="/"
+              aria-label={BRAND_NAME}
+              className="rounded-xl border border-white/20 bg-white/95 px-3 py-2 shadow-lg shadow-slate-950/25 backdrop-blur-sm transition hover:border-white/35 hover:bg-white"
+            >
+              <BrandLogoFull variant="hero" />
+            </Link>
+          </div>
+        </div>
+
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center py-16 sm:py-20 lg:py-24`}>
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
             <div className="order-2 text-center lg:order-1 lg:text-start">
@@ -267,7 +282,7 @@ export default function HomeLanding() {
                 style={{ animationDelay: "0.2s" }}
               >
                 {heroSubtitle ||
-                  "منصة ينفع تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
+                  "yanfa3 Education تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
               </p>
 
               <div
@@ -329,11 +344,11 @@ export default function HomeLanding() {
           </div>
         ))}
 
-      {/* —— لماذا منصة ينفع —— */}
+      {/* —— لماذا yanfa3 Education —— */}
       <section className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-bold text-brand-700">لماذا منصة ينفع؟</p>
+            <p className="text-sm font-bold text-brand-700">لماذا yanfa3 Education؟</p>
             <h2 id="why-yanfa" className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
               أدبٌ بروح أكاديمية، وبلاغةٌ بلا ضجيج
             </h2>
@@ -428,7 +443,7 @@ export default function HomeLanding() {
                 يقودك خطوة بخطوة في تحليل النص، ويعيد للغة العربية مكانتها كفنٍّ معرفيٍّ لا كحفظٍ جاف.
               </p>
               <p className="mt-4 max-w-prose text-pretty text-sm leading-relaxed text-slate-400 sm:text-base">
-                في منصة ينفع، يظهر {TEACHER_NAME} كوجه تعليمي واحد للصفحة الرئيسية — لأننا نؤمن بأن الاتساق والثقة تبدآن من
+                في yanfa3 Education، يظهر {TEACHER_NAME} كوجه تعليمي واحد للصفحة الرئيسية — لأننا نؤمن بأن الاتساق والثقة تبدآن من
                 مرجعٍ واضحٍ، لا من تشتيتٍ بين عشرات الأصوات.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
@@ -626,7 +641,7 @@ export default function HomeLanding() {
               </h2>
               <p className="mt-4 text-pretty text-slate-200 sm:text-lg">
                 {homepageContent?.ctaSubtitle ||
-                  `انضمّ إلى منصة ينفع وخذ نفسًا عميقًا في الأدب العربي — مع الأستاذ ${TEACHER_NAME} كمرجعك الأول في المسار.`}
+                  `انضمّ إلى yanfa3 Education وخذ نفسًا عميقًا في الأدب العربي — مع الأستاذ ${TEACHER_NAME} كمرجعك الأول في المسار.`}
               </p>
               <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
                 <Link href="/register" className={btnHeroPrimaryWide}>
@@ -646,15 +661,16 @@ export default function HomeLanding() {
         <div className={`${container} py-12 sm:py-14`}>
           <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between md:gap-8">
             <div className="max-w-md">
-              <Link href="/" className="inline-flex items-center gap-2 text-lg font-extrabold text-slate-900 no-underline hover:opacity-90">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-sm font-extrabold text-white shadow-sm">
-                  م
-                </span>
-                منصة ينفع
+              <Link
+                href="/"
+                aria-label={BRAND_NAME}
+                className="inline-flex items-center gap-3 text-lg font-extrabold text-slate-900 no-underline hover:opacity-90"
+              >
+                <BrandLogoFull variant="toolbar" />
               </Link>
               <p className="mt-4 text-sm leading-relaxed text-slate-600">
                 {homepageContent?.supportText ||
-                  `أكاديمية عربية للأدب وعلومه — بإشراف الأستاذ ${TEACHER_NAME}. نركّز على الوضوح، والعمق، واللغة الأدبية الراقية.`}
+                  `أكاديمية yanfa3 Education للأدب وعلومه — بإشراف الأستاذ ${TEACHER_NAME}. نركّز على الوضوح، والعمق، واللغة الأدبية الراقية.`}
               </p>
               <p className="mt-4 text-sm text-slate-600">
                 تواصل:{" "}
@@ -678,7 +694,12 @@ export default function HomeLanding() {
             </nav>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200/80 pt-8 text-center text-xs text-slate-500 sm:flex-row sm:text-start">
-            <p>© {new Date().getFullYear()} منصة ينفع. جميع الحقوق محفوظة.</p>
+            <p className="text-slate-500">
+              <span dir="ltr" className="tabular-nums text-slate-600">
+                © {new Date().getFullYear()} {BRAND_NAME}
+              </span>{" "}
+              — جميع الحقوق محفوظة.
+            </p>
             <p className="text-slate-400">{settings?.footerText || homepageContent?.footerText || "صُممت لتكريس الدرس الأدبي العربي."}</p>
           </div>
         </div>

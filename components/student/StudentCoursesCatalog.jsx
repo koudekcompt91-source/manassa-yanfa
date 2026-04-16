@@ -95,7 +95,7 @@ export default function StudentCoursesCatalog() {
       .filter((pkg) => studentSeesPackage(studentLevel || null, pkg, studentLevelCode || null))
       .map((pkg) => {
         const categoryName = (categories || []).find((row) => row.id === pkg.categoryId)?.name || "-";
-        const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "طاقم منصة ينفع";
+        const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "طاقم yanfa3 Education";
         const slug = String(pkg.slug || pkg.id || "").trim();
         const detailHref = `/packages/${slug}`;
         const firstLessonHref = detailHref;

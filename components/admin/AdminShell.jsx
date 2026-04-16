@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
 import { logoutSession } from "@/lib/admin-auth";
+import { BRAND_NAME } from "@/lib/brand";
 
 const adminLinks = [
   { href: "/admin/dashboard", label: "لوحة التحكم" },
@@ -41,8 +43,21 @@ export default function AdminShell({ title, subtitle, children }) {
     <section className="w-full bg-gray-50">
       <div className="container-landing grid gap-6 py-6 lg:grid-cols-[270px_1fr] lg:py-8">
       <aside className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:h-fit">
+        <Link
+          href="/admin/dashboard"
+          className="mb-3 flex flex-col items-center gap-2 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-lg"
+          aria-label={BRAND_NAME}
+        >
+          {/* Narrow sticky column (lg+): small full lockup; stacked full-width aside: slightly larger toolbar preset */}
+          <span className="flex justify-center lg:hidden">
+            <BrandLogoFull variant="toolbar" />
+          </span>
+          <span className="hidden justify-center lg:flex">
+            <BrandLogoFull variant="sidebar" />
+          </span>
+          <span className="sr-only">{BRAND_NAME}</span>
+        </Link>
         <h2 className="mb-1 text-sm font-extrabold text-slate-900">لوحة الإدارة</h2>
-        <p className="mb-3 text-xs text-slate-500">منصة ينفع</p>
         <nav className="space-y-1">
           {adminLinks.map((link) => {
             const active = isActiveLink(pathname, link.href);

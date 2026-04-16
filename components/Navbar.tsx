@@ -5,6 +5,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { authStore } from "@/lib/auth";
 import { formatDzd } from "@/lib/format-money";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
+import { BRAND_NAME } from "@/lib/brand";
 
 type StudentNavUser = {
   id: string;
@@ -113,6 +116,9 @@ export default function Navbar() {
       ? formatDzd(student.walletBalance)
       : null;
 
+  /** Centered full lockup on /login & /register — navbar stays compact (icon only). */
+  const compactPublicBrand = pathname === "/login" || pathname === "/register";
+
   return (
     <header className="sticky top-0 z-10 shrink-0 border-b border-slate-200 bg-white">
       <nav
@@ -121,13 +127,15 @@ export default function Navbar() {
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 no-underline text-lg font-bold tracking-tight text-ink-950 decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl"
+          aria-label={BRAND_NAME}
+          className="flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-sm font-extrabold text-white shadow-sm">
-            م
-          </span>
-          <span className="hidden min-[380px]:inline">منصة ينفع</span>
+          {compactPublicBrand ? (
+            <BrandLogoIcon size="md" className="shadow-sm" />
+          ) : (
+            <BrandLogoFull variant="toolbar" priority={pathname === "/"} />
+          )}
         </Link>
 
         {!hideMarketingNav ? (

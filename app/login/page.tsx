@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SEEDED_STUDENT } from "@/lib/admin-auth";
 import { authStore } from "@/lib/auth";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import { BRAND_NAME } from "@/lib/brand";
 
 const fieldClass =
   "mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-start text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500";
@@ -60,11 +62,18 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-slate-100">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-8">
-        <div className="mb-6 text-center">
-          <Link href="/" className="text-sm font-semibold text-brand-700 hover:underline">
-            ← منصة ينفع
+        <div className="mb-8 flex flex-col items-center gap-4 text-center">
+          <Link
+            href="/"
+            aria-label={BRAND_NAME}
+            className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm transition hover:border-brand-200"
+          >
+            <BrandLogoFull variant="auth" />
           </Link>
-          <h1 className="mt-4 text-xl font-bold text-slate-900">تسجيل الدخول</h1>
+          <Link href="/" className="text-sm font-semibold text-brand-700 no-underline transition hover:underline">
+            ← العودة للرئيسية
+          </Link>
+          <h1 className="text-xl font-bold text-slate-900">تسجيل الدخول</h1>
           <p className="mt-2 text-sm text-slate-600">أدخل بياناتك للوصول إلى حسابك.</p>
         </div>
 

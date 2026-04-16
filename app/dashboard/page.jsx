@@ -56,7 +56,7 @@ function DashboardPageInner() {
   }, []);
 
   const user = sessionData?.user;
-  const displayName = user?.fullName?.trim() || user?.email || "طالب منصة ينفع";
+  const displayName = user?.fullName?.trim() || user?.email || "طالب yanfa3 Education";
   const displayEmail = user?.email || "";
   const studentLevel = (user?.role === "STUDENT" ? String(user?.academicLevel || "").trim() : "") || "";
   const studentLevelCode = user?.role === "STUDENT" ? String(user?.level || "").trim() : "";

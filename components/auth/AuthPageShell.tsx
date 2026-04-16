@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import { BRAND_NAME } from "@/lib/brand";
 
 type AuthPageShellProps = {
   children: ReactNode;
@@ -15,15 +17,21 @@ export { inputFocus };
 export default function AuthPageShell({ children, title, subtitle }: AuthPageShellProps) {
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gray-50 px-4 py-8">
-      <Link
-        href="/"
-        className="mb-8 inline-flex items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-base font-bold text-slate-900 shadow-sm transition hover:border-brand-200 hover:shadow-md"
-      >
-        <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-sm font-extrabold text-white shadow-sm">
-          م
-        </span>
-        منصة ينفع
-      </Link>
+      <div className="mb-8 flex w-full max-w-md flex-col items-center gap-4 text-center">
+        <Link
+          href="/"
+          aria-label={BRAND_NAME}
+          className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm transition hover:border-brand-200 hover:shadow-md"
+        >
+          <BrandLogoFull variant="auth" />
+        </Link>
+        <Link
+          href="/"
+          className="text-sm font-semibold text-brand-700 no-underline transition hover:text-brand-800 hover:underline"
+        >
+          ← العودة للرئيسية
+        </Link>
+      </div>
 
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">

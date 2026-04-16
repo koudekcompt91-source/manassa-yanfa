@@ -4,6 +4,8 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SEEDED_ADMIN } from "@/lib/admin-auth";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import { BRAND_NAME } from "@/lib/brand";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -54,9 +56,15 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-slate-900 px-4 py-10">
+      <div className="mb-6 flex justify-center">
+        <div className="rounded-xl border border-slate-600/80 bg-white px-5 py-3 shadow-lg shadow-black/20">
+          <span className="sr-only">{BRAND_NAME}</span>
+          <BrandLogoFull variant="auth" />
+        </div>
+      </div>
       <div className="w-full max-w-md rounded-lg border border-slate-600 bg-slate-800 p-6 text-slate-100 shadow-sm">
         <div className="mb-6 text-center">
-          <p className="text-xs font-semibold text-brand-300">منصة ينفع — الإدارة</p>
+          <p className="text-xs font-semibold text-brand-300">{BRAND_NAME} — الإدارة</p>
           <h1 className="mt-2 text-xl font-bold text-white">تسجيل دخول الإدارة</h1>
           <p className="mt-2 text-sm text-slate-300">الدخول إلى لوحة التحكم</p>
           <p className="mt-2 text-xs text-slate-400">هذه الصفحة مخصصة لإدارة المنصة فقط</p>

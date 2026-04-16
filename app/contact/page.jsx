@@ -4,7 +4,7 @@ export default function ContactPage() {
       <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">تواصل معنا</h1>
         <p className="mt-3 text-slate-600">
-          فريق منصة ينفع جاهز لدعم رحلتك في الأدب العربي. لأي استفسار أكاديمي أو فني، يمكنك التواصل معنا عبر القنوات التالية.
+          فريق yanfa3 Education جاهز لدعم رحلتك في الأدب العربي. لأي استفسار أكاديمي أو فني، يمكنك التواصل معنا عبر القنوات التالية.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
