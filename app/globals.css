@@ -58,3 +58,26 @@
     ),
     radial-gradient(ellipse 70% 55% at 50% 48%, transparent 30%, rgba(2, 6, 23, 0.35) 100%);
 }
+
+@layer utilities {
+  /* Scroll-driven section reveals (toggled by IntersectionObserver in HomeLanding) */
+  [data-section-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+    transition:
+      opacity 0.95s cubic-bezier(0.33, 0, 0.2, 1),
+      transform 0.95s cubic-bezier(0.33, 0, 0.2, 1);
+  }
+  [data-section-reveal].section-reveal-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-section-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}

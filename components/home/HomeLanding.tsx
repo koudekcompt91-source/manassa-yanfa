@@ -3,47 +3,49 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDemoSection } from "@/lib/demo-store";
+import { useHeroAmbient } from "@/components/home/useHeroAmbient";
 import BrandLogoFull from "@/components/brand/BrandLogoFull";
 import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
 
 const pillCtaClass =
-  "inline-flex items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-300 hover:brightness-[1.06] active:scale-[0.98]";
+  "inline-flex items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:brightness-[1.04] active:scale-[0.995]";
 
-/** Hero / dark surfaces — tactile, inset-lit */
+/** Hero / dark surfaces — tactile, inset-lit, transform-forward for GPU */
 const btnHeroPrimary =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/45 transition duration-300 hover:bg-slate-50 hover:brightness-[1.03] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
+  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/45 will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-slate-50 hover:shadow-[0_16px_36px_-14px_rgba(0,0,0,0.28)] hover:brightness-[1.02] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
 
 const btnHeroGhost =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/22 bg-white/[0.07] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md transition duration-300 hover:border-white/32 hover:bg-white/[0.12] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45";
+  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/22 bg-white/[0.07] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/32 hover:bg-white/[0.12] hover:shadow-[0_12px_32px_-12px_rgba(0,0,0,0.35)] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45";
 
 const btnHeroBrand =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-300 hover:brightness-[1.06] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50";
+  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/25 will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:shadow-[0_18px_40px_-12px_rgba(24,117,245,0.42)] hover:brightness-[1.03] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50";
 
 const btnHeroPrimaryWide = btnHeroPrimary.replace("px-7", "px-8");
 const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
 
 const btnPricingFeatured =
-  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-l from-brand-600 to-indigo-600 py-3.5 text-sm font-extrabold text-white no-underline shadow-tactile-brand ring-1 ring-white/25 transition duration-300 hover:brightness-[1.06] active:scale-[0.98]";
+  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-l from-brand-600 to-indigo-600 py-3.5 text-sm font-extrabold text-white no-underline shadow-tactile-brand ring-1 ring-white/25 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:brightness-[1.03] active:scale-[0.995]";
 
 const btnPricingOutline =
-  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/95 py-3.5 text-sm font-extrabold text-slate-900 no-underline shadow-tactile ring-1 ring-slate-900/[0.06] transition duration-300 hover:border-brand-200/80 hover:shadow-card-luxury-hover active:scale-[0.98]";
+  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/95 py-3.5 text-sm font-extrabold text-slate-900 no-underline shadow-tactile ring-1 ring-slate-900/[0.06] transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/80 hover:shadow-card-luxury-hover active:scale-[0.995]";
 
 /** Light sections */
 const btnLightSolid =
-  "inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-tactile ring-1 ring-white/10 transition duration-300 hover:bg-slate-800 active:scale-[0.98]";
+  "inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-tactile ring-1 ring-white/10 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-slate-800 active:scale-[0.995]";
 
 const btnLightGhost =
-  "inline-flex items-center justify-center rounded-2xl border border-white/22 bg-white/5 px-6 py-3 text-sm font-bold text-white shadow-tactile-ghost backdrop-blur-sm transition duration-300 hover:bg-white/12 active:scale-[0.98]";
+  "inline-flex items-center justify-center rounded-2xl border border-white/22 bg-white/5 px-6 py-3 text-sm font-bold text-white shadow-tactile-ghost backdrop-blur-sm transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-white/12 active:scale-[0.995]";
 
 const btnMutedOutline =
-  "inline-flex items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-300 hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.99]";
+  "inline-flex items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.995]";
 
 const cardLuxury =
-  "rounded-3xl border border-slate-200/75 bg-gradient-to-b from-white via-white to-slate-50/75 shadow-card-luxury transition duration-500 ease-out hover:-translate-y-0.5 hover:border-brand-200/65 hover:shadow-card-luxury-hover";
+  "rounded-3xl border border-slate-200/75 bg-gradient-to-b from-white via-white to-slate-50/75 shadow-card-luxury transition duration-[420ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/65 hover:shadow-card-luxury-hover";
 
 const cardLuxuryFlat =
   "rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_8px_28px_-10px_rgba(15,23,42,0.08),0_0_0_1px_rgba(148,163,184,0.1)] transition duration-300 hover:border-brand-200/60 hover:shadow-card-luxury";
@@ -142,7 +144,7 @@ function TeacherPortrait({
               priority={priority}
               sizes={isHero ? "(max-width: 1024px) 100vw, 42vw" : "(max-width: 768px) 100vw, 320px"}
               className={`relative z-[1] h-auto w-full object-cover transition duration-700 ease-out ${
-                isHero ? "object-[center_18%] scale-[1.01] sm:object-[center_16%] lg:scale-[1.02]" : "object-[center_20%] scale-[1.005]"
+                isHero ? "object-[center_18%] scale-[1.005] sm:object-[center_16%] lg:scale-[1.008]" : "object-[center_20%] scale-[1.002]"
               }`}
             />
           </div>
@@ -202,6 +204,42 @@ export default function HomeLanding() {
   const homeButtons = (ctaButtons || []).filter((row: { placement?: string; visible?: boolean }) => row.placement === "homepage" && row.visible);
   const featuredCourses = (packages || []).filter((row: { isFeatured?: boolean }) => row.isFeatured).slice(0, 4);
 
+  const { nudge, scrollShift, motionOk } = useHeroAmbient("hero", authGate === "guest");
+  const sectionIoRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    if (authGate !== "guest") return;
+    const setup = () => {
+      if (typeof window === "undefined") return;
+      sectionIoRef.current?.disconnect();
+      sectionIoRef.current = null;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.querySelectorAll("[data-section-reveal]").forEach((n) => n.classList.add("section-reveal-visible"));
+        return;
+      }
+      const nodes = document.querySelectorAll("[data-section-reveal]");
+      if (!nodes.length) return;
+      sectionIoRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("section-reveal-visible");
+              sectionIoRef.current?.unobserve(entry.target);
+            }
+          });
+        },
+        { rootMargin: "0px 0px -10% 0px", threshold: 0.06 }
+      );
+      nodes.forEach((n) => sectionIoRef.current?.observe(n));
+    };
+    const tid = window.setTimeout(setup, 0);
+    return () => {
+      clearTimeout(tid);
+      sectionIoRef.current?.disconnect();
+      sectionIoRef.current = null;
+    };
+  }, [authGate]);
+
   if (authGate === "checking") {
     return (
       <div className="flex min-h-[50vh] items-center justify-center bg-slate-50 text-slate-600">
@@ -213,50 +251,122 @@ export default function HomeLanding() {
   const heroTitle = homepageContent?.heroTitle;
   const heroSubtitle = homepageContent?.heroSubtitle;
 
+  const nx = motionOk ? nudge.x : 0;
+  const ny = motionOk ? nudge.y : 0;
+  const s = scrollShift;
+  const pStyle = (mx: number, my: number, scrollX: number, scrollY: number) =>
+    ({
+      transform: `translate3d(${nx * mx + s * scrollX}px, ${ny * my + s * scrollY}px, 0)`,
+      transition: motionOk ? "transform 0.72s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+      willChange: motionOk ? ("transform" as const) : undefined,
+    }) as CSSProperties;
+
   return (
     <div className="bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
       {/* —— Hero —— */}
       <section
         id="hero"
         aria-labelledby="hero-title"
-        className="landing-hero-cinematic relative min-h-[min(88svh,56rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh"
+        className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] sm:bg-[length:120%_120%]"
       >
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_120%,rgba(15,23,42,0.92),transparent)]" aria-hidden />
-        <div className="pointer-events-none absolute -start-32 top-0 z-0 h-[28rem] w-[28rem] rounded-full bg-brand-500/20 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -end-24 top-40 z-0 h-[22rem] w-[22rem] rounded-full bg-indigo-500/15 blur-3xl" aria-hidden />
+        {/* Layered ink + color depth (static) */}
+        <div className="pointer-events-none absolute inset-0 z-0 bg-hero-atmosphere opacity-90" aria-hidden />
+
         <div
-          className="pointer-events-none absolute start-1/4 top-1/3 z-0 h-[min(42rem,70vw)] w-[min(42rem,70vw)] -translate-x-1/2 rounded-full bg-brand-400/10 blur-[100px] animate-ambient-drift"
+          className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_120%,rgba(15,23,42,0.92),transparent)]"
+          style={pStyle(8, 6, -28, -38)}
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -end-1/4 bottom-0 z-0 h-[36rem] w-[36rem] rounded-full bg-indigo-400/12 blur-[90px] animate-ambient-drift"
-          style={{ animationDelay: "-7s" }}
+          className="pointer-events-none absolute -start-32 top-0 z-0 h-[28rem] w-[28rem] rounded-full bg-brand-500/20 blur-3xl"
+          style={pStyle(26, 20, -42, -22)}
           aria-hidden
         />
+        <div
+          className="pointer-events-none absolute -end-24 top-40 z-0 h-[22rem] w-[22rem] rounded-full bg-indigo-500/15 blur-3xl"
+          style={pStyle(-18, 14, 34, -26)}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute start-1/4 top-1/3 z-0 h-[min(42rem,70vw)] w-[min(42rem,70vw)] -translate-x-1/2"
+          aria-hidden
+        >
+          <div
+            className="h-full w-full rounded-full bg-brand-400/10 blur-[100px] animate-ambient-drift"
+            style={pStyle(14, 18, -24, -32)}
+          />
+        </div>
+        <div className="pointer-events-none absolute -end-1/4 bottom-0 z-0 h-[36rem] w-[36rem]" aria-hidden>
+          <div
+            className="h-full w-full rounded-full bg-indigo-400/12 blur-[90px] animate-ambient-drift"
+            style={{ ...pStyle(-12, 10, 20, 14), animationDelay: "-7s" }}
+          />
+        </div>
         <div
           className="pointer-events-none absolute left-1/2 top-[18%] z-0 h-px w-[min(72vw,56rem)] -translate-x-1/2 rotate-[-11deg] bg-gradient-to-l from-transparent via-white/25 to-transparent blur-sm"
+          style={pStyle(10, 4, -14, -8)}
           aria-hidden
         />
 
-        {/* Brand corner: physical top-right in RTL = inline-start */}
-        <div className={`${container} pointer-events-none absolute start-0 top-4 z-20 sm:top-6`}>
+        <div
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-soft-light animate-hero-aurora"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 55% at 30% 20%, rgba(47,148,255,0.35), transparent 55%), radial-gradient(ellipse 60% 50% at 85% 60%, rgba(99,102,241,0.22), transparent 50%)",
+          }}
+          aria-hidden
+        />
+
+        {/* Slow-moving soft light veil */}
+        <div
+          className={`pointer-events-none absolute inset-0 z-0 mix-blend-screen motion-reduce:animate-none motion-reduce:opacity-[0.15] ${motionOk ? "animate-hero-veil" : "opacity-[0.16]"}`}
+          style={{
+            background:
+              "radial-gradient(ellipse 85% 55% at 42% 38%, rgba(255,255,255,0.07), transparent 52%), radial-gradient(ellipse 70% 50% at 78% 72%, rgba(147,197,253,0.09), transparent 48%)",
+          }}
+          aria-hidden
+        />
+
+        {/* Optional pointer-follow radial glow (transform-only) */}
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div
+            className="absolute left-1/2 top-[40%] h-[min(115vw,52rem)] w-[min(115vw,52rem)] rounded-full mix-blend-soft-light blur-3xl"
+            style={{
+              opacity: motionOk ? 0.55 : 0.32,
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(191,219,254,0.2) 0%, rgba(59,130,246,0.09) 28%, transparent 58%)",
+              transform: motionOk
+                ? `translate3d(calc(-50% + ${nx * 32}px), calc(-50% + ${ny * 26}px), 0)`
+                : "translate3d(-50%, -50%, 0)",
+              transition: motionOk ? "transform 0.9s cubic-bezier(0.33, 0, 0.2, 1), opacity 0.6s ease" : undefined,
+            }}
+          />
+        </div>
+
+        {/* Brand corner — larger lockup, tactile hover */}
+        <div className={`${container} pointer-events-none absolute start-0 top-3 z-20 sm:top-5 lg:top-6`}>
           <div className="pointer-events-auto flex justify-start">
             <Link
               href="/"
               aria-label={BRAND_NAME}
-              className="rounded-xl border border-white/20 bg-white/95 px-3 py-2 shadow-lg shadow-slate-950/25 backdrop-blur-sm transition hover:border-white/35 hover:bg-white"
+              className="group rounded-2xl border border-white/25 bg-white/95 px-4 py-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.45)] backdrop-blur-md transition duration-[320ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/38 hover:bg-white hover:shadow-[0_22px_52px_-20px_rgba(47,148,255,0.18)] active:scale-[0.998] sm:px-5 sm:py-3.5 lg:px-6 lg:py-4"
             >
               <BrandLogoFull variant="hero" />
             </Link>
           </div>
         </div>
 
-        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center py-16 sm:py-20 lg:py-24`}>
+        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-24 pb-16 sm:pt-28 sm:pb-24 lg:py-28`}>
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-            <div className="order-2 text-center lg:order-1 lg:text-start">
+            <div className="relative z-[1] order-2 text-center lg:order-1 lg:text-start">
+              {/* Stronger contrast behind Arabic headline block (RTL-safe) */}
               <div
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md sm:text-sm animate-fade-up"
-                style={{ animationDelay: "0.05s" }}
+                className="pointer-events-none absolute -inset-x-3 -inset-y-4 -z-10 rounded-[1.75rem] bg-gradient-to-b from-slate-950/88 via-slate-950/55 to-slate-950/25 ring-1 ring-white/[0.07] backdrop-blur-sm sm:-inset-x-4 sm:-inset-y-5 sm:rounded-[2rem] md:backdrop-blur-[6px] lg:from-slate-950/82 lg:via-slate-950/48"
+                aria-hidden
+              />
+              <div
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md sm:text-sm animate-hero-rise transition duration-300 hover:border-white/25 hover:bg-white/[0.1]"
+                style={{ animationDelay: "0.06s" }}
               >
                 <IconSpark className="size-4 text-brand-300" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
@@ -264,8 +374,8 @@ export default function HomeLanding() {
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-fade-up"
-                style={{ animationDelay: "0.12s" }}
+                className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-hero-rise"
+                style={{ animationDelay: "0.14s" }}
               >
                 {heroTitle || (
                   <>
@@ -278,16 +388,16 @@ export default function HomeLanding() {
               </h1>
 
               <p
-                className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg lg:mx-0 animate-fade-up"
-                style={{ animationDelay: "0.2s" }}
+                className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg lg:mx-0 animate-hero-rise"
+                style={{ animationDelay: "0.22s" }}
               >
                 {heroSubtitle ||
                   "yanfa3 Education تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
               </p>
 
               <div
-                className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-3 animate-fade-up"
-                style={{ animationDelay: "0.28s" }}
+                className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-3 animate-hero-rise"
+                style={{ animationDelay: "0.3s" }}
               >
                 <Link href="/courses" className={btnHeroPrimary}>
                   ابدأ التعلم
@@ -301,12 +411,12 @@ export default function HomeLanding() {
               </div>
 
               {homeButtons.length ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
+                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start animate-hero-rise" style={{ animationDelay: "0.36s" }}>
                   {homeButtons.slice(0, 2).map((btn: { id: string; label: string; route: string }) => (
                     <Link
                       key={btn.id}
                       href={btn.route}
-                      className="rounded-xl border border-white/18 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm transition duration-300 hover:bg-white/[0.11]"
+                      className="rounded-xl border border-white/18 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/26 hover:bg-white/[0.1] active:scale-[0.995]"
                     >
                       {btn.label}
                     </Link>
@@ -315,11 +425,14 @@ export default function HomeLanding() {
               ) : null}
 
               <div
-                className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/10 pt-8 text-sm text-slate-400 lg:justify-start animate-fade-up"
-                style={{ animationDelay: "0.36s" }}
+                className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/10 pt-8 text-sm text-slate-400 lg:justify-start animate-hero-rise"
+                style={{ animationDelay: "0.42s" }}
               >
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
-                  <span key={label} className="inline-flex items-center gap-2 rounded-full bg-white/[0.05] px-3 py-1.5 ring-1 ring-white/10">
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.06] px-3 py-1.5 ring-1 ring-white/10 shadow-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/14 hover:bg-white/[0.09] hover:shadow-sm"
+                  >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
                     </span>
@@ -329,8 +442,25 @@ export default function HomeLanding() {
               </div>
             </div>
 
-            <div className="order-1 lg:order-2 animate-fade-up lg:ps-4" style={{ animationDelay: "0.15s" }}>
-              <TeacherPortrait variant="hero" priority />
+            <div className="order-1 animate-hero-rise lg:order-2 lg:ps-4" style={{ animationDelay: "0.18s" }}>
+              <div
+                className="relative [transform-style:preserve-3d]"
+                style={{
+                  transform: motionOk ? `translate3d(${nx * 3}px, ${ny * 2.5 + s * -7}px, 0)` : undefined,
+                  transition: motionOk ? "transform 0.72s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+                  willChange: motionOk ? "transform" : undefined,
+                }}
+              >
+                <div
+                  className="relative will-change-transform"
+                  style={{
+                    transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.22}deg) rotateY(${nx * 0.26}deg)` : undefined,
+                    transition: motionOk ? "transform 0.78s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+                  }}
+                >
+                  <TeacherPortrait variant="hero" priority />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -345,7 +475,7 @@ export default function HomeLanding() {
         ))}
 
       {/* —— لماذا yanfa3 Education —— */}
-      <section className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
+      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-sm font-bold text-brand-700">لماذا yanfa3 Education؟</p>
@@ -387,7 +517,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— ماذا ستتعلم —— */}
-      <section className="border-b border-slate-200/80 bg-gradient-to-b from-[#f4f6fb] to-white py-16 sm:py-20" aria-labelledby="what-learn">
+      <section data-section-reveal className="border-b border-slate-200/80 bg-gradient-to-b from-[#f4f6fb] to-white py-16 sm:py-20" aria-labelledby="what-learn">
         <div className={container}>
           <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-5">
@@ -424,7 +554,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— الأستاذ يوسف مادن —— */}
-      <section className="relative overflow-hidden border-b border-slate-200/80 bg-slate-950 py-16 text-white sm:py-20" aria-labelledby="teacher-yusuf">
+      <section data-section-reveal className="relative overflow-hidden border-b border-slate-200/80 bg-slate-950 py-16 text-white sm:py-20" aria-labelledby="teacher-yusuf">
         <div className="pointer-events-none absolute -start-24 top-1/4 h-80 w-80 rounded-full bg-brand-500/12 blur-[100px] animate-ambient-drift" aria-hidden />
         <div
           className="pointer-events-none absolute -end-20 bottom-0 h-72 w-72 rounded-full bg-indigo-500/14 blur-[90px] animate-ambient-drift"
@@ -468,7 +598,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— الدورات المتاحة —— */}
-      <section className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="courses-block">
+      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="courses-block">
         <div className={container}>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
@@ -518,7 +648,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— رحلة مختصرة —— */}
-      <section className="border-b border-slate-200/80 bg-[#f4f6fb] py-16 sm:py-20" aria-labelledby="journey">
+      <section data-section-reveal className="border-b border-slate-200/80 bg-[#f4f6fb] py-16 sm:py-20" aria-labelledby="journey">
         <div className={container}>
           <h2 id="journey" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">
             ثلاث خطوات… ثم أنت في قلب النص
@@ -543,7 +673,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— آراء مختصرة —— */}
-      <section className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="voices">
+      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="voices">
         <div className={container}>
           <h2 id="voices" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">
             صوت الدارسين
@@ -566,7 +696,7 @@ export default function HomeLanding() {
             ].map((v) => (
               <figure
                 key={v.who}
-                className="flex h-full flex-col rounded-3xl border border-slate-200/70 bg-gradient-to-b from-slate-50/95 to-white/90 p-6 shadow-card-luxury transition duration-500 hover:-translate-y-0.5 hover:border-brand-200/55 hover:shadow-card-luxury-hover"
+                className="flex h-full flex-col rounded-3xl border border-slate-200/70 bg-gradient-to-b from-slate-50/95 to-white/90 p-6 shadow-card-luxury transition duration-[420ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/55 hover:shadow-card-luxury-hover"
               >
                 <blockquote className="flex-1 text-sm leading-relaxed text-slate-800 sm:text-base">«{v.q}»</blockquote>
                 <figcaption className="mt-4 text-xs font-bold text-slate-500">{v.who}</figcaption>
@@ -577,7 +707,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— خطط الاشتراك —— */}
-      <section id="pricing" className="border-b border-slate-200/80 bg-gradient-to-b from-white to-[#f4f6fb] py-16 sm:py-20" aria-labelledby="pricing-title">
+      <section data-section-reveal id="pricing" className="border-b border-slate-200/80 bg-gradient-to-b from-white to-[#f4f6fb] py-16 sm:py-20" aria-labelledby="pricing-title">
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
             <h2 id="pricing-title" className="text-3xl font-black text-slate-900 sm:text-4xl">
@@ -630,7 +760,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— CTA —— */}
-      <section className="bg-white py-16 sm:py-20" aria-labelledby="cta-title">
+      <section data-section-reveal className="bg-white py-16 sm:py-20" aria-labelledby="cta-title">
         <div className={container}>
           <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-gradient-to-l from-slate-950 via-brand-900 to-indigo-950 px-6 py-14 text-center shadow-[0_32px_80px_-24px_rgba(15,23,42,0.35),0_0_0_1px_rgba(255,255,255,0.06)_inset] sm:px-12 sm:py-16">
             <div className="pointer-events-none absolute -start-20 top-0 h-64 w-64 rounded-full bg-brand-500/25 blur-3xl" aria-hidden />

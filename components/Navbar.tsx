@@ -119,10 +119,16 @@ export default function Navbar() {
   /** Centered full lockup on /login & /register — navbar stays compact (icon only). */
   const compactPublicBrand = pathname === "/login" || pathname === "/register";
 
+  const isMarketingHome = pathname === "/";
+
   return (
     <header className="sticky top-0 z-10 shrink-0 border-b border-slate-200 bg-white">
       <nav
-        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8"
+        className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8 ${
+          isMarketingHome
+            ? "min-h-[4.35rem] py-2.5 sm:min-h-[4.85rem] sm:py-3 md:min-h-[5rem] md:py-3 lg:min-h-[5.25rem] lg:py-3.5"
+            : "h-16"
+        }`}
         aria-label="التنقل الرئيسي"
       >
         <Link
@@ -134,7 +140,10 @@ export default function Navbar() {
           {compactPublicBrand ? (
             <BrandLogoIcon size="md" className="shadow-sm" />
           ) : (
-            <BrandLogoFull variant="toolbar" priority={pathname === "/"} />
+            <BrandLogoFull
+              variant={isMarketingHome ? "landingNav" : "toolbar"}
+              priority={isMarketingHome}
+            />
           )}
         </Link>
 
