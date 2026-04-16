@@ -11,11 +11,14 @@ export default function AppMain({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "";
   const isAdmin = pathname.startsWith("/admin");
   const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isMarketingHome = pathname === "/";
 
   const shell =
     isAdmin || isAuthPage
       ? "flex min-h-0 w-full flex-1 flex-col"
-      : "flex min-h-0 w-full flex-1 flex-col px-4 py-6 sm:px-6";
+      : isMarketingHome
+        ? "flex min-h-0 w-full flex-1 flex-col"
+        : "flex min-h-0 w-full flex-1 flex-col px-4 py-6 sm:px-6";
 
   return (
     <div id="main-content" className={shell}>
