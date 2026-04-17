@@ -35,7 +35,8 @@ const variantSizes: Record<NonNullable<BrandLogoFullProps["variant"]>, string> =
 };
 
 /**
- * Full "yanfa3 Education" lockup — primary brand asset (icon-only lives in `BrandLogoIcon`).
+ * Legacy full raster lockup — prefer `BrandLogoMark` + wordmark in product UI.
+ * Kept for optional marketing exports or one-off layouts.
  */
 export default function BrandLogoFull({
   className = "",

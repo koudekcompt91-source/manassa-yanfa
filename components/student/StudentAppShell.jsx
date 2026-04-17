@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { recordDailyLogin } from "@/lib/student-progress";
 import { formatDzd } from "@/lib/format-money";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
-import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 function IconHome({ className }) {
@@ -190,15 +189,9 @@ export default function StudentAppShell({ children }) {
       <Link
         href="/"
         aria-label={BRAND_NAME}
-        className="flex flex-col items-center justify-center no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl md:items-stretch"
+        className="flex flex-col items-center justify-center no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl"
       >
-        <span className="md:hidden">
-          <BrandLogoIcon size="md" className="shadow-sm" />
-        </span>
-        <span className="hidden md:flex md:justify-center">
-          <BrandLogoFull variant="sidebar" />
-        </span>
-        <span className="sr-only">{BRAND_NAME}</span>
+        <BrandLogoMark variant="footer" showWordmark className="justify-center" />
       </Link>
     </div>
   );

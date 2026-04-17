@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { logoutSession } from "@/lib/admin-auth";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -48,14 +48,9 @@ export default function AdminShell({ title, subtitle, children }) {
           className="mb-3 flex flex-col items-center gap-2 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-lg"
           aria-label={BRAND_NAME}
         >
-          {/* Narrow sticky column (lg+): small full lockup; stacked full-width aside: slightly larger toolbar preset */}
-          <span className="flex justify-center lg:hidden">
-            <BrandLogoFull variant="toolbar" />
+          <span className="flex justify-center">
+            <BrandLogoMark variant="footer" showWordmark className="justify-center" />
           </span>
-          <span className="hidden justify-center lg:flex">
-            <BrandLogoFull variant="sidebar" />
-          </span>
-          <span className="sr-only">{BRAND_NAME}</span>
         </Link>
         <h2 className="mb-1 text-sm font-extrabold text-slate-900">لوحة الإدارة</h2>
         <nav className="space-y-1">

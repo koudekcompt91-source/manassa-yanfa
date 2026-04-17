@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 type AuthPageShellProps = {
@@ -23,7 +23,7 @@ export default function AuthPageShell({ children, title, subtitle }: AuthPageShe
           aria-label={BRAND_NAME}
           className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm transition hover:border-brand-200 hover:shadow-md"
         >
-          <BrandLogoFull variant="auth" />
+          <BrandLogoMark variant="authFocal" showWordmark priority />
         </Link>
         <Link
           href="/"

@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { authStore } from "@/lib/auth";
 import { formatDzd } from "@/lib/format-money";
-import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -24,13 +23,15 @@ const navLinks = [
 ] as const;
 
 const linkClass =
-  "touch-manipulation rounded-xl px-2.5 py-2 text-sm font-semibold text-slate-600 no-underline decoration-transparent transition-[color,background-color] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-100/85 hover:text-brand-700 active:scale-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+  "touch-manipulation rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline decoration-transparent transition-[color,background-color] duration-[220ms] ease-out hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-100/95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+
+const navEase = "duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 const ctaGhostClass =
-  "touch-manipulation rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline shadow-sm shadow-slate-900/[0.03] ring-1 ring-slate-200/80 transition-[background-color,box-shadow] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-50 hover:shadow-md active:scale-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+  `touch-manipulation rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline shadow-sm shadow-slate-900/[0.025] ring-1 ring-slate-200/72 transition-[transform,background-color,box-shadow,filter,ring-color] ${navEase} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-white hover:shadow-[0_8px_24px_-12px_rgba(15,23,42,0.08)] hover:ring-slate-200/95 motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out active:brightness-[0.997] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2`;
 
 const ctaPrimaryClass =
-  "touch-manipulation rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white no-underline shadow-md shadow-brand-500/25 ring-1 ring-white/18 transition-[filter,box-shadow] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-[1.02] hover:shadow-md hover:shadow-brand-500/28 active:scale-[0.995] active:brightness-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+  `touch-manipulation rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white no-underline shadow-md shadow-brand-500/22 ring-1 ring-white/14 transition-[transform,filter,box-shadow,ring-color] ${navEase} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:brightness-[1.015] hover:ring-white/22 hover:shadow-[0_10px_32px_-12px_rgba(24,117,245,0.28)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out active:brightness-[0.992] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2`;
 
 function avatarLetter(fullName: string, email: string) {
   const s = (fullName || email || "?").trim();
@@ -116,21 +117,21 @@ export default function Navbar() {
       ? formatDzd(student.walletBalance)
       : null;
 
-  /** Centered full lockup on /login & /register — navbar stays compact (icon only). */
-  const compactPublicBrand = pathname === "/login" || pathname === "/register";
-
   const isMarketingHome = pathname === "/";
+  const isPublicAuth = pathname === "/login" || pathname === "/register";
 
   return (
     <header
-      className={`sticky top-0 z-10 shrink-0 border-b bg-white ${
-        isMarketingHome ? "border-slate-200/90 shadow-[0_1px_0_0_rgba(15,23,42,0.04)]" : "border-slate-200"
+      className={`sticky top-0 z-10 shrink-0 border-b ${
+        isMarketingHome
+          ? "border-slate-200/80 bg-white/[0.98] shadow-[0_1px_0_0_rgba(15,23,42,0.035)] supports-[backdrop-filter]:backdrop-blur-sm"
+          : "border-slate-200 bg-white"
       }`}
     >
       <nav
-        className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8 ${
+        className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-7 lg:px-8 xl:px-10 ${
           isMarketingHome
-            ? "min-h-[5.95rem] py-2.5 sm:min-h-[6.45rem] sm:py-3 md:min-h-[6.65rem] md:py-3.5 lg:min-h-[6.95rem] lg:py-4"
+            ? "min-h-[6.05rem] py-2.5 sm:min-h-[6.55rem] sm:py-3 md:min-h-[6.75rem] md:py-3.5 lg:min-h-[7.05rem] lg:py-4"
             : "h-16"
         }`}
         aria-label="التنقل الرئيسي"
@@ -138,25 +139,27 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label={BRAND_NAME}
-          className="flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-lg py-0.5 transition-colors duration-200 ease-out hover:bg-slate-50/90"
+          className="motion-safe:animate-nav-choreo motion-reduce:animate-none flex shrink-0 items-center rounded-lg py-0.5 no-underline decoration-transparent transition-colors duration-200 ease-out hover:bg-slate-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+          style={{ animationDelay: "0ms" }}
           onClick={() => setMobileOpen(false)}
         >
-          {compactPublicBrand ? (
-            <BrandLogoIcon size="md" className="shadow-sm" />
-          ) : (
-            <BrandLogoMark
-              variant={isMarketingHome ? "navPrimary" : "nav"}
-              showWordmark
-              priority={isMarketingHome}
-            />
-          )}
+          <BrandLogoMark
+            variant={isMarketingHome ? "navPrimary" : "nav"}
+            showWordmark
+            priority={isMarketingHome || isPublicAuth}
+          />
         </Link>
 
         {!hideMarketingNav ? (
           <div className="hidden min-w-0 flex-1 justify-center md:flex">
-            <div className="flex flex-wrap items-center justify-center gap-1 lg:gap-2">
-              {navLinks.map((item) => (
-                <Link key={item.href} href={item.href} className={linkClass}>
+            <div className="flex max-w-full flex-wrap items-center justify-center gap-0.5 lg:gap-1.5">
+              {navLinks.map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${linkClass} motion-safe:animate-nav-choreo motion-reduce:animate-none`}
+                  style={{ animationDelay: `${72 + i * 36}ms` }}
+                >
                   {item.label}
                 </Link>
               ))}
@@ -172,14 +175,19 @@ export default function Navbar() {
               <span className="inline-flex h-10 w-40 animate-pulse rounded-xl bg-slate-100" aria-hidden />
             ) : student ? (
               <>
-                <Link href="/dashboard" className={ctaGhostClass}>
+                <Link
+                  href="/dashboard"
+                  className={`${ctaGhostClass} motion-safe:animate-nav-choreo motion-reduce:animate-none`}
+                  style={{ animationDelay: "220ms" }}
+                >
                   لوحة التحكم
                 </Link>
                 <div className="relative" ref={accountRef}>
                   <button
                     type="button"
                     onClick={() => setAccountOpen((v) => !v)}
-                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 pe-3 ps-2 text-start shadow-sm transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                    className="motion-safe:animate-nav-choreo motion-reduce:animate-none flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5 pe-3 ps-2 text-start shadow-sm transition-[background-color,box-shadow] duration-200 ease-out hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 active:scale-[0.995] motion-reduce:active:scale-100"
+                    style={{ animationDelay: "268ms" }}
                     aria-expanded={accountOpen}
                     aria-haspopup="menu"
                     aria-label="حسابي"
@@ -237,10 +245,18 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" className={ctaGhostClass}>
+                <Link
+                  href="/login"
+                  className={`${ctaGhostClass} motion-safe:animate-nav-choreo motion-reduce:animate-none`}
+                  style={{ animationDelay: "232ms" }}
+                >
                   تسجيل الدخول
                 </Link>
-                <Link href="/register" className={ctaPrimaryClass}>
+                <Link
+                  href="/register"
+                  className={`${ctaPrimaryClass} motion-safe:animate-nav-choreo motion-reduce:animate-none`}
+                  style={{ animationDelay: "278ms" }}
+                >
                   إنشاء حساب
                 </Link>
               </>
@@ -249,7 +265,8 @@ export default function Navbar() {
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition hover:bg-slate-50 md:hidden"
+            className="motion-safe:animate-nav-choreo motion-reduce:animate-none inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 transition-[background-color,box-shadow] duration-200 ease-out hover:bg-slate-50 active:scale-[0.98] motion-reduce:active:scale-100 md:hidden"
+            style={{ animationDelay: "300ms" }}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav-menu"
             aria-label={mobileOpen ? "إغلاق القائمة" : "فتح القائمة"}
@@ -341,14 +358,14 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className="rounded-xl border border-slate-200 py-3 text-center text-sm font-semibold text-slate-800 no-underline hover:bg-slate-50"
+                      className={`touch-manipulation rounded-xl border border-slate-200/95 bg-white py-3 text-center text-sm font-semibold text-slate-800 no-underline shadow-sm ring-1 ring-transparent transition-[transform,background-color,box-shadow,ring-color] ${navEase} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-slate-50/98 hover:ring-slate-200/80 hover:shadow-[0_8px_22px_-12px_rgba(15,23,42,0.09)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.99] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                       onClick={() => setMobileOpen(false)}
                     >
                       تسجيل الدخول
                     </Link>
                     <Link
                       href="/register"
-                      className="rounded-xl bg-brand-600 py-3 text-center text-sm font-semibold text-white no-underline hover:bg-brand-700"
+                      className={`touch-manipulation rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 py-3 text-center text-sm font-semibold text-white no-underline shadow-md shadow-brand-500/22 ring-1 ring-white/14 transition-[transform,filter,box-shadow,ring-color] ${navEase} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:brightness-[1.015] hover:ring-white/22 hover:shadow-[0_10px_30px_-12px_rgba(24,117,245,0.26)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out active:brightness-[0.992]`}
                       onClick={() => setMobileOpen(false)}
                     >
                       إنشاء حساب

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SEEDED_STUDENT } from "@/lib/admin-auth";
 import { authStore } from "@/lib/auth";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 const fieldClass =
@@ -68,7 +68,7 @@ export default function LoginPage() {
             aria-label={BRAND_NAME}
             className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm transition hover:border-brand-200"
           >
-            <BrandLogoFull variant="auth" />
+            <BrandLogoMark variant="authFocal" showWordmark priority />
           </Link>
           <Link href="/" className="text-sm font-semibold text-brand-700 no-underline transition hover:underline">
             ← العودة للرئيسية

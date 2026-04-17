@@ -12,18 +12,20 @@ import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
 
-const pillCtaClass =
-  "inline-flex touch-manipulation items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-[1.02] active:scale-[0.992] motion-reduce:active:scale-100";
+/** Minimal luxury: soft out-ease, slightly longer settle — GPU-friendly props only */
+const easeTactile = "duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)]";
 
-/** Hero / dark surfaces — tactile, inset-lit, transform-forward for GPU */
+const pillCtaClass =
+  `inline-flex touch-manipulation items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/20 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:brightness-[1.015] hover:ring-white/28 hover:shadow-[0_12px_36px_-14px_rgba(24,117,245,0.28)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`;
+
 const btnHeroPrimary =
-  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/45 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-50 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.22)] hover:brightness-[1.015] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
+  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/40 transition-[transform,box-shadow,filter,background-color,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-slate-50/98 hover:ring-white/52 hover:shadow-[0_12px_40px_-20px_rgba(15,23,42,0.18)] hover:brightness-[1.01] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60`;
 
 const btnHeroGhost =
-  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-white/[0.07] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/28 hover:bg-white/[0.1] hover:shadow-[0_10px_28px_-14px_rgba(0,0,0,0.28)] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45";
+  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/18 bg-white/[0.055] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/27 hover:bg-white/[0.09] hover:shadow-[0_8px_36px_-16px_rgba(0,0,0,0.2)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45`;
 
 const btnHeroBrand =
-  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:shadow-[0_16px_36px_-14px_rgba(24,117,245,0.32)] hover:brightness-[1.02] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50";
+  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/18 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/26 hover:shadow-[0_14px_44px_-16px_rgba(24,117,245,0.26)] hover:brightness-[1.015] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50`;
 
 const btnHeroPrimaryWide = btnHeroPrimary.replace("px-7", "px-8");
 const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
@@ -270,8 +272,8 @@ export default function HomeLanding() {
                 aria-hidden
               />
               <div
-                className="mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.1] bg-slate-950/35 px-4 py-2 text-xs font-semibold text-slate-200/95 shadow-sm sm:text-sm animate-hero-rise transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/14 hover:bg-slate-950/48 active:scale-[0.995] motion-reduce:active:scale-100"
-                style={{ animationDelay: "0s" }}
+                className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.09] bg-slate-950/32 px-4 py-2 text-xs font-semibold text-slate-200/95 shadow-sm ring-1 ring-transparent sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/12 hover:bg-slate-950/44 hover:ring-white/[0.07] hover:shadow-[0_6px_28px_-10px_rgba(0,0,0,0.28)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                style={{ animationDelay: "0ms" }}
               >
                 <IconSpark className="size-4 text-brand-300" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
@@ -280,7 +282,7 @@ export default function HomeLanding() {
               <h1
                 id="hero-title"
                 className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white drop-shadow-[0_2px_28px_rgba(2,6,23,0.5)] sm:text-[2.125rem] sm:leading-[1.12] md:text-5xl md:leading-[1.1] xl:text-[3.35rem] animate-hero-rise"
-                style={{ animationDelay: "0.1s" }}
+                style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (
                   <>
@@ -294,7 +296,7 @@ export default function HomeLanding() {
 
               <p
                 className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.75] text-slate-200/88 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-[1.72] lg:mx-0 lg:max-w-none animate-hero-rise"
-                style={{ animationDelay: "0.2s" }}
+                style={{ animationDelay: "0.28s" }}
               >
                 {heroSubtitle ||
                   "yanfa3 Education تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
@@ -302,7 +304,7 @@ export default function HomeLanding() {
 
               <div
                 className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:mt-11 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-x-3 sm:gap-y-3 animate-hero-rise"
-                style={{ animationDelay: "0.3s" }}
+                style={{ animationDelay: "0.4s" }}
               >
                 <Link href="/courses" className={btnHeroPrimary}>
                   ابدأ التعلم
@@ -316,12 +318,12 @@ export default function HomeLanding() {
               </div>
 
               {homeButtons.length ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start animate-hero-rise" style={{ animationDelay: "0.38s" }}>
+                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start animate-hero-rise" style={{ animationDelay: "0.5s" }}>
                   {homeButtons.slice(0, 2).map((btn: { id: string; label: string; route: string }) => (
                     <Link
                       key={btn.id}
                       href={btn.route}
-                      className="touch-manipulation rounded-xl border border-white/18 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/24 hover:bg-white/[0.1] active:scale-[0.992] motion-reduce:active:scale-100"
+                      className={`touch-manipulation rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm ring-1 ring-transparent transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-white/[0.088] hover:ring-white/[0.08] hover:shadow-[0_4px_24px_-10px_rgba(0,0,0,0.22)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.991] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                     >
                       {btn.label}
                     </Link>
@@ -331,12 +333,12 @@ export default function HomeLanding() {
 
               <div
                 className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/10 pt-8 text-sm text-slate-400 lg:justify-start animate-hero-rise"
-                style={{ animationDelay: "0.46s" }}
+                style={{ animationDelay: "0.6s" }}
               >
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
                   <span
                     key={label}
-                    className="inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.05] px-3 py-1.5 ring-1 ring-white/[0.06] shadow-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/10 hover:bg-white/[0.08] hover:shadow-sm active:scale-[0.995] motion-reduce:active:scale-100"
+                    className={`inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.05] bg-white/[0.04] px-3 py-1.5 ring-1 ring-white/[0.045] shadow-sm transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/10 hover:bg-white/[0.068] hover:ring-white/[0.09] hover:shadow-[0_2px_20px_-8px_rgba(255,255,255,0.06)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
@@ -349,7 +351,7 @@ export default function HomeLanding() {
 
             <div
               className="order-1 flex w-full justify-center justify-self-center px-1 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-7 lg:max-w-none lg:justify-self-start lg:ps-4 lg:pt-2 xl:ps-8 xl:pt-3"
-              style={{ animationDelay: "0.14s" }}
+              style={{ animationDelay: "0.08s" }}
             >
               <div className="w-full max-w-[min(22rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(36rem,calc(50vw-1.5rem))] xl:max-w-[min(38rem,44vw)]">
                 <div

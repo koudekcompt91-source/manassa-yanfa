@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SEEDED_ADMIN } from "@/lib/admin-auth";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 export default function AdminLoginPage() {
@@ -57,9 +57,9 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-slate-900 px-4 py-10">
       <div className="mb-6 flex justify-center">
-        <div className="rounded-xl border border-slate-600/80 bg-white px-5 py-3 shadow-lg shadow-black/20">
+        <div className="rounded-xl border border-slate-600/80 bg-white px-5 py-4 shadow-lg shadow-black/20">
           <span className="sr-only">{BRAND_NAME}</span>
-          <BrandLogoFull variant="auth" />
+          <BrandLogoMark variant="authFocal" showWordmark priority />
         </div>
       </div>
       <div className="w-full max-w-md rounded-lg border border-slate-600 bg-slate-800 p-6 text-slate-100 shadow-sm">
