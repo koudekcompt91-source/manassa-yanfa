@@ -13,42 +13,36 @@ import { BRAND_NAME } from "@/lib/brand";
 const container = "container-landing";
 
 const pillCtaClass =
-  "inline-flex items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:brightness-[1.04] active:scale-[0.995]";
+  "inline-flex touch-manipulation items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-[1.02] active:scale-[0.992] motion-reduce:active:scale-100";
 
 /** Hero / dark surfaces — tactile, inset-lit, transform-forward for GPU */
 const btnHeroPrimary =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/45 will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-slate-50 hover:shadow-[0_16px_36px_-14px_rgba(0,0,0,0.28)] hover:brightness-[1.02] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
+  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-tactile ring-1 ring-white/45 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-50 hover:shadow-[0_14px_32px_-16px_rgba(0,0,0,0.22)] hover:brightness-[1.015] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
 
 const btnHeroGhost =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/22 bg-white/[0.07] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/32 hover:bg-white/[0.12] hover:shadow-[0_12px_32px_-12px_rgba(0,0,0,0.35)] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45";
+  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-white/[0.07] px-7 py-3.5 text-base font-bold text-white shadow-tactile-ghost backdrop-blur-md transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/28 hover:bg-white/[0.1] hover:shadow-[0_10px_28px_-14px_rgba(0,0,0,0.28)] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/45";
 
 const btnHeroBrand =
-  "inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/25 will-change-transform transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:shadow-[0_18px_40px_-12px_rgba(24,117,245,0.42)] hover:brightness-[1.03] active:scale-[0.995] active:duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50";
+  "inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/12 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-tactile-brand ring-1 ring-white/25 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:shadow-[0_16px_36px_-14px_rgba(24,117,245,0.32)] hover:brightness-[1.02] active:scale-[0.992] active:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50";
 
 const btnHeroPrimaryWide = btnHeroPrimary.replace("px-7", "px-8");
 const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
 
-const btnPricingFeatured =
-  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-l from-brand-600 to-indigo-600 py-3.5 text-sm font-extrabold text-white no-underline shadow-tactile-brand ring-1 ring-white/25 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:brightness-[1.03] active:scale-[0.995]";
-
-const btnPricingOutline =
-  "mt-8 inline-flex w-full min-h-[3rem] items-center justify-center rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/95 py-3.5 text-sm font-extrabold text-slate-900 no-underline shadow-tactile ring-1 ring-slate-900/[0.06] transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/80 hover:shadow-card-luxury-hover active:scale-[0.995]";
-
 /** Light sections */
 const btnLightSolid =
-  "inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-tactile ring-1 ring-white/10 transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-slate-800 active:scale-[0.995]";
+  "inline-flex touch-manipulation items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-tactile ring-1 ring-white/10 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-800 active:scale-[0.992] motion-reduce:active:scale-100";
 
 const btnLightGhost =
-  "inline-flex items-center justify-center rounded-2xl border border-white/22 bg-white/5 px-6 py-3 text-sm font-bold text-white shadow-tactile-ghost backdrop-blur-sm transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:bg-white/12 active:scale-[0.995]";
+  "inline-flex touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-white/5 px-6 py-3 text-sm font-bold text-white shadow-tactile-ghost backdrop-blur-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-white/10 active:scale-[0.992] motion-reduce:active:scale-100";
 
 const btnMutedOutline =
-  "inline-flex items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-[280ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.995]";
+  "inline-flex touch-manipulation items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.992] motion-reduce:active:scale-100";
 
 const cardLuxury =
-  "rounded-3xl border border-slate-200/75 bg-gradient-to-b from-white via-white to-slate-50/75 shadow-card-luxury transition duration-[420ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/65 hover:shadow-card-luxury-hover";
+  "touch-manipulation rounded-3xl border border-slate-200/75 bg-gradient-to-b from-white via-white to-slate-50/75 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/65 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100";
 
 const cardLuxuryFlat =
-  "rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_8px_28px_-10px_rgba(15,23,42,0.08),0_0_0_1px_rgba(148,163,184,0.1)] transition duration-300 hover:border-brand-200/60 hover:shadow-card-luxury";
+  "touch-manipulation rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_8px_28px_-10px_rgba(15,23,42,0.08),0_0_0_1px_rgba(148,163,184,0.1)] transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/60 hover:shadow-card-luxury active:scale-[0.997] motion-reduce:active:scale-100";
 
 const TEACHER_NAME = "يوسف مادن";
 /** Studio portrait (682×1024); served from /public */
@@ -86,7 +80,7 @@ function TeacherPortrait({
     : "[clip-path:ellipse(100%_97%_at_50%_49%)]";
 
   return (
-    <div className={`relative mx-auto ${isHero ? "max-w-md lg:max-w-none" : "max-w-sm"}`}>
+    <div className={`relative mx-auto ${isHero ? "group/portrait max-w-md lg:max-w-none" : "max-w-sm"}`}>
       <div
         className={`pointer-events-none absolute rounded-full bg-gradient-to-br from-brand-500/40 via-indigo-500/28 to-teal-400/18 blur-3xl animate-soft-glow ${
           isHero ? "-inset-10 sm:-inset-16" : "-inset-6"
@@ -143,8 +137,10 @@ function TeacherPortrait({
               height={TEACHER_IMAGE_HEIGHT}
               priority={priority}
               sizes={isHero ? "(max-width: 1024px) 100vw, 42vw" : "(max-width: 768px) 100vw, 320px"}
-              className={`relative z-[1] h-auto w-full object-cover transition duration-700 ease-out ${
-                isHero ? "object-[center_18%] scale-[1.005] sm:object-[center_16%] lg:scale-[1.008]" : "object-[center_20%] scale-[1.002]"
+              className={`relative z-[1] h-auto w-full object-cover transition duration-[1100ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+                isHero
+                  ? "object-[center_18%] scale-[1.003] motion-safe:group-hover/portrait:scale-[1.006] sm:object-[center_16%] lg:scale-[1.005]"
+                  : "object-[center_20%] scale-[1.002]"
               }`}
             />
           </div>
@@ -228,7 +224,7 @@ export default function HomeLanding() {
             }
           });
         },
-        { rootMargin: "0px 0px -10% 0px", threshold: 0.06 }
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
       );
       nodes.forEach((n) => sectionIoRef.current?.observe(n));
     };
@@ -257,7 +253,7 @@ export default function HomeLanding() {
   const pStyle = (mx: number, my: number, scrollX: number, scrollY: number) =>
     ({
       transform: `translate3d(${nx * mx + s * scrollX}px, ${ny * my + s * scrollY}px, 0)`,
-      transition: motionOk ? "transform 0.72s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+      transition: motionOk ? "transform 0.95s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
       willChange: motionOk ? ("transform" as const) : undefined,
     }) as CSSProperties;
 
@@ -267,7 +263,7 @@ export default function HomeLanding() {
       <section
         id="hero"
         aria-labelledby="hero-title"
-        className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] sm:bg-[length:120%_120%]"
+        className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:bg-[length:120%_120%]"
       >
         {/* Layered ink + color depth (static) */}
         <div className="pointer-events-none absolute inset-0 z-0 bg-hero-atmosphere opacity-[0.82]" aria-hidden />
@@ -333,13 +329,13 @@ export default function HomeLanding() {
           <div
             className="absolute left-1/2 top-[40%] h-[min(115vw,52rem)] w-[min(115vw,52rem)] rounded-full mix-blend-normal blur-3xl"
             style={{
-              opacity: motionOk ? 0.26 : 0.16,
+              opacity: motionOk ? 0.2 : 0.14,
               background:
-                "radial-gradient(circle at 50% 50%, rgba(59,130,246,0.11) 0%, rgba(37,99,235,0.045) 34%, transparent 62%)",
+                "radial-gradient(circle at 50% 50%, rgba(59,130,246,0.09) 0%, rgba(37,99,235,0.038) 34%, transparent 62%)",
               transform: motionOk
-                ? `translate3d(calc(-50% + ${nx * 32}px), calc(-50% + ${ny * 26}px), 0)`
+                ? `translate3d(calc(-50% + ${nx * 18}px), calc(-50% + ${ny * 14}px), 0)`
                 : "translate3d(-50%, -50%, 0)",
-              transition: motionOk ? "transform 0.9s cubic-bezier(0.33, 0, 0.2, 1), opacity 0.6s ease" : undefined,
+              transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.75s ease" : undefined,
             }}
           />
         </div>
@@ -353,8 +349,8 @@ export default function HomeLanding() {
                 aria-hidden
               />
               <div
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-slate-950/35 px-4 py-2 text-xs font-semibold text-slate-200/95 shadow-sm sm:text-sm animate-hero-rise transition duration-300 hover:border-white/16 hover:bg-slate-950/45"
-                style={{ animationDelay: "0.06s" }}
+                className="mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.1] bg-slate-950/35 px-4 py-2 text-xs font-semibold text-slate-200/95 shadow-sm sm:text-sm animate-hero-rise transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/14 hover:bg-slate-950/48 active:scale-[0.995] motion-reduce:active:scale-100"
+                style={{ animationDelay: "0s" }}
               >
                 <IconSpark className="size-4 text-brand-300" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
@@ -363,7 +359,7 @@ export default function HomeLanding() {
               <h1
                 id="hero-title"
                 className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white drop-shadow-[0_2px_28px_rgba(2,6,23,0.5)] sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-hero-rise"
-                style={{ animationDelay: "0.14s" }}
+                style={{ animationDelay: "0.1s" }}
               >
                 {heroTitle || (
                   <>
@@ -377,7 +373,7 @@ export default function HomeLanding() {
 
               <p
                 className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-200/90 sm:text-lg lg:mx-0 animate-hero-rise"
-                style={{ animationDelay: "0.22s" }}
+                style={{ animationDelay: "0.2s" }}
               >
                 {heroSubtitle ||
                   "yanfa3 Education تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
@@ -399,12 +395,12 @@ export default function HomeLanding() {
               </div>
 
               {homeButtons.length ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start animate-hero-rise" style={{ animationDelay: "0.36s" }}>
+                <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start animate-hero-rise" style={{ animationDelay: "0.38s" }}>
                   {homeButtons.slice(0, 2).map((btn: { id: string; label: string; route: string }) => (
                     <Link
                       key={btn.id}
                       href={btn.route}
-                      className="rounded-xl border border-white/18 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/26 hover:bg-white/[0.1] active:scale-[0.995]"
+                      className="touch-manipulation rounded-xl border border-white/18 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-tactile-ghost backdrop-blur-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/24 hover:bg-white/[0.1] active:scale-[0.992] motion-reduce:active:scale-100"
                     >
                       {btn.label}
                     </Link>
@@ -414,12 +410,12 @@ export default function HomeLanding() {
 
               <div
                 className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/10 pt-8 text-sm text-slate-400 lg:justify-start animate-hero-rise"
-                style={{ animationDelay: "0.42s" }}
+                style={{ animationDelay: "0.46s" }}
               >
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
                   <span
                     key={label}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.05] px-3 py-1.5 ring-1 ring-white/[0.06] shadow-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/12 hover:bg-white/[0.08] hover:shadow-sm"
+                    className="inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.05] px-3 py-1.5 ring-1 ring-white/[0.06] shadow-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-white/10 hover:bg-white/[0.08] hover:shadow-sm active:scale-[0.995] motion-reduce:active:scale-100"
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
@@ -432,21 +428,21 @@ export default function HomeLanding() {
 
             <div
               className="order-1 flex w-full justify-center animate-hero-rise lg:order-2 lg:justify-center lg:ps-4 lg:pt-2 xl:ps-8"
-              style={{ animationDelay: "0.18s" }}
+              style={{ animationDelay: "0.14s" }}
             >
               <div
                 className="relative [transform-style:preserve-3d]"
                 style={{
-                  transform: motionOk ? `translate3d(${nx * 3}px, ${ny * 2.5 + s * -7}px, 0)` : undefined,
-                  transition: motionOk ? "transform 0.72s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+                  transform: motionOk ? `translate3d(${nx * 1.8}px, ${ny * 1.4 + s * -4}px, 0)` : undefined,
+                  transition: motionOk ? "transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                   willChange: motionOk ? "transform" : undefined,
                 }}
               >
                 <div
                   className="relative will-change-transform"
                   style={{
-                    transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.22}deg) rotateY(${nx * 0.26}deg)` : undefined,
-                    transition: motionOk ? "transform 0.78s cubic-bezier(0.33, 0, 0.2, 1)" : undefined,
+                    transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.12}deg) rotateY(${nx * 0.14}deg)` : undefined,
+                    transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                   }}
                 >
                   <TeacherPortrait variant="hero" priority />
@@ -687,64 +683,11 @@ export default function HomeLanding() {
             ].map((v) => (
               <figure
                 key={v.who}
-                className="flex h-full flex-col rounded-3xl border border-slate-200/70 bg-gradient-to-b from-slate-50/95 to-white/90 p-6 shadow-card-luxury transition duration-[420ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-brand-200/55 hover:shadow-card-luxury-hover"
+                className="flex h-full touch-manipulation flex-col rounded-3xl border border-slate-200/70 bg-gradient-to-b from-slate-50/95 to-white/90 p-6 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/55 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100"
               >
                 <blockquote className="flex-1 text-sm leading-relaxed text-slate-800 sm:text-base">«{v.q}»</blockquote>
                 <figcaption className="mt-4 text-xs font-bold text-slate-500">{v.who}</figcaption>
               </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* —— خطط الاشتراك —— */}
-      <section data-section-reveal id="pricing" className="border-b border-slate-200/80 bg-gradient-to-b from-white to-[#f4f6fb] py-16 sm:py-20" aria-labelledby="pricing-title">
-        <div className={container}>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 id="pricing-title" className="text-3xl font-black text-slate-900 sm:text-4xl">
-              خطط الاشتراك
-            </h2>
-            <p className="mt-3 text-slate-600 sm:text-lg">اختر إيقاعًا يناسب التزامك — ثم عُد إلى الدروس مع الأستاذ {TEACHER_NAME}.</p>
-          </div>
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {[
-              { name: "أساسي", price: "199", desc: "إيقاع مريح لبناء الأساس اللغوي.", feat: ["حصتان مباشرتان أسبوعيًا", "ملخصات نحوية وبلاغية", "مجموعة نقاش أدبي"], hi: false },
-              { name: "متقدم", price: "349", desc: "الأكثر طلبًا: عمق أكبر في التحليل والنقد.", feat: ["٤ حصص أسبوعيًا", "تصحيح تحليلات نصية", "متابعة أسبوعية"], hi: true },
-              { name: "احترافي", price: "499", desc: "برنامج مكثف لصقل الذائقة الأدبية.", feat: ["ورش قراءة متقدمة", "جلسات تقوية فردية", "أولوية في الأسئلة"], hi: false },
-            ].map((p) => (
-              <div
-                key={p.name}
-                className={`relative flex flex-col p-7 sm:p-8 ${
-                  p.hi
-                    ? "rounded-3xl border border-brand-300/90 bg-gradient-to-b from-white to-brand-50/30 shadow-card-luxury ring-2 ring-brand-500/20 transition duration-500 hover:shadow-card-luxury-hover"
-                    : cardLuxury
-                }`}
-              >
-                {p.hi ? (
-                  <span className="absolute -top-3 left-1/2 z-10 flex w-max -translate-x-1/2 rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-1 text-xs font-extrabold text-white shadow-md">
-                    الأكثر شعبية
-                  </span>
-                ) : null}
-                <h3 className="text-lg font-extrabold text-slate-900">{p.name}</h3>
-                <p className="mt-2 text-sm text-slate-600">{p.desc}</p>
-                <p className="mt-6">
-                  <span className="text-4xl font-black text-slate-900">{p.price}</span>
-                  <span className="ms-1 text-sm font-semibold text-slate-500">دج / شهر</span>
-                </p>
-                <ul className="mt-6 flex flex-1 flex-col gap-2.5 text-sm text-slate-700">
-                  {p.feat.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                        <IconCheck className="size-3" />
-                      </span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className={p.hi ? btnPricingFeatured : btnPricingOutline}>
-                  اختر {p.name}
-                </Link>
-              </div>
             ))}
           </div>
         </div>
@@ -804,7 +747,7 @@ export default function HomeLanding() {
               {[
                 { href: "/#hero", label: "الرئيسية" },
                 { href: "/courses", label: "الدورات" },
-                { href: "/#pricing", label: "الأسعار" },
+                { href: "/pricing", label: "الأسعار" },
                 { href: "/login", label: "تسجيل الدخول" },
                 { href: "/register", label: "إنشاء حساب" },
               ].map((l) => (

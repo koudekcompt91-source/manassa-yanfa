@@ -24,13 +24,13 @@ const navLinks = [
 ] as const;
 
 const linkClass =
-  "rounded-lg px-1 py-1 text-sm font-semibold text-slate-600 no-underline decoration-transparent transition-colors hover:text-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+  "touch-manipulation rounded-xl px-2.5 py-2 text-sm font-semibold text-slate-600 no-underline decoration-transparent transition-[color,background-color] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-100/85 hover:text-brand-700 active:scale-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 const ctaGhostClass =
-  "rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 no-underline transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+  "touch-manipulation rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline shadow-sm shadow-slate-900/[0.03] ring-1 ring-slate-200/80 transition-[background-color,box-shadow] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-50 hover:shadow-md active:scale-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
 
 const ctaPrimaryClass =
-  "rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white no-underline shadow-md shadow-brand-500/25 transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+  "touch-manipulation rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white no-underline shadow-md shadow-brand-500/25 ring-1 ring-white/18 transition-[filter,box-shadow] duration-[240ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-[1.02] hover:shadow-md hover:shadow-brand-500/28 active:scale-[0.995] active:brightness-[0.995] motion-reduce:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
 
 function avatarLetter(fullName: string, email: string) {
   const s = (fullName || email || "?").trim();
@@ -130,7 +130,7 @@ export default function Navbar() {
       <nav
         className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8 ${
           isMarketingHome
-            ? "min-h-[4.65rem] py-2.5 sm:min-h-[5.15rem] sm:py-3 md:min-h-[5.35rem] md:py-3.5 lg:min-h-[5.6rem] lg:py-4"
+            ? "min-h-[5.55rem] py-2.5 sm:min-h-[6.1rem] sm:py-3 md:min-h-[6.5rem] md:py-3.5 lg:min-h-[6.85rem] lg:py-4"
             : "h-16"
         }`}
         aria-label="التنقل الرئيسي"
@@ -138,8 +138,10 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label={BRAND_NAME}
-          className={`flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl ${
-            isMarketingHome ? "-ms-0.5 py-0.5 sm:-ms-1 sm:py-1" : ""
+          className={`flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition-[background-color,box-shadow,transform] duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] motion-safe:hover:scale-[1.004] motion-safe:active:scale-[0.998] motion-reduce:transform-none ${
+            isMarketingHome
+              ? "-ms-0.5 rounded-2xl py-1.5 pe-2 ps-1 sm:-ms-1 sm:py-2 sm:pe-2.5 sm:ps-1.5 ring-1 ring-slate-200/35 bg-slate-50/40 hover:bg-slate-50/70 hover:ring-slate-200/55"
+              : "rounded-xl py-0.5"
           }`}
           onClick={() => setMobileOpen(false)}
         >
