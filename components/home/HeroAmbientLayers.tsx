@@ -87,10 +87,10 @@ export default function HeroAmbientLayers({ motionOk, nudge, scrollShift }: Hero
       />
 
       <div
-        className="pointer-events-none absolute inset-0 z-0 mix-blend-soft-light motion-safe:animate-hero-aurora motion-reduce:animate-none motion-reduce:opacity-[0.09]"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.55] mix-blend-soft-light motion-safe:animate-hero-aurora motion-reduce:animate-none motion-reduce:opacity-[0.05]"
         style={{
           background:
-            "radial-gradient(ellipse 72% 54% at 32% 22%, rgba(59,130,246,0.14), transparent 58%), radial-gradient(ellipse 62% 48% at 88% 62%, rgba(79,70,229,0.1), transparent 54%), radial-gradient(ellipse 44% 36% at 12% 78%, rgba(15,23,42,0.12), transparent 50%)",
+            "radial-gradient(ellipse 72% 54% at 32% 22%, rgba(59,130,246,0.1), transparent 58%), radial-gradient(ellipse 62% 48% at 88% 62%, rgba(79,70,229,0.07), transparent 54%), radial-gradient(ellipse 44% 36% at 12% 78%, rgba(15,23,42,0.08), transparent 50%)",
         }}
         aria-hidden
       />
@@ -108,15 +108,15 @@ export default function HeroAmbientLayers({ motionOk, nudge, scrollShift }: Hero
       {/* Pointer-reactive cool light — large, soft */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <div
-          className="absolute left-1/2 top-[38%] h-[min(118vw,54rem)] w-[min(118vw,54rem)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-90 blur-3xl"
+          className="absolute left-1/2 top-[38%] h-[min(118vw,54rem)] w-[min(118vw,54rem)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-3xl"
           style={{
             ...lightShift,
             background:
-              "radial-gradient(circle at 50% 50%, rgba(147,197,253,0.085) 0%, rgba(59,130,246,0.055) 28%, rgba(37,99,235,0.035) 48%, transparent 68%)",
+              "radial-gradient(circle at 50% 50%, rgba(147,197,253,0.055) 0%, rgba(59,130,246,0.04) 28%, rgba(37,99,235,0.028) 48%, transparent 68%)",
           }}
         />
         <div
-          className="absolute left-1/2 top-[44%] h-[min(95vw,42rem)] w-[min(95vw,42rem)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-80 blur-3xl"
+          className="absolute left-1/2 top-[44%] h-[min(95vw,42rem)] w-[min(95vw,42rem)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
           style={{
             ...lightCounter,
             background:

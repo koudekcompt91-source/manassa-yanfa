@@ -22,10 +22,10 @@ const btnHeroPrimary =
   `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_10px_28px_-8px_rgba(15,23,42,0.22)] ring-1 ring-white/50 transition-[transform,box-shadow,filter,background-color,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-white hover:ring-white/58 hover:shadow-[0_14px_40px_-16px_rgba(15,23,42,0.26)] hover:brightness-[1.01] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60`;
 
 const btnHeroGhost =
-  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/32 bg-white/[0.14] px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.12)_inset,0_8px_24px_-10px_rgba(0,0,0,0.35)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/40 hover:bg-white/[0.2] hover:shadow-[0_10px_32px_-12px_rgba(0,0,0,0.38)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50`;
+  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border-2 border-white/45 bg-slate-950 px-7 py-3.5 text-base font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14),0_10px_32px_-8px_rgba(0,0,0,0.55)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/55 hover:bg-slate-900 hover:shadow-[0_12px_36px_-8px_rgba(0,0,0,0.6)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60`;
 
 const btnHeroBrand =
-  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/14 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.2)_inset,0_12px_32px_-8px_rgba(24,117,245,0.42)] ring-1 ring-white/22 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/32 hover:shadow-[0_16px_44px_-12px_rgba(24,117,245,0.38)] hover:brightness-[1.02] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50`;
+  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_14px_36px_-8px_rgba(24,117,245,0.5)] ring-1 ring-white/28 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/38 hover:shadow-[0_18px_48px_-10px_rgba(24,117,245,0.45)] hover:brightness-[1.02] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50`;
 
 const btnHeroPrimaryWide = btnHeroPrimary.replace("px-7", "px-8");
 const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
@@ -266,28 +266,25 @@ export default function HomeLanding() {
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.5rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
           <div className="mx-auto grid w-full max-w-[min(100%,80rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-8 lg:gap-y-0 xl:gap-x-12">
             <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[26rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[28rem] xl:pe-10 xl:pt-6">
-              {/* Subtle readability veil — no heavy frost */}
+              <div className="relative overflow-hidden rounded-[1.65rem] border border-white/[0.09] bg-[#071225]/[0.82] px-5 py-7 shadow-[0_18px_48px_-18px_rgba(0,0,0,0.5)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.35rem] lg:px-7 lg:py-9">
+                <div className="relative z-[1]">
               <div
-                className="pointer-events-none absolute -inset-x-2 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-b from-slate-950/78 via-slate-950/52 to-slate-950/22 ring-1 ring-white/[0.07] sm:-inset-x-3 sm:-inset-y-4 sm:rounded-[1.75rem] lg:from-slate-950/72 lg:via-slate-950/48 lg:to-slate-950/18"
-                aria-hidden
-              />
-              <div
-                className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/55 px-4 py-2 text-xs font-semibold text-slate-50 shadow-sm ring-1 ring-white/[0.08] sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/20 hover:bg-slate-950/65 hover:ring-white/12 hover:shadow-[0_6px_28px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/45 px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                 style={{ animationDelay: "0ms" }}
               >
-                <IconSpark className="size-4 text-brand-300" />
+                <IconSpark className="size-4 shrink-0 text-brand-200" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white drop-shadow-[0_3px_36px_rgba(2,6,23,0.75)] sm:text-[2.125rem] sm:leading-[1.12] md:text-5xl md:leading-[1.1] xl:text-[3.35rem] animate-hero-rise"
+                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white [text-shadow:0_1px_20px_rgba(0,0,0,0.55)] sm:text-[2.125rem] sm:leading-[1.12] md:text-5xl md:leading-[1.1] xl:text-[3.35rem] animate-hero-rise"
                 style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (
                   <>
                     رحلة أدبية{" "}
-                    <span className="bg-gradient-to-l from-sky-100 via-brand-100 to-indigo-100 bg-clip-text text-transparent">عميقة وأنيقة</span>
+                    <span className="font-black text-sky-200/95">عميقة وأنيقة</span>
                     <br className="hidden sm:block" />
                     تبدأ من هنا
                   </>
@@ -295,7 +292,7 @@ export default function HomeLanding() {
               </h1>
 
               <p
-                className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.78] text-slate-100/95 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-[1.75] lg:mx-0 lg:max-w-none animate-hero-rise"
+                className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.78] text-slate-200/90 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-[1.75] lg:mx-0 lg:max-w-none animate-hero-rise"
                 style={{ animationDelay: "0.28s" }}
               >
                 {heroSubtitle ||
@@ -323,7 +320,7 @@ export default function HomeLanding() {
                     <Link
                       key={btn.id}
                       href={btn.route}
-                      className={`touch-manipulation rounded-xl border border-white/26 bg-white/[0.12] px-4 py-2 text-xs font-semibold text-slate-50 shadow-[0_1px_0_0_rgba(255,255,255,0.1)_inset,0_6px_20px_-8px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.08] transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/34 hover:bg-white/[0.18] hover:ring-white/14 hover:shadow-[0_6px_26px_-8px_rgba(0,0,0,0.32)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.991] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                      className={`touch-manipulation rounded-xl border border-white/22 bg-slate-950/55 px-4 py-2 text-xs font-bold text-slate-100 shadow-[0_6px_20px_-10px_rgba(0,0,0,0.4)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/32 hover:bg-slate-950/70 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.991] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                     >
                       {btn.label}
                     </Link>
@@ -332,20 +329,22 @@ export default function HomeLanding() {
               ) : null}
 
               <div
-                className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/16 pt-8 text-sm text-slate-300/95 lg:justify-start animate-hero-rise"
+                className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-white/12 pt-8 text-sm text-slate-400 lg:justify-start animate-hero-rise"
                 style={{ animationDelay: "0.6s" }}
               >
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
                   <span
                     key={label}
-                    className={`inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-white/[0.1] px-3 py-1.5 ring-1 ring-white/10 shadow-sm transition-[transform,border-color,background-color,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-white/[0.14] hover:ring-white/14 hover:shadow-[0_4px_22px_-8px_rgba(0,0,0,0.25)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                    className={`inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/40 px-3 py-1.5 shadow-sm transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
                     </span>
-                    <span className="font-semibold text-slate-100">{label}</span>
+                    <span className="font-semibold text-slate-200">{label}</span>
                   </span>
                 ))}
+              </div>
+                </div>
               </div>
             </div>
 
