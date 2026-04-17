@@ -122,11 +122,15 @@ export default function Navbar() {
   const isMarketingHome = pathname === "/";
 
   return (
-    <header className="sticky top-0 z-10 shrink-0 border-b border-slate-200 bg-white">
+    <header
+      className={`sticky top-0 z-10 shrink-0 border-b bg-white ${
+        isMarketingHome ? "border-slate-200/90 shadow-[0_1px_0_0_rgba(15,23,42,0.04)]" : "border-slate-200"
+      }`}
+    >
       <nav
         className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8 ${
           isMarketingHome
-            ? "min-h-[4.35rem] py-2.5 sm:min-h-[4.85rem] sm:py-3 md:min-h-[5rem] md:py-3 lg:min-h-[5.25rem] lg:py-3.5"
+            ? "min-h-[4.65rem] py-2.5 sm:min-h-[5.15rem] sm:py-3 md:min-h-[5.35rem] md:py-3.5 lg:min-h-[5.6rem] lg:py-4"
             : "h-16"
         }`}
         aria-label="التنقل الرئيسي"
@@ -134,7 +138,9 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label={BRAND_NAME}
-          className="flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl"
+          className={`flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl ${
+            isMarketingHome ? "-ms-0.5 py-0.5 sm:-ms-1 sm:py-1" : ""
+          }`}
           onClick={() => setMobileOpen(false)}
         >
           {compactPublicBrand ? (

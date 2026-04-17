@@ -109,7 +109,7 @@ function TeacherPortrait({
       />
 
       <div
-        className={`relative overflow-hidden rounded-[2.15rem] border border-white/18 bg-gradient-to-b from-white/[0.16] via-white/[0.05] to-white/[0.02] shadow-portrait-halo backdrop-blur-md sm:rounded-[2.45rem] ${
+        className={`relative overflow-hidden rounded-[2.15rem] border border-white/14 bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-transparent shadow-portrait-halo backdrop-blur-sm sm:rounded-[2.45rem] ${
           isHero ? "p-[5px] sm:p-2" : "p-1"
         }`}
       >
@@ -121,7 +121,7 @@ function TeacherPortrait({
           }}
           aria-hidden
         />
-        <div className="pointer-events-none absolute inset-x-8 top-2 z-20 h-px rounded-full bg-gradient-to-l from-transparent via-white/45 to-transparent blur-sm" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-8 top-2 z-20 h-px rounded-full bg-gradient-to-l from-transparent via-white/22 to-transparent blur-sm" aria-hidden />
 
         <div
           className={`relative overflow-hidden bg-slate-950 ring-1 ring-white/12 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07),inset_0_0_80px_rgba(2,6,23,0.42)] sm:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_0_100px_rgba(2,6,23,0.48)] ${
@@ -155,13 +155,13 @@ function TeacherPortrait({
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_95%_55%_at_50%_0%,rgba(255,255,255,0.07),transparent_58%)]"
+            className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_95%_55%_at_50%_0%,rgba(255,255,255,0.035),transparent_58%)]"
             aria-hidden
           />
         </div>
       </div>
       {isHero ? (
-        <div className="pointer-events-none absolute -bottom-6 inset-x-4 z-[3] mx-auto max-w-md rounded-2xl border border-white/18 bg-slate-950/82 px-4 py-3.5 text-center shadow-[0_24px_48px_-12px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl sm:-bottom-8 sm:px-5">
+        <div className="pointer-events-none absolute -bottom-6 inset-x-4 z-[3] mx-auto max-w-md rounded-2xl border border-white/14 bg-slate-950/90 px-4 py-3.5 text-center shadow-[0_20px_40px_-14px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.06),inset_0_1px_0_0_rgba(255,255,255,0.08)] backdrop-blur-md sm:-bottom-8 sm:px-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">وجه المنصة التعليمية</p>
           <p className="mt-1 text-base font-extrabold text-white sm:text-lg">{TEACHER_NAME}</p>
           <p className="mt-0.5 text-xs font-medium text-slate-300 sm:text-sm">أستاذ الأدب العربي وعلومه — قراءة منهجية، أسلوب رصين، ولغة أدبية أنيقة</p>
@@ -270,7 +270,7 @@ export default function HomeLanding() {
         className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] sm:bg-[length:120%_120%]"
       >
         {/* Layered ink + color depth (static) */}
-        <div className="pointer-events-none absolute inset-0 z-0 bg-hero-atmosphere opacity-90" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 z-0 bg-hero-atmosphere opacity-[0.82]" aria-hidden />
 
         <div
           className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_120%,rgba(15,23,42,0.92),transparent)]"
@@ -278,12 +278,12 @@ export default function HomeLanding() {
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -start-32 top-0 z-0 h-[28rem] w-[28rem] rounded-full bg-brand-500/20 blur-3xl"
+          className="pointer-events-none absolute -start-32 top-0 z-0 h-[28rem] w-[28rem] rounded-full bg-brand-500/16 blur-3xl"
           style={pStyle(26, 20, -42, -22)}
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -end-24 top-40 z-0 h-[22rem] w-[22rem] rounded-full bg-indigo-500/15 blur-3xl"
+          className="pointer-events-none absolute -end-24 top-40 z-0 h-[22rem] w-[22rem] rounded-full bg-indigo-500/12 blur-3xl"
           style={pStyle(-18, 14, 34, -26)}
           aria-hidden
         />
@@ -303,7 +303,7 @@ export default function HomeLanding() {
           />
         </div>
         <div
-          className="pointer-events-none absolute left-1/2 top-[18%] z-0 h-px w-[min(72vw,56rem)] -translate-x-1/2 rotate-[-11deg] bg-gradient-to-l from-transparent via-white/25 to-transparent blur-sm"
+          className="pointer-events-none absolute left-1/2 top-[18%] z-0 h-px w-[min(72vw,56rem)] -translate-x-1/2 rotate-[-11deg] bg-gradient-to-l from-transparent via-sky-200/12 to-transparent blur-sm"
           style={pStyle(10, 4, -14, -8)}
           aria-hidden
         />
@@ -312,17 +312,18 @@ export default function HomeLanding() {
           className="pointer-events-none absolute inset-0 z-0 mix-blend-soft-light animate-hero-aurora"
           style={{
             background:
-              "radial-gradient(ellipse 70% 55% at 30% 20%, rgba(47,148,255,0.35), transparent 55%), radial-gradient(ellipse 60% 50% at 85% 60%, rgba(99,102,241,0.22), transparent 50%)",
+              "radial-gradient(ellipse 70% 55% at 30% 20%, rgba(47,148,255,0.18), transparent 56%), radial-gradient(ellipse 60% 50% at 85% 60%, rgba(99,102,241,0.11), transparent 52%)",
           }}
           aria-hidden
         />
 
-        {/* Slow-moving soft light veil */}
+        {/* Slow-moving tinted depth — no screen blend / no white milk */}
         <div
-          className={`pointer-events-none absolute inset-0 z-0 mix-blend-screen motion-reduce:animate-none motion-reduce:opacity-[0.15] ${motionOk ? "animate-hero-veil" : "opacity-[0.16]"}`}
+          className={`pointer-events-none absolute inset-0 z-0 motion-reduce:animate-none motion-reduce:opacity-[0.1] ${motionOk ? "animate-hero-veil" : "opacity-[0.12]"}`}
           style={{
+            mixBlendMode: "normal",
             background:
-              "radial-gradient(ellipse 85% 55% at 42% 38%, rgba(255,255,255,0.07), transparent 52%), radial-gradient(ellipse 70% 50% at 78% 72%, rgba(147,197,253,0.09), transparent 48%)",
+              "radial-gradient(ellipse 82% 52% at 38% 34%, rgba(37,99,235,0.085), transparent 54%), radial-gradient(ellipse 68% 46% at 80% 72%, rgba(67,56,202,0.075), transparent 52%), radial-gradient(ellipse 48% 38% at 14% 80%, rgba(13,148,136,0.04), transparent 48%)",
           }}
           aria-hidden
         />
@@ -330,11 +331,11 @@ export default function HomeLanding() {
         {/* Optional pointer-follow radial glow (transform-only) */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <div
-            className="absolute left-1/2 top-[40%] h-[min(115vw,52rem)] w-[min(115vw,52rem)] rounded-full mix-blend-soft-light blur-3xl"
+            className="absolute left-1/2 top-[40%] h-[min(115vw,52rem)] w-[min(115vw,52rem)] rounded-full mix-blend-normal blur-3xl"
             style={{
-              opacity: motionOk ? 0.55 : 0.32,
+              opacity: motionOk ? 0.26 : 0.16,
               background:
-                "radial-gradient(circle at 50% 50%, rgba(191,219,254,0.2) 0%, rgba(59,130,246,0.09) 28%, transparent 58%)",
+                "radial-gradient(circle at 50% 50%, rgba(59,130,246,0.11) 0%, rgba(37,99,235,0.045) 34%, transparent 62%)",
               transform: motionOk
                 ? `translate3d(calc(-50% + ${nx * 32}px), calc(-50% + ${ny * 26}px), 0)`
                 : "translate3d(-50%, -50%, 0)",
@@ -343,29 +344,16 @@ export default function HomeLanding() {
           />
         </div>
 
-        {/* Brand corner — larger lockup, tactile hover */}
-        <div className={`${container} pointer-events-none absolute start-0 top-3 z-20 sm:top-5 lg:top-6`}>
-          <div className="pointer-events-auto flex justify-start">
-            <Link
-              href="/"
-              aria-label={BRAND_NAME}
-              className="group rounded-2xl border border-white/25 bg-white/95 px-4 py-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.45)] backdrop-blur-md transition duration-[320ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/38 hover:bg-white hover:shadow-[0_22px_52px_-20px_rgba(47,148,255,0.18)] active:scale-[0.998] sm:px-5 sm:py-3.5 lg:px-6 lg:py-4"
-            >
-              <BrandLogoFull variant="hero" />
-            </Link>
-          </div>
-        </div>
-
-        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-24 pb-16 sm:pt-28 sm:pb-24 lg:py-28`}>
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-            <div className="relative z-[1] order-2 text-center lg:order-1 lg:text-start">
-              {/* Stronger contrast behind Arabic headline block (RTL-safe) */}
+        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-20 pb-16 sm:pt-24 sm:pb-24 lg:py-28`}>
+          <div className="grid items-center gap-10 sm:gap-12 lg:grid-cols-2 lg:items-start lg:gap-x-14 lg:gap-y-10 xl:gap-x-20">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:mx-0 lg:max-w-lg lg:text-start xl:max-w-xl">
+              {/* Subtle readability veil — no heavy frost */}
               <div
-                className="pointer-events-none absolute -inset-x-3 -inset-y-4 -z-10 rounded-[1.75rem] bg-gradient-to-b from-slate-950/88 via-slate-950/55 to-slate-950/25 ring-1 ring-white/[0.07] backdrop-blur-sm sm:-inset-x-4 sm:-inset-y-5 sm:rounded-[2rem] md:backdrop-blur-[6px] lg:from-slate-950/82 lg:via-slate-950/48"
+                className="pointer-events-none absolute -inset-x-2 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-b from-slate-950/30 via-slate-950/12 to-transparent sm:-inset-x-3 sm:-inset-y-4 sm:rounded-[1.75rem] lg:from-slate-950/26 lg:via-slate-950/08"
                 aria-hidden
               />
               <div
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm backdrop-blur-md sm:text-sm animate-hero-rise transition duration-300 hover:border-white/25 hover:bg-white/[0.1]"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-slate-950/35 px-4 py-2 text-xs font-semibold text-slate-200/95 shadow-sm sm:text-sm animate-hero-rise transition duration-300 hover:border-white/16 hover:bg-slate-950/45"
                 style={{ animationDelay: "0.06s" }}
               >
                 <IconSpark className="size-4 text-brand-300" />
@@ -374,7 +362,7 @@ export default function HomeLanding() {
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-hero-rise"
+                className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white drop-shadow-[0_2px_28px_rgba(2,6,23,0.5)] sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-hero-rise"
                 style={{ animationDelay: "0.14s" }}
               >
                 {heroTitle || (
@@ -388,7 +376,7 @@ export default function HomeLanding() {
               </h1>
 
               <p
-                className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-300 sm:text-lg lg:mx-0 animate-hero-rise"
+                className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-200/90 sm:text-lg lg:mx-0 animate-hero-rise"
                 style={{ animationDelay: "0.22s" }}
               >
                 {heroSubtitle ||
@@ -396,7 +384,7 @@ export default function HomeLanding() {
               </p>
 
               <div
-                className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-3 animate-hero-rise"
+                className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-x-3 sm:gap-y-3 animate-hero-rise"
                 style={{ animationDelay: "0.3s" }}
               >
                 <Link href="/courses" className={btnHeroPrimary}>
@@ -431,7 +419,7 @@ export default function HomeLanding() {
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
                   <span
                     key={label}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.06] px-3 py-1.5 ring-1 ring-white/10 shadow-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/14 hover:bg-white/[0.09] hover:shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.05] px-3 py-1.5 ring-1 ring-white/[0.06] shadow-sm transition duration-[260ms] ease-[cubic-bezier(0.33,0,0.2,1)] hover:border-white/12 hover:bg-white/[0.08] hover:shadow-sm"
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
@@ -442,7 +430,10 @@ export default function HomeLanding() {
               </div>
             </div>
 
-            <div className="order-1 animate-hero-rise lg:order-2 lg:ps-4" style={{ animationDelay: "0.18s" }}>
+            <div
+              className="order-1 flex w-full justify-center animate-hero-rise lg:order-2 lg:justify-center lg:ps-4 lg:pt-2 xl:ps-8"
+              style={{ animationDelay: "0.18s" }}
+            >
               <div
                 className="relative [transform-style:preserve-3d]"
                 style={{

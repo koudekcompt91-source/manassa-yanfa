@@ -18,7 +18,7 @@ const variantClass: Record<NonNullable<BrandLogoFullProps["variant"]>, string> =
   toolbar:
     "h-7 w-auto max-w-[min(190px,52vw)] object-contain object-center sm:h-8 sm:max-w-[210px]",
   landingNav:
-    "h-11 w-auto max-w-[min(300px,78vw)] object-contain object-center sm:h-12 sm:max-w-[min(330px,62vw)] md:h-[3.35rem] md:max-w-[min(360px,48vw)] lg:h-14 lg:max-w-[min(400px,40vw)] xl:h-[3.75rem] xl:max-w-[min(440px,34vw)]",
+    "h-12 w-auto max-w-[min(328px,84vw)] object-contain object-center sm:h-[3.75rem] sm:max-w-[min(380px,70vw)] md:h-[4.05rem] md:max-w-[min(420px,54vw)] lg:h-[4.2rem] lg:max-w-[min(460px,44vw)] xl:h-[4.55rem] xl:max-w-[min(510px,38vw)]",
   hero:
     "h-12 w-auto max-w-[min(320px,82vw)] object-contain object-center sm:h-[3.35rem] sm:max-w-[min(380px,70vw)] md:h-14 md:max-w-[min(420px,56vw)] lg:h-16 lg:max-w-[min(460px,48vw)] xl:h-[4.25rem] xl:max-w-[min(500px,42vw)]",
   auth: "h-9 w-auto max-w-[min(240px,78vw)] object-contain object-center sm:h-10 sm:max-w-[260px]",
@@ -28,7 +28,7 @@ const variantClass: Record<NonNullable<BrandLogoFullProps["variant"]>, string> =
 
 const variantSizes: Record<NonNullable<BrandLogoFullProps["variant"]>, string> = {
   toolbar: "(max-width: 640px) 190px, 210px",
-  landingNav: "(max-width: 768px) 300px, (max-width: 1280px) 380px, 440px",
+  landingNav: "(max-width: 768px) 360px, (max-width: 1280px) 440px, 520px",
   hero: "(max-width: 768px) 360px, (max-width: 1280px) 460px, 500px",
   auth: "(max-width: 640px) 240px, 260px",
   sidebar: "168px",
