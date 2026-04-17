@@ -3,21 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import AuthPageShell, { easePremium, inputFocus } from "@/components/auth/AuthPageShell";
+import AuthPageShell from "@/components/auth/AuthPageShell";
+import {
+  premiumAuthAlertErrorClass,
+  premiumAuthAlertSuccessClass,
+  premiumAuthFieldClass as fieldClass,
+  premiumAuthFooterLinkClass as footerLinkClass,
+  premiumAuthFormFooterClass,
+  premiumAuthLabelClass as labelClass,
+  premiumAuthSubmitClass as submitClass,
+} from "@/components/auth/premiumAuthFormClasses";
 import { STUDENT_LEVEL_SELECT_OPTIONS } from "@/lib/student-level-codes";
-
-const fieldClass =
-  `mt-1.5 w-full touch-manipulation rounded-xl border border-white/[0.1] bg-slate-950/40 px-4 py-3 text-start text-base text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.035)] transition-[border-color,background-color,box-shadow,transform,color] ${easePremium} placeholder:text-slate-500/90 hover:border-white/[0.14] hover:bg-slate-950/48 motion-safe:active:scale-[0.998] motion-reduce:active:scale-100 active:duration-[180ms] active:ease-out ${inputFocus}`;
-
-const labelClass =
-  `block text-sm font-medium tracking-wide text-slate-300 transition-colors ${easePremium} group-focus-within:text-slate-100`;
-
-/** Matches homepage `btnHeroBrand` — full-width auth CTA + tactile press */
-const submitClass =
-  `inline-flex min-h-[3rem] w-full touch-manipulation select-none items-center justify-center rounded-2xl border border-white/22 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_14px_36px_-8px_rgba(24,117,245,0.5)] ring-1 ring-white/28 transition-[transform,filter,box-shadow,ring-color,border-color] ${easePremium} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/38 hover:shadow-[0_18px_48px_-10px_rgba(24,117,245,0.45)] hover:brightness-[1.02] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] active:ease-out disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:brightness-100 disabled:hover:shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_14px_36px_-8px_rgba(24,117,245,0.5)] disabled:hover:ring-white/28 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50`;
-
-const footerLinkClass =
-  `font-semibold text-brand-300/95 no-underline transition-[color,transform,opacity] ${easePremium} motion-safe:hover:text-brand-200 motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98] motion-reduce:active:scale-100 active:duration-[180ms] active:ease-out focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/45`;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -185,16 +181,12 @@ export default function RegisterPage() {
         </div>
 
         {error ? (
-          <p
-            id="register-error"
-            role="alert"
-            className="rounded-xl border border-red-400/20 bg-red-950/45 px-3.5 py-2.5 text-sm leading-relaxed text-red-100/95"
-          >
+          <p id="register-error" role="alert" className={premiumAuthAlertErrorClass}>
             {error}
           </p>
         ) : null}
         {success ? (
-          <p role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-950/38 px-3.5 py-2.5 text-sm leading-relaxed text-emerald-100/95">
+          <p role="status" className={premiumAuthAlertSuccessClass}>
             {success}
           </p>
         ) : null}
@@ -203,9 +195,9 @@ export default function RegisterPage() {
           {loading ? "جاري إنشاء الحساب…" : "إنشاء حساب"}
         </button>
 
-        <p className="pt-0.5 text-center text-sm text-slate-500">
+        <p className={premiumAuthFormFooterClass}>
           لديك حساب بالفعل؟{" "}
-          <Link href="/login" className={`inline-flex touch-manipulation ${footerLinkClass}`}>
+          <Link href="/login" className={footerLinkClass}>
             تسجيل الدخول
           </Link>
         </p>
