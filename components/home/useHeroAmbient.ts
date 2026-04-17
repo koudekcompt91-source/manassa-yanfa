@@ -37,8 +37,8 @@ export function useHeroAmbient(heroId = "hero", enabled = true) {
         const ny = (e.clientY - r.top) / Math.max(1, r.height) - 0.5;
         /* Restrained range: cinematic depth without busy tracking */
         setNudge({
-          x: Math.max(-0.32, Math.min(0.32, nx * 0.65)),
-          y: Math.max(-0.32, Math.min(0.32, ny * 0.65)),
+          x: Math.max(-0.24, Math.min(0.24, nx * 0.5)),
+          y: Math.max(-0.24, Math.min(0.24, ny * 0.5)),
         });
       });
     };

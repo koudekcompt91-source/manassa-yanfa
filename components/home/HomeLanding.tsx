@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useDemoSection } from "@/lib/demo-store";
 import { useHeroAmbient } from "@/components/home/useHeroAmbient";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
@@ -39,10 +39,10 @@ const btnMutedOutline =
   "inline-flex touch-manipulation items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.992] motion-reduce:active:scale-100";
 
 const cardLuxury =
-  "touch-manipulation rounded-3xl border border-slate-200/75 bg-gradient-to-b from-white via-white to-slate-50/75 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/65 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100";
+  "touch-manipulation rounded-3xl border border-slate-200/70 bg-gradient-to-b from-white via-white to-slate-50/80 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/60 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100";
 
 const cardLuxuryFlat =
-  "touch-manipulation rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_8px_28px_-10px_rgba(15,23,42,0.08),0_0_0_1px_rgba(148,163,184,0.1)] transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/60 hover:shadow-card-luxury active:scale-[0.997] motion-reduce:active:scale-100";
+  "touch-manipulation rounded-2xl border border-slate-200/75 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.92)_inset,0_8px_28px_-10px_rgba(15,23,42,0.07),0_0_0_1px_rgba(148,163,184,0.09)] transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/55 hover:shadow-card-luxury active:scale-[0.997] motion-reduce:active:scale-100";
 
 const TEACHER_NAME = "يوسف مادن";
 /** Studio portrait (682×1024); served from /public */
@@ -80,15 +80,15 @@ function TeacherPortrait({
     : "[clip-path:ellipse(100%_97%_at_50%_49%)]";
 
   return (
-    <div className={`relative mx-auto ${isHero ? "group/portrait max-w-md lg:max-w-none" : "max-w-sm"}`}>
+    <div className={`relative mx-auto w-full ${isHero ? "" : "max-w-sm"}`}>
       <div
-        className={`pointer-events-none absolute rounded-full bg-gradient-to-br from-brand-500/40 via-indigo-500/28 to-teal-400/18 blur-3xl animate-soft-glow ${
+        className={`pointer-events-none absolute rounded-full bg-gradient-to-br from-brand-500/40 via-indigo-500/28 to-teal-400/18 blur-3xl motion-safe:animate-soft-glow motion-reduce:animate-none motion-reduce:opacity-[0.68] ${
           isHero ? "-inset-10 sm:-inset-16" : "-inset-6"
         }`}
         aria-hidden
       />
       <div
-        className={`pointer-events-none absolute rounded-full bg-gradient-to-tl from-sky-400/15 via-transparent to-transparent blur-3xl animate-ambient-drift ${
+        className={`pointer-events-none absolute rounded-full bg-gradient-to-tl from-sky-400/15 via-transparent to-transparent blur-3xl motion-safe:animate-ambient-drift motion-reduce:animate-none ${
           isHero ? "-end-8 -top-4 size-48 sm:size-64" : "-end-4 -top-2 size-36"
         }`}
         style={{ animationDelay: "-4s" }}
@@ -136,11 +136,11 @@ function TeacherPortrait({
               width={TEACHER_IMAGE_WIDTH}
               height={TEACHER_IMAGE_HEIGHT}
               priority={priority}
-              sizes={isHero ? "(max-width: 1024px) 100vw, 42vw" : "(max-width: 768px) 100vw, 320px"}
-              className={`relative z-[1] h-auto w-full object-cover transition duration-[1100ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+              sizes={isHero ? "(max-width: 640px) 90vw, (max-width: 1024px) 50vw, (max-width: 1536px) 42vw, 38rem" : "(max-width: 768px) 100vw, 320px"}
+              className={`relative z-[1] h-auto w-full object-cover transition duration-[900ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                 isHero
-                  ? "object-[center_18%] scale-[1.003] motion-safe:group-hover/portrait:scale-[1.006] sm:object-[center_16%] lg:scale-[1.005]"
-                  : "object-[center_20%] scale-[1.002]"
+                  ? "object-[center_18%] scale-[1.001] sm:object-[center_16%] lg:scale-[1.002]"
+                  : "object-[center_20%] scale-[1.001]"
               }`}
             />
           </div>
@@ -250,12 +250,6 @@ export default function HomeLanding() {
   const nx = motionOk ? nudge.x : 0;
   const ny = motionOk ? nudge.y : 0;
   const s = scrollShift;
-  const pStyle = (mx: number, my: number, scrollX: number, scrollY: number) =>
-    ({
-      transform: `translate3d(${nx * mx + s * scrollX}px, ${ny * my + s * scrollY}px, 0)`,
-      transition: motionOk ? "transform 0.95s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
-      willChange: motionOk ? ("transform" as const) : undefined,
-    }) as CSSProperties;
 
   return (
     <div className="bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
@@ -265,87 +259,14 @@ export default function HomeLanding() {
         aria-labelledby="hero-title"
         className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:bg-[length:120%_120%]"
       >
-        {/* Layered ink + color depth (static) */}
-        <div className="pointer-events-none absolute inset-0 z-0 bg-hero-atmosphere opacity-[0.82]" aria-hidden />
+        <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_120%,rgba(15,23,42,0.92),transparent)]"
-          style={pStyle(8, 6, -28, -38)}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -start-32 top-0 z-0 h-[28rem] w-[28rem] rounded-full bg-brand-500/16 blur-3xl"
-          style={pStyle(26, 20, -42, -22)}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -end-24 top-40 z-0 h-[22rem] w-[22rem] rounded-full bg-indigo-500/12 blur-3xl"
-          style={pStyle(-18, 14, 34, -26)}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute start-1/4 top-1/3 z-0 h-[min(42rem,70vw)] w-[min(42rem,70vw)] -translate-x-1/2"
-          aria-hidden
-        >
-          <div
-            className="h-full w-full rounded-full bg-brand-400/10 blur-[100px] animate-ambient-drift"
-            style={pStyle(14, 18, -24, -32)}
-          />
-        </div>
-        <div className="pointer-events-none absolute -end-1/4 bottom-0 z-0 h-[36rem] w-[36rem]" aria-hidden>
-          <div
-            className="h-full w-full rounded-full bg-indigo-400/12 blur-[90px] animate-ambient-drift"
-            style={{ ...pStyle(-12, 10, 20, 14), animationDelay: "-7s" }}
-          />
-        </div>
-        <div
-          className="pointer-events-none absolute left-1/2 top-[18%] z-0 h-px w-[min(72vw,56rem)] -translate-x-1/2 rotate-[-11deg] bg-gradient-to-l from-transparent via-sky-200/12 to-transparent blur-sm"
-          style={pStyle(10, 4, -14, -8)}
-          aria-hidden
-        />
-
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-soft-light animate-hero-aurora"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 55% at 30% 20%, rgba(47,148,255,0.18), transparent 56%), radial-gradient(ellipse 60% 50% at 85% 60%, rgba(99,102,241,0.11), transparent 52%)",
-          }}
-          aria-hidden
-        />
-
-        {/* Slow-moving tinted depth — no screen blend / no white milk */}
-        <div
-          className={`pointer-events-none absolute inset-0 z-0 motion-reduce:animate-none motion-reduce:opacity-[0.1] ${motionOk ? "animate-hero-veil" : "opacity-[0.12]"}`}
-          style={{
-            mixBlendMode: "normal",
-            background:
-              "radial-gradient(ellipse 82% 52% at 38% 34%, rgba(37,99,235,0.085), transparent 54%), radial-gradient(ellipse 68% 46% at 80% 72%, rgba(67,56,202,0.075), transparent 52%), radial-gradient(ellipse 48% 38% at 14% 80%, rgba(13,148,136,0.04), transparent 48%)",
-          }}
-          aria-hidden
-        />
-
-        {/* Optional pointer-follow radial glow (transform-only) */}
-        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-          <div
-            className="absolute left-1/2 top-[40%] h-[min(115vw,52rem)] w-[min(115vw,52rem)] rounded-full mix-blend-normal blur-3xl"
-            style={{
-              opacity: motionOk ? 0.2 : 0.14,
-              background:
-                "radial-gradient(circle at 50% 50%, rgba(59,130,246,0.09) 0%, rgba(37,99,235,0.038) 34%, transparent 62%)",
-              transform: motionOk
-                ? `translate3d(calc(-50% + ${nx * 18}px), calc(-50% + ${ny * 14}px), 0)`
-                : "translate3d(-50%, -50%, 0)",
-              transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.75s ease" : undefined,
-            }}
-          />
-        </div>
-
-        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-20 pb-16 sm:pt-24 sm:pb-24 lg:py-28`}>
-          <div className="grid items-center gap-10 sm:gap-12 lg:grid-cols-2 lg:items-start lg:gap-x-14 lg:gap-y-10 xl:gap-x-20">
-            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:mx-0 lg:max-w-lg lg:text-start xl:max-w-xl">
+        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.5rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
+          <div className="mx-auto grid w-full max-w-[min(100%,80rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-8 lg:gap-y-0 xl:gap-x-12">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[26rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[28rem] xl:pe-10 xl:pt-6">
               {/* Subtle readability veil — no heavy frost */}
               <div
-                className="pointer-events-none absolute -inset-x-2 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-b from-slate-950/30 via-slate-950/12 to-transparent sm:-inset-x-3 sm:-inset-y-4 sm:rounded-[1.75rem] lg:from-slate-950/26 lg:via-slate-950/08"
+                className="pointer-events-none absolute -inset-x-2 -inset-y-3 -z-10 rounded-3xl bg-gradient-to-b from-slate-950/38 via-slate-950/16 to-transparent sm:-inset-x-3 sm:-inset-y-4 sm:rounded-[1.75rem] lg:from-slate-950/32 lg:via-slate-950/11"
                 aria-hidden
               />
               <div
@@ -358,7 +279,7 @@ export default function HomeLanding() {
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.15] tracking-tight text-white drop-shadow-[0_2px_28px_rgba(2,6,23,0.5)] sm:text-4xl md:text-5xl xl:text-[3.25rem] animate-hero-rise"
+                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white drop-shadow-[0_2px_28px_rgba(2,6,23,0.5)] sm:text-[2.125rem] sm:leading-[1.12] md:text-5xl md:leading-[1.1] xl:text-[3.35rem] animate-hero-rise"
                 style={{ animationDelay: "0.1s" }}
               >
                 {heroTitle || (
@@ -372,7 +293,7 @@ export default function HomeLanding() {
               </h1>
 
               <p
-                className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-slate-200/90 sm:text-lg lg:mx-0 animate-hero-rise"
+                className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.75] text-slate-200/88 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-[1.72] lg:mx-0 lg:max-w-none animate-hero-rise"
                 style={{ animationDelay: "0.2s" }}
               >
                 {heroSubtitle ||
@@ -380,7 +301,7 @@ export default function HomeLanding() {
               </p>
 
               <div
-                className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-x-3 sm:gap-y-3 animate-hero-rise"
+                className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:mt-11 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-x-3 sm:gap-y-3 animate-hero-rise"
                 style={{ animationDelay: "0.3s" }}
               >
                 <Link href="/courses" className={btnHeroPrimary}>
@@ -427,25 +348,27 @@ export default function HomeLanding() {
             </div>
 
             <div
-              className="order-1 flex w-full justify-center animate-hero-rise lg:order-2 lg:justify-center lg:ps-4 lg:pt-2 xl:ps-8"
+              className="order-1 flex w-full justify-center justify-self-center px-1 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-7 lg:max-w-none lg:justify-self-start lg:ps-4 lg:pt-2 xl:ps-8 xl:pt-3"
               style={{ animationDelay: "0.14s" }}
             >
-              <div
-                className="relative [transform-style:preserve-3d]"
-                style={{
-                  transform: motionOk ? `translate3d(${nx * 1.8}px, ${ny * 1.4 + s * -4}px, 0)` : undefined,
-                  transition: motionOk ? "transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
-                  willChange: motionOk ? "transform" : undefined,
-                }}
-              >
+              <div className="w-full max-w-[min(22rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(36rem,calc(50vw-1.5rem))] xl:max-w-[min(38rem,44vw)]">
                 <div
-                  className="relative will-change-transform"
+                  className="relative [transform-style:preserve-3d]"
                   style={{
-                    transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.12}deg) rotateY(${nx * 0.14}deg)` : undefined,
-                    transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
+                    transform: motionOk ? `translate3d(${nx * 1.1}px, ${ny * 0.85 + s * -2.5}px, 0)` : undefined,
+                    transition: motionOk ? "transform 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
+                    willChange: motionOk ? "transform" : undefined,
                   }}
                 >
-                  <TeacherPortrait variant="hero" priority />
+                  <div
+                    className="relative will-change-transform"
+                    style={{
+                      transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.07}deg) rotateY(${nx * 0.08}deg)` : undefined,
+                      transition: motionOk ? "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
+                    }}
+                  >
+                    <TeacherPortrait variant="hero" priority />
+                  </div>
                 </div>
               </div>
             </div>
@@ -728,9 +651,9 @@ export default function HomeLanding() {
               <Link
                 href="/"
                 aria-label={BRAND_NAME}
-                className="inline-flex items-center gap-3 text-lg font-extrabold text-slate-900 no-underline hover:opacity-90"
+                className="inline-flex items-center gap-1 text-lg font-extrabold text-slate-900 no-underline transition-opacity duration-200 hover:opacity-90"
               >
-                <BrandLogoFull variant="toolbar" />
+                <BrandLogoMark variant="footer" showWordmark />
               </Link>
               <p className="mt-4 text-sm leading-relaxed text-slate-600">
                 {homepageContent?.supportText ||

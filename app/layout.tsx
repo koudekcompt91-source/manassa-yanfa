@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   description:
     "yanfa3 Education — أكاديمية عربية متخصصة في النحو والبلاغة والشعر والنقد وتحليل النصوص الأدبية.",
   icons: {
-    icon: [{ url: "/brand/yanfa-icon-mark.jpg", type: "image/jpeg" }],
-    apple: [{ url: "/brand/yanfa-icon-mark.jpg", type: "image/jpeg" }],
+    icon: [{ url: "/brand/yanfa-icon-mark.png", type: "image/png" }],
+    apple: [{ url: "/brand/yanfa-icon-mark.png", type: "image/png" }],
   },
 };
 

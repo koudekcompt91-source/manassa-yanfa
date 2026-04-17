@@ -49,24 +49,25 @@
   inset: 0;
   pointer-events: none;
   z-index: 2;
+  /* Slightly deeper vignette behind type + portrait; keeps Arabic copy crisp */
   background: linear-gradient(
       180deg,
-      rgba(2, 6, 23, 0.38) 0%,
-      transparent 14%,
-      transparent 82%,
-      rgba(2, 6, 23, 0.55) 100%
+      rgba(2, 6, 23, 0.42) 0%,
+      transparent 15%,
+      transparent 80%,
+      rgba(2, 6, 23, 0.58) 100%
     ),
-    radial-gradient(ellipse 70% 55% at 50% 48%, transparent 30%, rgba(2, 6, 23, 0.26) 100%);
+    radial-gradient(ellipse 72% 58% at 50% 46%, transparent 26%, rgba(2, 8, 28, 0.3) 100%);
 }
 
 @layer utilities {
   /* Scroll-driven section reveals (toggled by IntersectionObserver in HomeLanding) */
   [data-section-reveal] {
     opacity: 0;
-    transform: translate3d(0, 0.4rem, 0);
+    transform: translate3d(0, 0.32rem, 0);
     transition:
-      opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
   [data-section-reveal].section-reveal-visible {
     opacity: 1;

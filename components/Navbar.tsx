@@ -5,8 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { authStore } from "@/lib/auth";
 import { formatDzd } from "@/lib/format-money";
-import BrandLogoFull from "@/components/brand/BrandLogoFull";
 import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
+import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
 type StudentNavUser = {
@@ -130,7 +130,7 @@ export default function Navbar() {
       <nav
         className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8 ${
           isMarketingHome
-            ? "min-h-[5.55rem] py-2.5 sm:min-h-[6.1rem] sm:py-3 md:min-h-[6.5rem] md:py-3.5 lg:min-h-[6.85rem] lg:py-4"
+            ? "min-h-[5.95rem] py-2.5 sm:min-h-[6.45rem] sm:py-3 md:min-h-[6.65rem] md:py-3.5 lg:min-h-[6.95rem] lg:py-4"
             : "h-16"
         }`}
         aria-label="التنقل الرئيسي"
@@ -138,18 +138,15 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label={BRAND_NAME}
-          className={`flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition-[background-color,box-shadow,transform] duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] motion-safe:hover:scale-[1.004] motion-safe:active:scale-[0.998] motion-reduce:transform-none ${
-            isMarketingHome
-              ? "-ms-0.5 rounded-2xl py-1.5 pe-2 ps-1 sm:-ms-1 sm:py-2 sm:pe-2.5 sm:ps-1.5 ring-1 ring-slate-200/35 bg-slate-50/40 hover:bg-slate-50/70 hover:ring-slate-200/55"
-              : "rounded-xl py-0.5"
-          }`}
+          className="flex shrink-0 items-center no-underline decoration-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-lg py-0.5 transition-colors duration-200 ease-out hover:bg-slate-50/90"
           onClick={() => setMobileOpen(false)}
         >
           {compactPublicBrand ? (
             <BrandLogoIcon size="md" className="shadow-sm" />
           ) : (
-            <BrandLogoFull
-              variant={isMarketingHome ? "landingNav" : "toolbar"}
+            <BrandLogoMark
+              variant={isMarketingHome ? "navPrimary" : "nav"}
+              showWordmark
               priority={isMarketingHome}
             />
           )}
