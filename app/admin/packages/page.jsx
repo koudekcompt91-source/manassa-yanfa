@@ -40,6 +40,16 @@ const EMPTY_LESSON_FORM = {
   durationSec: "",
 };
 
+const EMPTY_LIVE_SESSION_FORM = {
+  title: "",
+  description: "",
+  zoomUrl: "",
+  startsAt: "",
+  durationMin: 60,
+  status: "SCHEDULED",
+  isPublished: true,
+};
+
 export default function AdminPackagesPage() {
   const [categories] = useDemoSection("categories");
   const [teachers] = useDemoSection("teachers");
@@ -66,6 +76,13 @@ export default function AdminPackagesPage() {
   const [editingLessonId, setEditingLessonId] = useState(null);
   const [lessonError, setLessonError] = useState("");
   const [lessonSaving, setLessonSaving] = useState(false);
+  const [managerTab, setManagerTab] = useState("RECORDED");
+  const [liveSessions, setLiveSessions] = useState([]);
+  const [liveSessionsLoading, setLiveSessionsLoading] = useState(false);
+  const [liveSessionForm, setLiveSessionForm] = useState(EMPTY_LIVE_SESSION_FORM);
+  const [editingLiveSessionId, setEditingLiveSessionId] = useState(null);
+  const [liveSessionError, setLiveSessionError] = useState("");
+  const [liveSessionSaving, setLiveSessionSaving] = useState(false);
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -240,21 +257,39 @@ export default function AdminPackagesPage() {
   async function openLessonsManager(course) {
     setLessonCourse(course);
     setLessonModalOpen(true);
+    setManagerTab("RECORDED");
     setEditingLessonId(null);
     setLessonForm(EMPTY_LESSON_FORM);
     setLessonError("");
+    setEditingLiveSessionId(null);
+    setLiveSessionForm(EMPTY_LIVE_SESSION_FORM);
+    setLiveSessionError("");
     setLessonsLoading(true);
+    setLiveSessionsLoading(true);
     try {
-      const res = await fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.ok) {
-        setLessonError(data?.message || "تعذّر تحميل الدروس.");
+      const [lessonsRes, sessionsRes] = await Promise.all([
+        fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" }),
+        fetch(`/api/admin/courses/${course.id}/live-sessions`, { credentials: "include" }),
+      ]);
+
+      const lessonsData = await lessonsRes.json().catch(() => ({}));
+      if (!lessonsRes.ok || !lessonsData?.ok) {
+        setLessonError(lessonsData?.message || "تعذّر تحميل الدروس.");
         setLessons([]);
-        return;
+      } else {
+        setLessons(Array.isArray(lessonsData.lessons) ? lessonsData.lessons : []);
       }
-      setLessons(Array.isArray(data.lessons) ? data.lessons : []);
+
+      const sessionsData = await sessionsRes.json().catch(() => ({}));
+      if (!sessionsRes.ok || !sessionsData?.ok) {
+        setLiveSessionError(sessionsData?.message || "تعذّر تحميل الحصص المباشرة.");
+        setLiveSessions([]);
+      } else {
+        setLiveSessions(Array.isArray(sessionsData.liveSessions) ? sessionsData.liveSessions : []);
+      }
     } finally {
       setLessonsLoading(false);
+      setLiveSessionsLoading(false);
     }
   }
 
@@ -351,10 +386,88 @@ export default function AdminPackagesPage() {
     await openLessonsManager(lessonCourse);
   }
 
+  function openLiveSessionEdit(session) {
+    const startsAtValue = session?.startsAt ? new Date(session.startsAt).toISOString().slice(0, 16) : "";
+    setEditingLiveSessionId(session.id);
+    setLiveSessionForm({
+      title: session.title || "",
+      description: session.description || "",
+      zoomUrl: session.zoomUrl || "",
+      startsAt: startsAtValue,
+      durationMin: Number(session.durationMin || 60) || 60,
+      status: session.status || "SCHEDULED",
+      isPublished: session.isPublished === true,
+    });
+    setLiveSessionError("");
+  }
+
+  function resetLiveSessionForm() {
+    setEditingLiveSessionId(null);
+    setLiveSessionForm(EMPTY_LIVE_SESSION_FORM);
+    setLiveSessionError("");
+  }
+
+  async function saveLiveSession(e) {
+    e.preventDefault();
+    if (!lessonCourse) return;
+    setLiveSessionError("");
+    setLiveSessionSaving(true);
+    try {
+      const payload = {
+        ...liveSessionForm,
+        durationMin: Math.max(1, Number(liveSessionForm.durationMin) || 1),
+      };
+      const isEdit = Boolean(editingLiveSessionId);
+      const url = isEdit
+        ? `/api/admin/live-sessions/${editingLiveSessionId}`
+        : `/api/admin/courses/${lessonCourse.id}/live-sessions`;
+      const method = isEdit ? "PATCH" : "POST";
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setLiveSessionError(data?.message || "تعذّر حفظ الحصة المباشرة.");
+        return;
+      }
+      await openLessonsManager(lessonCourse);
+      setManagerTab("LIVE");
+      resetLiveSessionForm();
+    } finally {
+      setLiveSessionSaving(false);
+    }
+  }
+
+  async function deleteLiveSession(sessionId) {
+    const res = await fetch(`/api/admin/live-sessions/${sessionId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setLiveSessionError(data?.message || "تعذّر حذف الحصة المباشرة.");
+      return;
+    }
+    if (lessonCourse) {
+      await openLessonsManager(lessonCourse);
+      setManagerTab("LIVE");
+    }
+  }
+
   function shortText(value, max = 96) {
     const s = String(value || "").trim();
     if (!s) return "بدون وصف.";
     return s.length > max ? `${s.slice(0, max)}...` : s;
+  }
+
+  function liveStatusMeta(status) {
+    if (status === "LIVE") return { label: "مباشر الآن", tone: "success" };
+    if (status === "ENDED") return { label: "انتهت", tone: "warning" };
+    if (status === "CANCELLED") return { label: "ملغاة", tone: "warning" };
+    return { label: "قادمة", tone: "brand" };
   }
 
   return (
@@ -562,73 +675,191 @@ export default function AdminPackagesPage() {
               <AdminActionButton onClick={() => setLessonModalOpen(false)}>إغلاق</AdminActionButton>
             </div>
 
-            <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveLesson}>
-              <AdminFormField label="عنوان الدرس">
-                <AdminInput value={lessonForm.title} onChange={(e) => setLessonForm((s) => ({ ...s, title: e.target.value }))} required />
-              </AdminFormField>
-              <AdminFormField label="رابط يوتيوب">
-                <AdminInput value={lessonForm.youtubeUrl} onChange={(e) => setLessonForm((s) => ({ ...s, youtubeUrl: e.target.value }))} placeholder="https://youtube.com/watch?v=..." required />
-              </AdminFormField>
-              <AdminFormField label="الوصف (اختياري)">
-                <AdminInput value={lessonForm.description} onChange={(e) => setLessonForm((s) => ({ ...s, description: e.target.value }))} />
-              </AdminFormField>
-              <AdminFormField label="الترتيب">
-                <AdminInput type="number" min="1" value={lessonForm.order} onChange={(e) => setLessonForm((s) => ({ ...s, order: Number(e.target.value) || 1 }))} />
-              </AdminFormField>
-              <AdminFormField label="المدة بالثواني (اختياري)">
-                <AdminInput type="number" min="0" value={lessonForm.durationSec} onChange={(e) => setLessonForm((s) => ({ ...s, durationSec: e.target.value }))} />
-              </AdminFormField>
-              <AdminFormField label="الحالة">
-                <AdminSelect value={lessonForm.isPublished ? "1" : "0"} onChange={(e) => setLessonForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}>
-                  <option value="1">منشور</option>
-                  <option value="0">مخفي</option>
-                </AdminSelect>
-              </AdminFormField>
-              <AdminFormField label="معاينة مجانية">
-                <AdminSelect value={lessonForm.isFreePreview ? "1" : "0"} onChange={(e) => setLessonForm((s) => ({ ...s, isFreePreview: e.target.value === "1" }))}>
-                  <option value="0">لا</option>
-                  <option value="1">نعم</option>
-                </AdminSelect>
-              </AdminFormField>
-              {lessonError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:col-span-2">{lessonError}</p> : null}
-              <div className="flex flex-wrap gap-2 md:col-span-2">
-                <AdminActionButton type="submit" tone="primary" disabled={lessonSaving}>
-                  {lessonSaving ? "جاري الحفظ..." : editingLessonId ? "تحديث الدرس" : "إضافة درس"}
-                </AdminActionButton>
-                {editingLessonId ? (
-                  <AdminActionButton type="button" onClick={resetLessonForm}>
-                    إلغاء التعديل
-                  </AdminActionButton>
-                ) : null}
-              </div>
-            </form>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <AdminActionButton
+                onClick={() => setManagerTab("RECORDED")}
+                tone={managerTab === "RECORDED" ? "primary" : undefined}
+              >
+                الدروس المسجلة
+              </AdminActionButton>
+              <AdminActionButton
+                onClick={() => setManagerTab("LIVE")}
+                tone={managerTab === "LIVE" ? "primary" : undefined}
+              >
+                الحصص المباشرة
+              </AdminActionButton>
+            </div>
 
-            {lessonsLoading ? <p className="mt-4 text-sm text-slate-600">جاري تحميل الدروس...</p> : null}
-            {!lessonsLoading && !lessons.length ? <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">لا توجد دروس بعد. أضف أول درس للدورة.</p> : null}
-            {!lessonsLoading && lessons.length ? (
-              <div className="mt-4 space-y-2">
-                {lessons.map((lesson, idx) => (
-                  <div key={lesson.id} className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm">
-                    <div>
-                      <p className="font-semibold text-slate-900">
-                        {idx + 1}. {lesson.title}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">{lesson.youtubeUrl}</p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <AdminBadge tone={lesson.isPublished ? "success" : "warning"}>{lesson.isPublished ? "منشور" : "مخفي"}</AdminBadge>
-                        {lesson.isFreePreview ? <AdminBadge tone="brand">معاينة مجانية</AdminBadge> : null}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <AdminActionButton onClick={() => moveLesson(lesson.id, "up")} disabled={idx === 0}>رفع</AdminActionButton>
-                      <AdminActionButton onClick={() => moveLesson(lesson.id, "down")} disabled={idx === lessons.length - 1}>خفض</AdminActionButton>
-                      <AdminActionButton onClick={() => openLessonEdit(lesson)}>تعديل</AdminActionButton>
-                      <AdminActionButton onClick={() => deleteLesson(lesson.id)} tone="danger">حذف</AdminActionButton>
-                    </div>
+            {managerTab === "RECORDED" ? (
+              <>
+                <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveLesson}>
+                  <AdminFormField label="عنوان الدرس">
+                    <AdminInput value={lessonForm.title} onChange={(e) => setLessonForm((s) => ({ ...s, title: e.target.value }))} required />
+                  </AdminFormField>
+                  <AdminFormField label="رابط يوتيوب">
+                    <AdminInput value={lessonForm.youtubeUrl} onChange={(e) => setLessonForm((s) => ({ ...s, youtubeUrl: e.target.value }))} placeholder="https://youtube.com/watch?v=..." required />
+                  </AdminFormField>
+                  <AdminFormField label="الوصف (اختياري)">
+                    <AdminInput value={lessonForm.description} onChange={(e) => setLessonForm((s) => ({ ...s, description: e.target.value }))} />
+                  </AdminFormField>
+                  <AdminFormField label="الترتيب">
+                    <AdminInput type="number" min="1" value={lessonForm.order} onChange={(e) => setLessonForm((s) => ({ ...s, order: Number(e.target.value) || 1 }))} />
+                  </AdminFormField>
+                  <AdminFormField label="المدة بالثواني (اختياري)">
+                    <AdminInput type="number" min="0" value={lessonForm.durationSec} onChange={(e) => setLessonForm((s) => ({ ...s, durationSec: e.target.value }))} />
+                  </AdminFormField>
+                  <AdminFormField label="الحالة">
+                    <AdminSelect value={lessonForm.isPublished ? "1" : "0"} onChange={(e) => setLessonForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}>
+                      <option value="1">منشور</option>
+                      <option value="0">مخفي</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  <AdminFormField label="معاينة مجانية">
+                    <AdminSelect value={lessonForm.isFreePreview ? "1" : "0"} onChange={(e) => setLessonForm((s) => ({ ...s, isFreePreview: e.target.value === "1" }))}>
+                      <option value="0">لا</option>
+                      <option value="1">نعم</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  {lessonError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:col-span-2">{lessonError}</p> : null}
+                  <div className="flex flex-wrap gap-2 md:col-span-2">
+                    <AdminActionButton type="submit" tone="primary" disabled={lessonSaving}>
+                      {lessonSaving ? "جاري الحفظ..." : editingLessonId ? "تحديث الدرس" : "إضافة درس"}
+                    </AdminActionButton>
+                    {editingLessonId ? (
+                      <AdminActionButton type="button" onClick={resetLessonForm}>
+                        إلغاء التعديل
+                      </AdminActionButton>
+                    ) : null}
                   </div>
-                ))}
-              </div>
-            ) : null}
+                </form>
+
+                {lessonsLoading ? <p className="mt-4 text-sm text-slate-600">جاري تحميل الدروس...</p> : null}
+                {!lessonsLoading && !lessons.length ? <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">لا توجد دروس بعد. أضف أول درس للدورة.</p> : null}
+                {!lessonsLoading && lessons.length ? (
+                  <div className="mt-4 space-y-2">
+                    {lessons.map((lesson, idx) => (
+                      <div key={lesson.id} className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm">
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {idx + 1}. {lesson.title}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">{lesson.youtubeUrl}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <AdminBadge tone={lesson.isPublished ? "success" : "warning"}>{lesson.isPublished ? "منشور" : "مخفي"}</AdminBadge>
+                            {lesson.isFreePreview ? <AdminBadge tone="brand">معاينة مجانية</AdminBadge> : null}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <AdminActionButton onClick={() => moveLesson(lesson.id, "up")} disabled={idx === 0}>رفع</AdminActionButton>
+                          <AdminActionButton onClick={() => moveLesson(lesson.id, "down")} disabled={idx === lessons.length - 1}>خفض</AdminActionButton>
+                          <AdminActionButton onClick={() => openLessonEdit(lesson)}>تعديل</AdminActionButton>
+                          <AdminActionButton onClick={() => deleteLesson(lesson.id)} tone="danger">حذف</AdminActionButton>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveLiveSession}>
+                  <AdminFormField label="عنوان الحصة">
+                    <AdminInput value={liveSessionForm.title} onChange={(e) => setLiveSessionForm((s) => ({ ...s, title: e.target.value }))} required />
+                  </AdminFormField>
+                  <AdminFormField label="رابط Zoom">
+                    <AdminInput
+                      value={liveSessionForm.zoomUrl}
+                      onChange={(e) => setLiveSessionForm((s) => ({ ...s, zoomUrl: e.target.value }))}
+                      placeholder="https://zoom.us/j/..."
+                      required
+                    />
+                  </AdminFormField>
+                  <AdminFormField label="الوصف (اختياري)">
+                    <AdminInput value={liveSessionForm.description} onChange={(e) => setLiveSessionForm((s) => ({ ...s, description: e.target.value }))} />
+                  </AdminFormField>
+                  <AdminFormField label="تاريخ ووقت البداية">
+                    <AdminInput
+                      type="datetime-local"
+                      value={liveSessionForm.startsAt}
+                      onChange={(e) => setLiveSessionForm((s) => ({ ...s, startsAt: e.target.value }))}
+                      required
+                    />
+                  </AdminFormField>
+                  <AdminFormField label="المدة بالدقائق">
+                    <AdminInput
+                      type="number"
+                      min="1"
+                      value={liveSessionForm.durationMin}
+                      onChange={(e) => setLiveSessionForm((s) => ({ ...s, durationMin: Number(e.target.value) || 1 }))}
+                      required
+                    />
+                  </AdminFormField>
+                  <AdminFormField label="الحالة">
+                    <AdminSelect value={liveSessionForm.status} onChange={(e) => setLiveSessionForm((s) => ({ ...s, status: e.target.value }))}>
+                      <option value="SCHEDULED">قادمة</option>
+                      <option value="LIVE">مباشر الآن</option>
+                      <option value="ENDED">انتهت</option>
+                      <option value="CANCELLED">ملغاة</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  <AdminFormField label="النشر">
+                    <AdminSelect
+                      value={liveSessionForm.isPublished ? "1" : "0"}
+                      onChange={(e) => setLiveSessionForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}
+                    >
+                      <option value="1">منشورة</option>
+                      <option value="0">مخفية</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  {liveSessionError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:col-span-2">{liveSessionError}</p> : null}
+                  <div className="flex flex-wrap gap-2 md:col-span-2">
+                    <AdminActionButton type="submit" tone="primary" disabled={liveSessionSaving}>
+                      {liveSessionSaving ? "جاري الحفظ..." : editingLiveSessionId ? "تحديث الحصة" : "إضافة حصة مباشرة"}
+                    </AdminActionButton>
+                    {editingLiveSessionId ? (
+                      <AdminActionButton type="button" onClick={resetLiveSessionForm}>
+                        إلغاء التعديل
+                      </AdminActionButton>
+                    ) : null}
+                  </div>
+                </form>
+
+                {liveSessionsLoading ? <p className="mt-4 text-sm text-slate-600">جاري تحميل الحصص المباشرة...</p> : null}
+                {!liveSessionsLoading && !liveSessions.length ? (
+                  <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                    لا توجد حصص مباشرة بعد.
+                  </p>
+                ) : null}
+                {!liveSessionsLoading && liveSessions.length ? (
+                  <div className="mt-4 space-y-2">
+                    {liveSessions.map((session) => {
+                      const meta = liveStatusMeta(session.status);
+                      return (
+                        <div key={session.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm">
+                          <div>
+                            <p className="font-semibold text-slate-900">{session.title}</p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {new Date(session.startsAt).toLocaleString("ar-DZ")} - {session.durationMin} دقيقة
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">{session.zoomUrl}</p>
+                            <div className="mt-2 flex flex-wrap items-center gap-2">
+                              <AdminBadge tone={meta.tone}>{meta.label}</AdminBadge>
+                              <AdminBadge tone={session.isPublished ? "success" : "warning"}>
+                                {session.isPublished ? "منشورة" : "مخفية"}
+                              </AdminBadge>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <AdminActionButton onClick={() => openLiveSessionEdit(session)}>تعديل</AdminActionButton>
+                            <AdminActionButton onClick={() => deleteLiveSession(session.id)} tone="danger">حذف</AdminActionButton>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
         </div>
       ) : null}

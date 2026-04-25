@@ -28,6 +28,13 @@ enum CourseStatus {
   PUBLISHED
 }
 
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -112,6 +119,7 @@ model Course {
   updatedAt    DateTime         @updatedAt
 
   lessons      Lesson[]
+  liveSessions LiveSession[]
 }
 
 model Lesson {
@@ -130,4 +138,22 @@ model Lesson {
   updatedAt     DateTime @updatedAt
 
   @@index([courseId, order])
+}
+
+model LiveSession {
+  id          String            @id @default(cuid())
+  courseId    String
+  course      Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String            @default("")
+  zoomUrl     String
+  startsAt    DateTime
+  durationMin Int
+  status      LiveSessionStatus @default(SCHEDULED)
+  isPublished Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([courseId, startsAt])
+  @@index([courseId, isPublished, startsAt])
 }
