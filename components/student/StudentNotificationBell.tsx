@@ -21,12 +21,49 @@ function formatWhen(iso: string) {
   }
 }
 
-export default function StudentNotificationBell() {
+type StudentNotificationBellProps = {
+  enableToast?: boolean;
+};
+
+export default function StudentNotificationBell({ enableToast = true }: StudentNotificationBellProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<NotificationRow[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [toastRow, setToastRow] = useState<NotificationRow | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastProgressRunning, setToastProgressRunning] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
+  const latestKnownMsRef = useRef(0);
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const hideTimerRef = useRef<number | null>(null);
+  const removeTimerRef = useRef<number | null>(null);
+
+  const closeToast = useCallback(() => {
+    setToastVisible(false);
+    setToastProgressRunning(false);
+    if (removeTimerRef.current) window.clearTimeout(removeTimerRef.current);
+    removeTimerRef.current = window.setTimeout(() => {
+      setToastRow(null);
+    }, 350);
+  }, []);
+
+  const showToast = useCallback(
+    (row: NotificationRow) => {
+      if (!enableToast) return;
+      if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current);
+      if (removeTimerRef.current) window.clearTimeout(removeTimerRef.current);
+      setToastRow(row);
+      setToastVisible(true);
+      setToastProgressRunning(false);
+      window.requestAnimationFrame(() => setToastProgressRunning(true));
+      hideTimerRef.current = window.setTimeout(() => {
+        closeToast();
+      }, 5000);
+    },
+    [closeToast, enableToast]
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -34,17 +71,53 @@ export default function StudentNotificationBell() {
       const res = await fetch("/api/notifications?limit=8", { cache: "no-store", credentials: "include" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) return;
-      setRows(Array.isArray(data.notifications) ? data.notifications : []);
+      const nextRows: NotificationRow[] = Array.isArray(data.notifications) ? data.notifications : [];
+      setRows(nextRows);
       setUnreadCount(Number(data.unreadCount || 0) || 0);
+
+      const nextLatestMs = nextRows.reduce((max, row) => {
+        const t = new Date(row.createdAt).getTime();
+        return Number.isFinite(t) ? Math.max(max, t) : max;
+      }, latestKnownMsRef.current);
+
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        latestKnownMsRef.current = nextLatestMs;
+        nextRows.forEach((row) => seenIdsRef.current.add(row.id));
+        return;
+      }
+
+      const incoming = nextRows.filter((row) => {
+        const t = new Date(row.createdAt).getTime();
+        return Number.isFinite(t) && t > latestKnownMsRef.current && !seenIdsRef.current.has(row.id);
+      });
+
+      if (incoming.length) {
+        const latestIncoming = incoming.sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )[incoming.length - 1];
+        showToast(latestIncoming);
+      }
+
+      latestKnownMsRef.current = nextLatestMs;
+      nextRows.forEach((row) => seenIdsRef.current.add(row.id));
+      if (seenIdsRef.current.size > 200) {
+        const keep = new Set(nextRows.map((row) => row.id));
+        seenIdsRef.current = keep;
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     load();
-    const t = window.setInterval(load, 30000);
-    return () => window.clearInterval(t);
+    const t = window.setInterval(load, 15000);
+    return () => {
+      window.clearInterval(t);
+      if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current);
+      if (removeTimerRef.current) window.clearTimeout(removeTimerRef.current);
+    };
   }, [load]);
 
   useEffect(() => {
@@ -79,6 +152,46 @@ export default function StudentNotificationBell() {
 
   return (
     <div className="relative" ref={rootRef}>
+      {toastRow ? (
+        <button
+          type="button"
+          onClick={() => {
+            if (toastRow.link) window.location.href = toastRow.link;
+            closeToast();
+          }}
+          className={`fixed left-1/2 top-4 z-[80] w-[min(92vw,30rem)] -translate-x-1/2 overflow-hidden rounded-2xl bg-gradient-to-l from-rose-700 to-red-600 text-white shadow-[0_14px_35px_-16px_rgba(190,24,93,0.65)] transition-all duration-300 ${
+            toastVisible ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"
+          }`}
+          dir="rtl"
+        >
+          <div className="flex items-start justify-between gap-3 p-4 pe-3">
+            <div className="min-w-0 text-start">
+              <p className="text-xs font-bold text-rose-100">إشعار جديد</p>
+              <p className="mt-1 text-sm font-extrabold text-white">{toastRow.title}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-rose-100">{toastRow.message}</p>
+            </div>
+            <button
+              type="button"
+              aria-label="إغلاق الإشعار"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeToast();
+              }}
+              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30"
+            >
+              <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l8 8M14 6l-8 8" />
+              </svg>
+            </button>
+          </div>
+          <div className="h-1 w-full bg-white/20">
+            <div
+              className={`h-full bg-white/80 transition-[width] ease-linear ${toastProgressRunning ? "w-0 duration-[5000ms]" : "w-full duration-0"}`}
+            />
+          </div>
+        </button>
+      ) : null}
+
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

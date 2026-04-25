@@ -314,7 +314,7 @@ export default function Navbar() {
                 ) : student ? (
                   <>
                     <div className="mb-1 flex justify-start">
-                      <StudentNotificationBell />
+                      <StudentNotificationBell enableToast={false} />
                     </div>
                     <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-3">
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-base font-extrabold text-white">
