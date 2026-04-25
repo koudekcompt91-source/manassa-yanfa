@@ -113,7 +113,7 @@ export default function CourseChatPanel({
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm sm:p-5">
+    <div className="interactive-card mt-4 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
         <p className="text-sm font-extrabold text-slate-900">المحادثة مع الأستاذ</p>
         <p className="mt-1 text-xs text-slate-600">
@@ -167,7 +167,7 @@ export default function CourseChatPanel({
           type="button"
           onClick={() => void send()}
           disabled={closed || sending || !body.trim()}
-          className="h-fit rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+          className="touch-button-primary h-fit px-4 py-2"
         >
           {sending ? "..." : "إرسال"}
         </button>

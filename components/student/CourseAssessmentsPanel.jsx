@@ -121,7 +121,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
 
   return (
     <div className="mt-4 grid gap-4 lg:grid-cols-[320px_1fr]">
-      <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <aside className="interactive-card rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <h3 className="px-2 text-sm font-extrabold text-slate-900">الواجبات والاختبارات</h3>
         {state.loading ? <p className="px-2 py-3 text-sm text-slate-500">جاري التحميل...</p> : null}
         {state.error ? <p className="mx-2 mt-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{state.error}</p> : null}
@@ -132,7 +132,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
               key={row.id}
               type="button"
               onClick={() => setActiveAssessmentId(row.id)}
-              className={`w-full rounded-xl border px-3 py-2 text-start text-sm ${activeAssessmentId === row.id ? "border-brand-500 bg-brand-50/40" : "border-slate-200 bg-slate-50/40 hover:bg-slate-50"}`}
+              className={`interactive-card w-full rounded-xl border px-3 py-2 text-start text-sm ${activeAssessmentId === row.id ? "border-brand-500 bg-brand-50/40" : "border-slate-200 bg-slate-50/40 hover:bg-slate-50"}`}
             >
               <p className="font-bold text-slate-900">{row.title}</p>
               <p className="mt-1 text-[11px] text-slate-500">{row.type === "QUIZ" ? "اختبار" : "واجب"} - {fmtDate(row.dueDate)}</p>
@@ -143,7 +143,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
         </div>
       </aside>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="interactive-card rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         {!selected ? <p className="text-sm text-slate-500">اختر اختبارًا أو واجبًا لعرضه.</p> : null}
         {selected && detail.loading ? <p className="text-sm text-slate-500">جاري التحميل...</p> : null}
         {selected && detail.error ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{detail.error}</p> : null}
@@ -158,7 +158,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
 
             <div className="space-y-3">
               {detail.questions.map((q, idx) => (
-                <article key={q.id} className="rounded-xl border border-slate-200 bg-white p-3">
+                <article key={q.id} className="interactive-card rounded-xl border border-slate-200 bg-white p-3">
                   <p className="font-bold text-slate-900">{idx + 1}. {q.questionText}</p>
                   <p className="mt-1 text-xs text-slate-500">النقاط: {q.points}</p>
                   {detail.canSubmit ? (
@@ -179,8 +179,8 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
                         </div>
                       ) : q.type === "TRUE_FALSE" ? (
                         <div className="flex gap-2">
-                          <button type="button" onClick={() => setDraftAnswers((s) => ({ ...s, [q.id]: { value: true } }))} className={`rounded-lg px-3 py-1.5 text-sm ${draftAnswers[q.id]?.value === true ? "bg-brand-600 text-white" : "border border-slate-200"}`}>صح</button>
-                          <button type="button" onClick={() => setDraftAnswers((s) => ({ ...s, [q.id]: { value: false } }))} className={`rounded-lg px-3 py-1.5 text-sm ${draftAnswers[q.id]?.value === false ? "bg-brand-600 text-white" : "border border-slate-200"}`}>خطأ</button>
+                          <button type="button" onClick={() => setDraftAnswers((s) => ({ ...s, [q.id]: { value: true } }))} className={`interactive-tab rounded-lg px-3 py-1.5 text-sm ${draftAnswers[q.id]?.value === true ? "bg-brand-600 text-white" : "border border-slate-200"}`}>صح</button>
+                          <button type="button" onClick={() => setDraftAnswers((s) => ({ ...s, [q.id]: { value: false } }))} className={`interactive-tab rounded-lg px-3 py-1.5 text-sm ${draftAnswers[q.id]?.value === false ? "bg-brand-600 text-white" : "border border-slate-200"}`}>خطأ</button>
                         </div>
                       ) : (
                         <textarea
@@ -212,7 +212,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
                 type="button"
                 onClick={() => void submit()}
                 disabled={submitting}
-                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                className="touch-button-primary px-4 py-2"
               >
                 {submitting ? "جاري الإرسال..." : "ابدأ"}
               </button>

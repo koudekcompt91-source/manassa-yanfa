@@ -206,8 +206,8 @@ export default function PackageDetailsPage() {
   }
 
   return (
-    <section className="container-page space-y-8 py-8 text-start sm:space-y-10 sm:py-10">
-      <header className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+    <section className="container-page premium-app-bg space-y-8 py-8 text-start sm:space-y-10 sm:py-10">
+      <header className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{categoryName}</span>
@@ -223,7 +223,7 @@ export default function PackageDetailsPage() {
               <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">شهادة إتمام</span>
             </div>
           </div>
-          <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:max-w-xs">
+          <div className="interactive-card w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:max-w-xs">
             <p className="text-xs font-bold text-slate-500">سعر الدورة</p>
             <p className="mt-1 text-2xl font-black text-brand-700">{isPaid ? formatDzd(priceMad) : "مجانية"}</p>
             <p className="mt-2 text-xs text-slate-500">دروس الدورة: {lessons.length}</p>
@@ -233,22 +233,22 @@ export default function PackageDetailsPage() {
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {continueLesson ? (
-            <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
+            <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="touch-button-primary no-underline">
               واصل التعلم
             </Link>
           ) : null}
-          <button type="button" onClick={() => setActiveTab("CHAT")} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+          <button type="button" onClick={() => setActiveTab("CHAT")} className="touch-button-secondary">
             راسل الأستاذ
           </button>
           {progress?.isCompleted && certificateState.certificate?.certificateCode ? (
-            <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800 no-underline">
+            <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-secondary border-emerald-200 bg-emerald-50 text-emerald-800 no-underline">
               عرض الشهادة
             </Link>
           ) : null}
         </div>
       </header>
 
-      <section id="purchase" className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+      <section id="purchase" className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-extrabold text-slate-900">الوصول إلى الدورة</h2>
         {courseState.enrolled ? (
           <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
@@ -304,7 +304,7 @@ export default function PackageDetailsPage() {
       </section>
 
       {courseState.canAccessPaid ? (
-        <section className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+        <section className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-extrabold text-slate-900">تقدمك في الدورة</h2>
@@ -321,24 +321,24 @@ export default function PackageDetailsPage() {
               {progress?.isCompleted ? <p className="mt-1 text-sm font-bold text-emerald-700">أكملت هذه الدورة بنجاح</p> : null}
             </div>
           </div>
-          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
-            <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-all" style={{ width: `${progress?.progressPercent || 0}%` }} />
+            <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-[width] duration-500" style={{ width: `${progress?.progressPercent || 0}%` }} />
           </div>
           {progress?.isCompleted ? (
-            <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+            <div className="certificate-shine mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
               <p className="text-base font-extrabold text-emerald-800">أكملت هذه الدورة بنجاح</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {certificateState.certificate?.certificateCode ? (
                   <>
                     <Link
                       href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
-                      className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white no-underline"
+                      className="touch-button-primary from-emerald-600 to-emerald-500 no-underline"
                     >
                       عرض الشهادة
                     </Link>
                     <Link
                       href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
-                      className="rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-bold text-emerald-800 no-underline"
+                      className="touch-button-secondary border-emerald-300 bg-white text-emerald-800 no-underline"
                     >
                       تحميل الشهادة
                     </Link>
@@ -348,7 +348,7 @@ export default function PackageDetailsPage() {
                     type="button"
                     onClick={loadCertificate}
                     disabled={certificateState.loading}
-                    className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                    className="touch-button-primary from-emerald-600 to-emerald-500"
                   >
                     {certificateState.loading ? "جاري تجهيز الشهادة..." : "عرض الشهادة"}
                   </button>
@@ -361,7 +361,7 @@ export default function PackageDetailsPage() {
           )}
           {continueLesson ? (
             <div className="mt-4">
-              <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="inline-flex rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
+              <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="touch-button-primary no-underline">
                 واصل التعلم
               </Link>
             </div>
@@ -369,41 +369,41 @@ export default function PackageDetailsPage() {
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+      <section className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-xl font-extrabold text-slate-900">محتوى الدورة</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1">
           <button
             type="button"
             onClick={() => setActiveTab("RECORDED")}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "RECORDED" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "RECORDED" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
             الدروس المسجلة
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("LIVE")}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "LIVE" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "LIVE" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
             الحصص المباشرة
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("CHAT")}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CHAT" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CHAT" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
             المحادثة مع الأستاذ
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("ASSESSMENTS")}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "ASSESSMENTS" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "ASSESSMENTS" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
             الواجبات والاختبارات
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("CERTIFICATE")}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CERTIFICATE" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CERTIFICATE" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
             الشهادة
           </button>
@@ -414,7 +414,7 @@ export default function PackageDetailsPage() {
             {!lessons.length ? <p className="mt-4 text-sm text-slate-600">لا توجد دروس منشورة في هذه الدورة حاليًا.</p> : null}
             <div className="mt-5 space-y-3">
               {lessons.map((lesson) => (
-                <article key={lesson.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+                <article key={lesson.id} className="interactive-card rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="font-bold text-slate-900">
@@ -425,12 +425,12 @@ export default function PackageDetailsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {completedLessonIds.has(lesson.id) ? (
-                        <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">تم إكمال الدرس</span>
+                        <span className="motion-safe:animate-[softPulse_1.8s_ease-in-out_2] rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">تم إكمال الدرس</span>
                       ) : null}
                       {lesson.locked ? <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">يتطلب اشتراك</span> : null}
                       <Link
                         href={`/packages/${course.slug}/lesson/${lesson.id}`}
-                        className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline"
+                        className="touch-button-primary no-underline"
                       >
                         تشغيل الدرس
                       </Link>
@@ -451,10 +451,10 @@ export default function PackageDetailsPage() {
                 {liveSessions.map((session) => {
                   const meta = liveStatusMeta(session.status);
                   return (
-                    <article key={session.id} className="rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4 shadow-sm">
+                    <article key={session.id} className="interactive-card rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4 shadow-sm">
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="text-base font-extrabold text-slate-900">{session.title}</h3>
-                        <span className={`rounded-full px-2 py-1 text-xs font-bold ${meta.badge}`}>{meta.label}</span>
+                        <span className={`rounded-full px-2 py-1 text-xs font-bold ${meta.badge} ${session.status === "LIVE" ? "badge-live-pulse" : ""}`}>{meta.label}</span>
                       </div>
                       <p className="mt-2 text-xs text-slate-500">{new Date(session.startsAt).toLocaleString("ar-DZ")} - {session.durationMin} دقيقة</p>
                       <p className="mt-2 text-sm text-slate-600">{String(session.description || "").trim() || "بدون وصف."}</p>
@@ -464,7 +464,7 @@ export default function PackageDetailsPage() {
                             href={session.zoomUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline"
+                            className="touch-button-primary no-underline"
                           >
                             انضم إلى الحصة
                           </a>
@@ -497,7 +497,7 @@ export default function PackageDetailsPage() {
             onProgressChange={loadProgress}
           />
         ) : (
-          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+          <div className="interactive-card mt-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
             {progress?.isCompleted ? (
               <>
                 <p className="text-lg font-extrabold text-emerald-800">أكملت هذه الدورة بنجاح</p>
@@ -505,15 +505,15 @@ export default function PackageDetailsPage() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   {certificateState.certificate?.certificateCode ? (
                     <>
-                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white no-underline">
+                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-primary from-emerald-600 to-emerald-500 no-underline">
                         عرض الشهادة
                       </Link>
-                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-bold text-emerald-800 no-underline">
+                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-secondary border-emerald-300 bg-white text-emerald-800 no-underline">
                         تحميل الشهادة
                       </Link>
                     </>
                   ) : (
-                    <button type="button" onClick={loadCertificate} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">
+                    <button type="button" onClick={loadCertificate} className="touch-button-primary from-emerald-600 to-emerald-500">
                       عرض الشهادة
                     </button>
                   )}
@@ -531,7 +531,7 @@ export default function PackageDetailsPage() {
 
       {firstLessonHref ? (
         <div className="flex flex-wrap justify-center gap-3 border-t border-slate-200 pt-6">
-          <Link href={firstLessonHref} className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-bold text-white no-underline">
+          <Link href={firstLessonHref} className="touch-button-primary px-6 no-underline">
             ابدأ التعلّم
           </Link>
         </div>
@@ -546,7 +546,7 @@ function AdminLikeButton({ children, onClick, disabled }) {
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-sm disabled:opacity-50"
+      className="touch-button-primary px-5"
     >
       {children}
     </button>

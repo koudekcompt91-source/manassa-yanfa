@@ -59,6 +59,87 @@
   );
 }
 
+@keyframes softPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.86;
+  }
+}
+
+@keyframes glowSweep {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@layer components {
+  .premium-app-bg {
+    @apply bg-[radial-gradient(1200px_480px_at_90%_-10%,rgba(59,130,246,0.10),transparent_62%),radial-gradient(900px_360px_at_10%_0%,rgba(99,102,241,0.08),transparent_58%),linear-gradient(to_bottom,#f8fafc,#f1f5f9)];
+  }
+
+  .pressable {
+    @apply transition-transform duration-200 ease-out motion-safe:active:scale-[0.97] motion-reduce:active:scale-100;
+  }
+
+  .interactive-card {
+    @apply pressable transition-all duration-200 ease-out hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 hover:shadow-[0_14px_34px_-18px_rgba(15,23,42,0.25)] hover:border-brand-200/70;
+  }
+
+  .interactive-tab {
+    @apply pressable transition-all duration-200 ease-out hover:-translate-y-0.5 motion-reduce:hover:translate-y-0;
+  }
+
+  .touch-button {
+    @apply pressable inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .touch-button-primary {
+    @apply touch-button bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm hover:brightness-105 hover:shadow-[0_12px_24px_-16px_rgba(37,99,235,0.8)];
+  }
+
+  .touch-button-secondary {
+    @apply touch-button border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+  }
+
+  .touch-button-danger {
+    @apply touch-button bg-rose-600 text-white hover:bg-rose-700;
+  }
+
+  .touch-target {
+    @apply min-h-11;
+  }
+
+  .badge-live-pulse {
+    @apply motion-safe:animate-[softPulse_1.6s_ease-in-out_infinite] motion-reduce:animate-none;
+  }
+
+  .bell-unread-pulse {
+    @apply motion-safe:animate-[softPulse_1.8s_ease-in-out_infinite] motion-reduce:animate-none;
+  }
+
+  .certificate-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .certificate-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 24%, rgba(255, 255, 255, 0.35) 42%, transparent 62%);
+    animation: glowSweep 3.8s linear infinite;
+  }
+}
+
 @layer utilities {
   /* Scroll-driven section reveals (toggled by IntersectionObserver in HomeLanding) */
   [data-section-reveal] {

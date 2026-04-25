@@ -177,7 +177,7 @@ export default function StudentNotificationBell({ enableToast = true }: StudentN
                 e.stopPropagation();
                 closeToast();
               }}
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30"
+              className="pressable inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30"
             >
               <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l8 8M14 6l-8 8" />
@@ -195,7 +195,7 @@ export default function StudentNotificationBell({ enableToast = true }: StudentN
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50"
+        className={`relative inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 ${unreadCount > 0 ? "bell-unread-pulse" : ""} pressable`}
         aria-label="الإشعارات"
         aria-expanded={open}
       >
@@ -234,7 +234,7 @@ export default function StudentNotificationBell({ enableToast = true }: StudentN
                       setOpen(false);
                       if (row.link) window.location.href = row.link;
                     }}
-                    className={`block w-full border-b border-slate-100 px-4 py-3 text-start hover:bg-slate-50 ${
+                    className={`pressable block w-full border-b border-slate-100 px-4 py-3 text-start hover:bg-slate-50 ${
                       row.isRead ? "bg-white" : "bg-brand-50/40"
                     }`}
                   >
@@ -246,7 +246,7 @@ export default function StudentNotificationBell({ enableToast = true }: StudentN
               : null}
           </div>
           <div className="px-4 py-3">
-            <Link href="/dashboard/notifications" onClick={() => setOpen(false)} className="text-sm font-bold text-brand-700 no-underline hover:underline">
+            <Link href="/dashboard/notifications" onClick={() => setOpen(false)} className="pressable text-sm font-bold text-brand-700 no-underline hover:underline">
               عرض كل الإشعارات
             </Link>
           </div>

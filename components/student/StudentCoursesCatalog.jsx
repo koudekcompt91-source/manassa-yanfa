@@ -173,7 +173,7 @@ export default function StudentCoursesCatalog() {
       cta = (
         <Link
           href={firstLessonHref}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-md"
+          className="touch-button-primary w-full px-4 text-sm font-extrabold"
         >
           الدخول إلى الدورة
         </Link>
@@ -182,7 +182,7 @@ export default function StudentCoursesCatalog() {
       cta = (
         <Link
           href={`/login?next=${encodeURIComponent(detailHref)}`}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-md"
+          className="touch-button-primary w-full px-4 text-sm font-extrabold"
         >
           {isFree ? "ابدأ الآن" : "اشترك الآن"}
         </Link>
@@ -193,7 +193,7 @@ export default function StudentCoursesCatalog() {
           type="button"
           disabled={purchasing}
           onClick={() => handleFreeStart(pkg.id, firstLessonHref)}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-md disabled:opacity-50"
+          className="touch-button-primary w-full px-4 text-sm font-extrabold"
         >
           {purchasing ? "جاري التحميل…" : "ابدأ الآن"}
         </button>
@@ -202,7 +202,7 @@ export default function StudentCoursesCatalog() {
       cta = (
         <Link
           href={`${detailHref}#purchase`}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-md"
+          className="touch-button-primary w-full px-4 text-sm font-extrabold"
         >
           اشترك الآن
         </Link>
@@ -212,7 +212,7 @@ export default function StudentCoursesCatalog() {
     return (
       <article
         key={pkg.id}
-        className="flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:shadow-md"
+        className="interactive-card flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:shadow-md"
       >
         <CourseCover title={pkg.title} coverImage={pkg.coverImage} />
         <div className="flex flex-1 flex-col p-5">
@@ -233,7 +233,7 @@ export default function StudentCoursesCatalog() {
           </p>
           <p className="mt-3 text-lg font-black text-brand-700">{isFree ? "مجانية" : formatDzd(priceMad)}</p>
           <div className="mt-4">{cta}</div>
-          <Link href={detailHref} className="mt-3 text-center text-xs font-bold text-brand-800 underline underline-offset-2">
+          <Link href={detailHref} className="pressable mt-3 text-center text-xs font-bold text-brand-800 underline underline-offset-2">
             عرض التفاصيل
           </Link>
         </div>
@@ -249,8 +249,8 @@ export default function StudentCoursesCatalog() {
   };
 
   return (
-    <section className="container-page space-y-10 py-8 sm:py-10">
-      <header className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+    <section className="container-page premium-app-bg space-y-10 py-8 sm:py-10">
+      <header className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-bold text-brand-700">كتالوج الدورات</p>
         <h1 className="mt-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">الدورات</h1>
         <p className="mt-2 text-slate-600">
@@ -268,14 +268,14 @@ export default function StudentCoursesCatalog() {
         />
       </header>
 
-      <nav className="flex flex-wrap gap-2" aria-label="تصنيفات الدورات">
+      <nav className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1" aria-label="تصنيفات الدورات">
         {categoryTabs.map((name) => (
           <button
             key={name}
             type="button"
             onClick={() => setActiveCategory(name)}
-            className={`rounded-xl px-4 py-2 text-sm font-bold ${
-              activeCategory === name ? "bg-brand-600 text-white" : "border border-slate-200 bg-white text-slate-700"
+            className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${
+              activeCategory === name ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-700"
             }`}
           >
             {name}
@@ -284,7 +284,7 @@ export default function StudentCoursesCatalog() {
       </nav>
 
       {!decorated.length ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600 shadow-sm">
+        <div className="interactive-card rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600 shadow-sm">
           {loadingCourses ? "جاري تحميل الدورات..." : "لا توجد دورات منشورة تطابق مستواك أو البحث الحالي."}
         </div>
       ) : authedStudent ? (

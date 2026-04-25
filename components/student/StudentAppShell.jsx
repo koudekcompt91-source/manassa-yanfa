@@ -174,9 +174,9 @@ export default function StudentAppShell({ children }) {
               key={n.href}
               href={n.href}
               onClick={() => onPick?.()}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition ${
+              className={`interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition ${
                 active
-                  ? "bg-brand-600 text-white shadow-md"
+                  ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-md"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
@@ -251,12 +251,12 @@ export default function StudentAppShell({ children }) {
   }
 
   return (
-    <div className="relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-2 py-2 md:hidden">
+    <div className="premium-app-bg relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2.5 md:hidden">
         <span className="text-sm font-extrabold text-slate-900">القائمة</span>
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-800"
+          className="touch-button-secondary px-3 py-2 text-sm font-bold text-slate-800"
           aria-label={mobileNavOpen ? "إخفاء القائمة" : "فتح القائمة"}
           aria-expanded={mobileNavOpen}
           onClick={() => setMobileNavOpen((o) => !o)}

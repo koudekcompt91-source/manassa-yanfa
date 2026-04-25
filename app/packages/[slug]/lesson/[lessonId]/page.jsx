@@ -144,17 +144,17 @@ export default function PackageLessonPage() {
   }
 
   return (
-    <section className="container-page grid gap-6 py-8 lg:grid-cols-12">
+    <section className="container-page premium-app-bg grid gap-6 py-8 lg:grid-cols-12">
       {lockOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-xl">
             <p className="text-lg font-extrabold text-slate-900">هذا الدرس يتطلب الاشتراك في الدورة</p>
             <p className="mt-2 text-sm text-slate-600">اشترك في الدورة للوصول إلى هذا الدرس ومتابعة المنهج كاملًا.</p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <Link href={`/packages/${pkg.slug}#purchase`} className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
+              <Link href={`/packages/${pkg.slug}#purchase`} className="touch-button-primary no-underline">
                 الذهاب لصفحة الشراء
               </Link>
-              <button type="button" onClick={() => setLockOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+              <button type="button" onClick={() => setLockOpen(false)} className="touch-button-secondary">
                 إغلاق
               </button>
             </div>
@@ -164,7 +164,7 @@ export default function PackageLessonPage() {
 
       <div className="space-y-4 lg:col-span-8">
         <h1 className="text-3xl font-extrabold text-slate-900">{pkg.title}</h1>
-        <div className="relative aspect-video overflow-hidden rounded-xl bg-black shadow-lg">
+        <div className="interactive-card relative aspect-video overflow-hidden rounded-xl bg-black shadow-lg">
           {lockedPremium ? (
             <button
               type="button"
@@ -179,7 +179,7 @@ export default function PackageLessonPage() {
             <VideoPlayer videoUrl={current.youtubeUrl || `https://www.youtube.com/watch?v=${current.youtubeVideoId}`} title={current.title} />
           )}
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="interactive-card rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="text-xl font-semibold text-slate-900">{current.title}</h2>
           <p className="mt-1 text-sm text-slate-500">المدة التقريبية: {Math.ceil((Number(current.durationSec || 0) || 0) / 60)} دقيقة</p>
           <p className="mt-3 text-slate-700">{current.description || "وصف الدرس غير متوفر."}</p>
@@ -187,14 +187,14 @@ export default function PackageLessonPage() {
             <button
               onClick={() => previousLesson && router.push(`/packages/${pkg.slug}/lesson/${previousLesson.id}`)}
               disabled={!previousLesson}
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+              className="touch-button-secondary border-slate-300"
             >
               الدرس السابق
             </button>
             <button
               onClick={() => nextLesson && router.push(`/packages/${pkg.slug}/lesson/${nextLesson.id}`)}
               disabled={!nextLesson}
-              className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="touch-button-primary"
             >
               الدرس التالي
             </button>
@@ -206,7 +206,7 @@ export default function PackageLessonPage() {
             </p>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-all"
+                className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-[width] duration-500"
                 style={{ width: `${progressStats?.progressPercent || 0}%` }}
               />
             </div>
@@ -214,7 +214,7 @@ export default function PackageLessonPage() {
               type="button"
               onClick={handleMarkComplete}
               disabled={lockedPremium || completedHere || progressState.marking || !canTrackProgress}
-              className="mt-3 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="touch-button-primary mt-3 disabled:cursor-not-allowed"
             >
               {completedHere ? "تم إكمال الدرس" : progressState.marking ? "جاري الحفظ..." : "تحديد الدرس كمكتمل"}
             </button>
@@ -224,7 +224,7 @@ export default function PackageLessonPage() {
         </div>
       </div>
 
-      <aside className="rounded-2xl border border-slate-200 bg-white p-4 lg:col-span-4 lg:sticky lg:top-6 lg:h-fit">
+      <aside className="interactive-card rounded-2xl border border-slate-200 bg-white p-4 lg:col-span-4 lg:sticky lg:top-6 lg:h-fit">
         <h3 className="mb-1 text-lg font-semibold text-slate-900">محتوى الدورة</h3>
         <p className="mb-1 text-sm text-slate-600">
           أكملت {progressStats?.completedLessons || 0} من {progressStats?.totalLessons || 0}{" "}
@@ -232,7 +232,7 @@ export default function PackageLessonPage() {
         </p>
         <p className="mb-3 text-xs text-slate-500">إجمالي الدروس المنشورة: {packageLessons.length}</p>
         <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" style={{ width: `${progressStats?.progressPercent || 0}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-[width] duration-500" style={{ width: `${progressStats?.progressPercent || 0}%` }} />
         </div>
         <div className="space-y-2">
           {packageLessons.map((lesson) => {
@@ -250,7 +250,7 @@ export default function PackageLessonPage() {
                   }
                   router.push(`/packages/${pkg.slug}/lesson/${lesson.id}`);
                 }}
-                className={`w-full rounded-xl border p-2 text-right text-sm transition ${
+                className={`interactive-card w-full rounded-xl border p-2 text-right text-sm transition ${
                   isCurrent ? "border-brand-600 bg-brand-50" : "border-slate-200 hover:bg-slate-50"
                 }`}
               >
@@ -268,7 +268,7 @@ export default function PackageLessonPage() {
                     <span className="me-2 inline-block rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-700">مدفوع</span>
                   ) : null}
                   {pageState.enrolled && done ? (
-                    <span className="me-2 inline-block rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-900">✓</span>
+                    <span className="motion-safe:animate-[softPulse_1.8s_ease-in-out_2] me-2 inline-block rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-900">✓</span>
                   ) : null}
                 </p>
                 {blocked ? <p className="mt-1 text-[11px] text-amber-800">يتطلب اشتراك الدورة</p> : null}

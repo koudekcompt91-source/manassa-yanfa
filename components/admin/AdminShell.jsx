@@ -42,12 +42,12 @@ export default function AdminShell({ title, subtitle, children }) {
   };
 
   return (
-    <section className="w-full bg-gray-50">
+    <section className="premium-app-bg w-full">
       <div className="container-landing grid gap-6 py-6 lg:grid-cols-[270px_1fr] lg:py-8">
       <aside className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:h-fit">
         <Link
           href="/admin/dashboard"
-          className="mb-3 flex flex-col items-center gap-2 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-lg"
+          className="pressable mb-3 flex flex-col items-center gap-2 rounded-lg no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           aria-label={BRAND_NAME}
         >
           <span className="flex justify-center">
@@ -62,9 +62,9 @@ export default function AdminShell({ title, subtitle, children }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`block rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                className={`interactive-tab touch-target block rounded-xl px-3 py-2 text-sm font-semibold transition ${
                   active
-                    ? "bg-brand-600 text-white shadow-sm"
+                    ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -76,7 +76,7 @@ export default function AdminShell({ title, subtitle, children }) {
         <button
           type="button"
           onClick={handleLogout}
-          className="mt-4 w-full rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+          className="touch-button-secondary mt-4 w-full justify-center border-slate-300 bg-slate-900 px-3 text-white hover:bg-slate-800"
         >
           تسجيل الخروج
         </button>

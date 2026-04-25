@@ -309,8 +309,8 @@ function DashboardPageInner() {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-8">
-      <header className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+    <div className="premium-app-bg flex w-full flex-col gap-8">
+      <header className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-medium text-slate-400">منصة ينفع</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا، {displayName}</h1>
         <p className="mt-2 text-base text-slate-500">واصل تعلمك وتابع تقدمك في الدورات.</p>
@@ -328,7 +328,7 @@ function DashboardPageInner() {
             <p className="text-sm text-slate-400">التقدّم الإجمالي</p>
             <p className="mt-1 text-2xl font-bold text-brand-600">{overallProgressPct}%</p>
             <div className="mt-2 h-2.5 w-full max-w-xs overflow-hidden rounded-full bg-slate-100 sm:ms-auto sm:me-0">
-              <div className="h-2.5 rounded-full bg-brand-600" style={{ width: `${overallProgressPct}%` }} />
+              <div className="h-2.5 rounded-full bg-brand-600 transition-[width] duration-500" style={{ width: `${overallProgressPct}%` }} />
             </div>
           </div>
         </div>
@@ -346,7 +346,7 @@ function DashboardPageInner() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6" aria-label="مؤشرات لوحة التحكم">
         {statCards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <div key={card.label} className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
             <p className="text-sm font-medium text-slate-400">{card.label}</p>
             <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{card.value}</p>
             <p className="mt-2 text-sm text-slate-400">{card.sub}</p>
@@ -354,32 +354,32 @@ function DashboardPageInner() {
         ))}
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">إجراءات سريعة</h2>
         <p className="mt-1 text-sm text-slate-400">اختصارات للمهام الأكثر استخدامًا.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
             type="button"
             onClick={() => setRechargeOpen(true)}
-            className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+            className="touch-button-primary px-5"
           >
             شحن الرصيد
           </button>
           <Link
             href="/courses"
-            className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-100"
+            className="touch-button-secondary px-5 text-center"
           >
             استكشاف الدورات
           </Link>
           <Link
             href={continueLearning.href}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-100"
+            className="touch-button-secondary px-5 text-center"
           >
             متابعة آخر درس
           </Link>
           <Link
             href="/profile"
-            className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-100"
+            className="touch-button-secondary px-5 text-center"
           >
             الملف الشخصي
           </Link>
@@ -390,7 +390,7 @@ function DashboardPageInner() {
               <Link
                 key={row.id}
                 href={row.route}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="touch-button-secondary px-4 py-2 text-xs"
               >
                 {row.label}
               </Link>
@@ -399,7 +399,7 @@ function DashboardPageInner() {
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">واصل من حيث توقفت</h2>
         {continueLearning.lessonTitle ? (
           <>
@@ -407,7 +407,7 @@ function DashboardPageInner() {
             <p className="mt-1 text-xl font-bold text-slate-900">{continueLearning.lessonTitle}</p>
             <Link
               href={continueLearning.href}
-              className="mt-6 inline-block rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+              className="touch-button-primary mt-6"
             >
               واصل التعلم
             </Link>
@@ -417,7 +417,7 @@ function DashboardPageInner() {
             <p className="text-sm text-slate-600">ابدأ أول دورة لك الآن</p>
             <Link
               href={continueLearning.href}
-              className="mt-4 inline-block rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
+              className="touch-button-secondary mt-4"
             >
               استكشف الدورات
             </Link>
@@ -426,7 +426,7 @@ function DashboardPageInner() {
       </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <section id="my-courses" className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section id="my-courses" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دوراتي</h2>
           <p className="mt-1 text-sm text-slate-400">متابعة التقدم في كل دورة بشكل مباشر.</p>
           {dashboardProgressLoading ? (
@@ -436,7 +436,7 @@ function DashboardPageInner() {
               <p className="text-sm text-slate-600">لم تسجّل في دورة بعد</p>
               <Link
                 href="/courses"
-                className="mt-4 inline-block rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+                className="touch-button-primary mt-4"
               >
                 استكشاف الدورات
               </Link>
@@ -448,9 +448,9 @@ function DashboardPageInner() {
                   ? `/packages/${row.slug}/lesson/${row.lastLessonId}`
                   : `/packages/${row.slug}`;
                 return (
-                  <li key={row.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
+                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="h-14 w-20 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-indigo-100">
+                      <div className="interactive-card h-14 w-20 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-indigo-100">
                         {row.coverImage ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={row.coverImage} alt={row.title} className="h-full w-full object-cover" />
@@ -474,19 +474,19 @@ function DashboardPageInner() {
                       <p className="text-lg font-bold text-brand-600">{row.progressPercent}%</p>
                     </div>
                     <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
-                      <div className="h-2.5 rounded-full bg-brand-600" style={{ width: `${row.progressPercent}%` }} />
+                      <div className="h-2.5 rounded-full bg-brand-600 transition-[width] duration-500" style={{ width: `${row.progressPercent}%` }} />
                     </div>
                     {row.isCompleted ? <p className="mt-2 text-xs font-bold text-emerald-700">أكملت هذه الدورة بنجاح</p> : null}
                     <div className="mt-4 flex flex-wrap gap-2">
                       <Link
                         href={continueHref}
-                        className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+                        className="touch-button-secondary border-slate-900 bg-slate-900 text-white hover:bg-slate-800"
                       >
                         واصل التعلم
                       </Link>
                       <Link
                         href={`/packages/${row.slug}`}
-                        className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        className="touch-button-secondary"
                       >
                         تفاصيل الدورة
                       </Link>
@@ -495,7 +495,7 @@ function DashboardPageInner() {
                           type="button"
                           onClick={() => void openCertificate(row)}
                           disabled={issuingCourseId === row.id}
-                          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 disabled:opacity-50"
+                          className="touch-button-secondary certificate-shine border-emerald-200 bg-emerald-50 text-emerald-800"
                         >
                           {issuingCourseId === row.id ? "جاري تجهيز الشهادة..." : "عرض الشهادة"}
                         </button>
@@ -508,7 +508,7 @@ function DashboardPageInner() {
           )}
         </section>
 
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">الحصص القادمة والواجبات</h2>
           <div className="mt-4">
             <p className="text-sm font-semibold text-slate-700">الحصص المباشرة القادمة</p>
@@ -517,12 +517,12 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-2 space-y-2">
                 {overview.upcomingLiveSessions.slice(0, 4).map((row) => (
-                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
                     <p className="font-semibold text-slate-900">{row.title}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
                     <p className="mt-1 text-xs text-slate-500">{new Date(row.startsAt).toLocaleString("ar-DZ")}</p>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${row.status === "LIVE" ? "bg-emerald-100 text-emerald-700" : "bg-brand-100 text-brand-700"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${row.status === "LIVE" ? "bg-emerald-100 text-emerald-700 badge-live-pulse" : "bg-brand-100 text-brand-700"}`}>
                         {row.status === "LIVE" ? "مباشر الآن" : "قادمة"}
                       </span>
                       <Link href={`/packages/${row.courseSlug}?tab=live`} className="text-xs font-bold text-brand-700 underline">
@@ -541,7 +541,7 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-2 space-y-2">
                 {overview.pendingAssessments.slice(0, 4).map((row) => (
-                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
                     <p className="font-semibold text-slate-900">{row.title}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.dueDate ? `الموعد: ${new Date(row.dueDate).toLocaleString("ar-DZ")}` : "بدون موعد محدد"}</p>
@@ -582,7 +582,7 @@ function DashboardPageInner() {
       </div>
 
       {recommendedPackages.length ? (
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دورات موصى بها</h2>
           <p className="mt-1 text-sm text-slate-400">اختر دورة وابدأ رحلتك.</p>
           <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -593,14 +593,14 @@ function DashboardPageInner() {
               return (
                 <article
                   key={pkg.id}
-                  className="flex flex-col rounded-2xl border border-slate-200/80 bg-slate-50/30 p-6 shadow-sm"
+                  className="interactive-card flex flex-col rounded-2xl border border-slate-200/80 bg-slate-50/30 p-6 shadow-sm"
                 >
                   <h3 className="text-base font-bold text-slate-900">{pkg.title}</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-500">{shortDesc}</p>
                   <p className="mt-4 text-lg font-bold text-brand-600">{priceMad <= 0 ? "مجانية" : formatDzd(priceMad)}</p>
                   <Link
                     href={`/packages/${pkg.slug}`}
-                    className="mt-4 rounded-xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+                    className="touch-button-primary mt-4 text-center"
                   >
                     اشترك الآن
                   </Link>
@@ -611,7 +611,7 @@ function DashboardPageInner() {
         </section>
       ) : null}
 
-      <section id="wallet" className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section id="wallet" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">المحفظة</h2>
         <p className="mt-3 text-3xl font-bold tracking-tight text-brand-600">{formatDzd(walletBalance)}</p>
         {pendingRechargeCount > 0 ? (
@@ -624,20 +624,20 @@ function DashboardPageInner() {
             type="button"
             id="recharge"
             onClick={() => setRechargeOpen(true)}
-            className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+            className="touch-button-primary px-5"
           >
             شحن الرصيد
           </button>
           <Link
             href="/courses"
-            className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+            className="touch-button-secondary px-5"
           >
             استكشاف الدورات
           </Link>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دروس دوراتك</h2>
         <p className="mt-1 text-sm text-slate-400">دروس متاحة في الدورات المسجّل بها.</p>
         {!upcomingFromEnrollments.length ? (
@@ -648,7 +648,7 @@ function DashboardPageInner() {
               const done =
                 hydrated && lesson.packageId ? getCompletedSet(lesson.packageId).has(lesson.id) : false;
               return (
-                <li key={lesson.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-4">
+                <li key={lesson.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <p className="min-w-0 flex-1 font-semibold text-slate-900">{lesson.title}</p>
                     <span className="shrink-0 text-xs font-medium text-slate-400">{done ? "مكتمل" : "قيد التعلم"}</span>
@@ -661,7 +661,7 @@ function DashboardPageInner() {
         )}
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">سجل المحفظة</h2>
         <p className="mt-1 text-sm text-slate-400">آخر العمليات المرتبطة برصيدك.</p>
         {!myWalletTx.length ? (
@@ -669,7 +669,7 @@ function DashboardPageInner() {
         ) : (
           <ul className="mt-6 flex flex-col gap-3">
             {myWalletTx.map((tx) => (
-              <li key={tx.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-4 text-sm">
+              <li key={tx.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4 text-sm">
                 <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                   <span className="font-semibold text-slate-900">{tx.labelAr || tx.type}</span>
                   <span className="font-mono text-xs text-slate-500 sm:text-end">
@@ -693,17 +693,17 @@ function DashboardPageInner() {
           </p>
         ))}
 
-      <footer className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-8">
+      <footer className="interactive-card flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-8">
         <div className="flex flex-wrap gap-2">
           <Link
             href="/courses"
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            className="touch-button-secondary"
           >
             عرض كل الدورات
           </Link>
           <Link
             href="/"
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            className="touch-button-secondary"
           >
             الصفحة الرئيسية
           </Link>
@@ -714,7 +714,7 @@ function DashboardPageInner() {
             await logoutSession();
             router.replace("/login");
           }}
-          className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          className="touch-button-secondary"
         >
           تسجيل الخروج
         </button>
