@@ -35,6 +35,14 @@ enum LiveSessionStatus {
   CANCELLED
 }
 
+enum NotificationType {
+  GENERAL
+  LIVE_SESSION
+  NEW_LESSON
+  COURSE_ANNOUNCEMENT
+  PAYMENT
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -53,6 +61,7 @@ model User {
   rechargeRequests   RechargeRequest[]
   walletTransactions WalletTransaction[]
   enrollments        Enrollment[]
+  notifications      Notification[]
 }
 
 model RechargeRequest {
@@ -156,4 +165,20 @@ model LiveSession {
 
   @@index([courseId, startsAt])
   @@index([courseId, isPublished, startsAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(GENERAL)
+  link      String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId, isRead, createdAt])
+  @@index([userId, createdAt])
 }

@@ -2,6 +2,7 @@ import { LiveSessionStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { notifyNewPublishedLiveSession } from "@/lib/server-notifications";
 
 function normalizeLiveSession(session: {
   id: string;
@@ -80,7 +81,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const valid = parseLiveSessionPayload(await req.json());
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
 
-    const course = await prisma.course.findUnique({ where: { id: params.id }, select: { id: true } });
+    const course = await prisma.course.findUnique({ where: { id: params.id }, select: { id: true, slug: true } });
     if (!course) return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
 
     const liveSession = await prisma.liveSession.create({
@@ -89,6 +90,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         ...valid.value,
       },
     });
+
+    if (liveSession.isPublished) {
+      await notifyNewPublishedLiveSession(course.id, course.slug);
+    }
 
     return NextResponse.json({
       ok: true,

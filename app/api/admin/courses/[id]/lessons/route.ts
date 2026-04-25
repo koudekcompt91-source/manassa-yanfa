@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { extractYoutubeVideoId } from "@/lib/youtube";
+import { notifyNewPublishedLesson } from "@/lib/server-notifications";
 
 function normalizeLesson(lesson: {
   id: string;
@@ -60,7 +61,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const valid = validate(await req.json());
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
 
-    const course = await prisma.course.findUnique({ where: { id: params.id }, select: { id: true } });
+    const course = await prisma.course.findUnique({ where: { id: params.id }, select: { id: true, slug: true } });
     if (!course) return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
 
     // Shift down lessons at/after target order to keep order stable.
@@ -75,6 +76,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         ...valid.value,
       },
     });
+
+    if (lesson.isPublished) {
+      await notifyNewPublishedLesson(course.id, course.slug);
+    }
 
     return NextResponse.json({ ok: true, message: "تمت إضافة الدرس.", lesson: normalizeLesson(lesson) });
   } catch (e) {

@@ -7,6 +7,7 @@ import { authStore } from "@/lib/auth";
 import { formatDzd } from "@/lib/format-money";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
+import StudentNotificationBell from "@/components/student/StudentNotificationBell";
 
 type StudentNavUser = {
   id: string;
@@ -175,6 +176,7 @@ export default function Navbar() {
               <span className="inline-flex h-10 w-40 animate-pulse rounded-xl bg-slate-100" aria-hidden />
             ) : student ? (
               <>
+                <StudentNotificationBell />
                 <Link
                   href="/dashboard"
                   className={`${ctaGhostClass} motion-safe:animate-nav-choreo motion-reduce:animate-none`}
@@ -311,6 +313,9 @@ export default function Navbar() {
                   <div className="h-24 animate-pulse rounded-xl bg-slate-100" aria-hidden />
                 ) : student ? (
                   <>
+                    <div className="mb-1 flex justify-start">
+                      <StudentNotificationBell />
+                    </div>
                     <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-3">
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-base font-extrabold text-white">
                         {avatarLetter(student.fullName, student.email)}

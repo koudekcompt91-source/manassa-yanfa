@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
 
 export default function PackageDetailsPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = decodeURIComponent(String(params?.slug || ""));
   const [categories] = useDemoSection("categories");
   const [teachers] = useDemoSection("teachers");
@@ -72,6 +73,17 @@ export default function PackageDetailsPage() {
     loadCourse();
     loadLiveSessions();
   }, [loadMe, loadCourse, loadLiveSessions]);
+
+  useEffect(() => {
+    const tab = String(searchParams?.get("tab") || "").toLowerCase();
+    if (tab === "live" || tab === "live-sessions") {
+      setActiveTab("LIVE");
+      return;
+    }
+    if (tab === "recorded" || tab === "lessons") {
+      setActiveTab("RECORDED");
+    }
+  }, [searchParams]);
 
   const course = courseState.course;
   const lessons = courseState.lessons || [];

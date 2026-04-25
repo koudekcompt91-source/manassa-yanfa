@@ -16,6 +16,7 @@ const adminLinks = [
   { href: "/admin/pages", label: "الصفحات" },
   { href: "/admin/buttons", label: "الأزرار" },
   { href: "/admin/messages", label: "الرسائل" },
+  { href: "/admin/notifications", label: "الإشعارات" },
   { href: "/admin/settings", label: "الإعدادات" },
 ];
 
