@@ -40,6 +40,14 @@ export async function getAllActiveStudentIds() {
   return rows.map((row) => row.id);
 }
 
+export async function getAllActiveAdminIds() {
+  const rows = await prisma.user.findMany({
+    where: { role: "ADMIN", status: "ACTIVE" },
+    select: { id: true },
+  });
+  return rows.map((row) => row.id);
+}
+
 export async function getEnrolledStudentIdsByCourseId(courseId: string) {
   const rows = await prisma.enrollment.findMany({
     where: { packageId: courseId },
@@ -75,5 +83,24 @@ export async function notifyNewPublishedLiveSession(courseId: string, courseSlug
     message: "تمت إضافة حصة مباشرة جديدة في هذه الدورة.",
     type: "LIVE_SESSION",
     link: courseSlug ? `/packages/${courseSlug}?tab=live` : null,
+  });
+}
+
+export async function notifyAdminsStudentChatMessage(courseTitle: string | null, conversationId: string) {
+  const adminIds = await getAllActiveAdminIds();
+  return createNotificationsForUsers(adminIds, {
+    title: "رسالة جديدة من طالب",
+    message: courseTitle ? `وصلتك رسالة جديدة في دورة ${courseTitle}.` : "وصلتك رسالة جديدة في محادثات الطلاب.",
+    type: "GENERAL",
+    link: `/admin/dashboard/messages?conversation=${encodeURIComponent(conversationId)}`,
+  });
+}
+
+export async function notifyStudentAdminReply(studentId: string, courseSlug: string | null) {
+  return createNotificationsForUsers([studentId], {
+    title: "رد جديد من الأستاذ",
+    message: "لديك رد جديد في محادثة الدورة.",
+    type: "GENERAL",
+    link: courseSlug ? `/packages/${courseSlug}?tab=chat` : null,
   });
 }

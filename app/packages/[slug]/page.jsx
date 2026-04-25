@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
+import CourseChatPanel from "@/components/student/CourseChatPanel";
 
 export default function PackageDetailsPage() {
   const params = useParams();
@@ -82,6 +83,10 @@ export default function PackageDetailsPage() {
     }
     if (tab === "recorded" || tab === "lessons") {
       setActiveTab("RECORDED");
+      return;
+    }
+    if (tab === "chat" || tab === "messages") {
+      setActiveTab("CHAT");
     }
   }, [searchParams]);
 
@@ -227,6 +232,13 @@ export default function PackageDetailsPage() {
           >
             الحصص المباشرة
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("CHAT")}
+            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CHAT" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+          >
+            المحادثة مع الأستاذ
+          </button>
         </div>
 
         {activeTab === "RECORDED" ? (
@@ -256,7 +268,7 @@ export default function PackageDetailsPage() {
               ))}
             </div>
           </>
-        ) : (
+        ) : activeTab === "LIVE" ? (
           <>
             {liveState.loading ? <p className="mt-4 text-sm text-slate-600">جاري تحميل الحصص المباشرة...</p> : null}
             {!liveState.loading && !liveSessions.length ? (
@@ -296,6 +308,15 @@ export default function PackageDetailsPage() {
               </div>
             ) : null}
           </>
+        ) : (
+          <CourseChatPanel
+            courseSlug={course.slug}
+            courseTitle={course.title}
+            teacherName={teacherName}
+            authedStudent={authedStudent}
+            canAccessChat={courseState.canAccessPaid}
+            myUserId={meState?.user?.id || ""}
+          />
         )}
       </section>
 
