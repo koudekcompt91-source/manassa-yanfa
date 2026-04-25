@@ -104,3 +104,13 @@ export async function notifyStudentAdminReply(studentId: string, courseSlug: str
     link: courseSlug ? `/packages/${courseSlug}?tab=chat` : null,
   });
 }
+
+export async function notifyNewPublishedAssessment(courseId: string, courseSlug: string | null) {
+  const userIds = await getEnrolledStudentIdsByCourseId(courseId);
+  return createNotificationsForUsers(userIds, {
+    title: "اختبار جديد",
+    message: "تمت إضافة اختبار أو واجب جديد داخل الدورة.",
+    type: "GENERAL",
+    link: courseSlug ? `/packages/${courseSlug}?tab=assessments` : null,
+  });
+}

@@ -48,6 +48,23 @@ enum ChatStatus {
   CLOSED
 }
 
+enum AssessmentType {
+  QUIZ
+  ASSIGNMENT
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  WRITTEN
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  PENDING_CORRECTION
+  CORRECTED
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -69,6 +86,7 @@ model User {
   notifications      Notification[]
   sentChatMessages   ChatMessage[]       @relation("ChatMessageSender")
   chatConversations  ChatConversation[]  @relation("ChatConversationStudent")
+  assessmentSubmissions AssessmentSubmission[]
 }
 
 model RechargeRequest {
@@ -137,6 +155,7 @@ model Course {
   lessons      Lesson[]
   liveSessions LiveSession[]
   chatConversations ChatConversation[]
+  assessments  Assessment[]
 }
 
 model Lesson {
@@ -221,4 +240,77 @@ model ChatMessage {
 
   @@index([conversationId, createdAt])
   @@index([conversationId, isRead])
+}
+
+model Assessment {
+  id          String           @id @default(cuid())
+  courseId    String
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String           @default("")
+  type        AssessmentType
+  isPublished Boolean          @default(false)
+  dueDate     DateTime?
+  allowRetake Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  questions   AssessmentQuestion[]
+  submissions AssessmentSubmission[]
+
+  @@index([courseId, isPublished, createdAt])
+}
+
+model AssessmentQuestion {
+  id            String        @id @default(cuid())
+  assessmentId  String
+  assessment    Assessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionText  String
+  type          QuestionType
+  options       Json?
+  correctAnswer Json?
+  points        Int           @default(1)
+  order         Int           @default(1)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  answers       AssessmentAnswer[]
+
+  @@index([assessmentId, order])
+}
+
+model AssessmentSubmission {
+  id          String           @id @default(cuid())
+  assessmentId String
+  assessment  Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status      SubmissionStatus @default(SUBMITTED)
+  score       Int              @default(0)
+  maxScore    Int              @default(0)
+  submittedAt DateTime?
+  correctedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  answers     AssessmentAnswer[]
+
+  @@index([assessmentId, studentId, createdAt])
+}
+
+model AssessmentAnswer {
+  id             String               @id @default(cuid())
+  submissionId   String
+  submission     AssessmentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       AssessmentQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer         Json?
+  isCorrect      Boolean?
+  pointsAwarded  Int                  @default(0)
+  correctionNote String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([submissionId, questionId])
+  @@index([questionId])
 }

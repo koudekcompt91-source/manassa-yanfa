@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
 import CourseChatPanel from "@/components/student/CourseChatPanel";
+import CourseAssessmentsPanel from "@/components/student/CourseAssessmentsPanel";
 
 export default function PackageDetailsPage() {
   const params = useParams();
@@ -87,6 +88,10 @@ export default function PackageDetailsPage() {
     }
     if (tab === "chat" || tab === "messages") {
       setActiveTab("CHAT");
+      return;
+    }
+    if (tab === "assessments" || tab === "quiz") {
+      setActiveTab("ASSESSMENTS");
     }
   }, [searchParams]);
 
@@ -239,6 +244,13 @@ export default function PackageDetailsPage() {
           >
             المحادثة مع الأستاذ
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("ASSESSMENTS")}
+            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "ASSESSMENTS" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+          >
+            الواجبات والاختبارات
+          </button>
         </div>
 
         {activeTab === "RECORDED" ? (
@@ -308,7 +320,7 @@ export default function PackageDetailsPage() {
               </div>
             ) : null}
           </>
-        ) : (
+        ) : activeTab === "CHAT" ? (
           <CourseChatPanel
             courseSlug={course.slug}
             courseTitle={course.title}
@@ -316,6 +328,12 @@ export default function PackageDetailsPage() {
             authedStudent={authedStudent}
             canAccessChat={courseState.canAccessPaid}
             myUserId={meState?.user?.id || ""}
+          />
+        ) : (
+          <CourseAssessmentsPanel
+            courseSlug={course.slug}
+            authedStudent={authedStudent}
+            canAccess={courseState.canAccessPaid}
           />
         )}
       </section>

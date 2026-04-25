@@ -50,6 +50,25 @@ const EMPTY_LIVE_SESSION_FORM = {
   isPublished: true,
 };
 
+const EMPTY_ASSESSMENT_FORM = {
+  title: "",
+  description: "",
+  type: "QUIZ",
+  isPublished: false,
+  dueDate: "",
+  allowRetake: false,
+};
+
+const EMPTY_QUESTION_FORM = {
+  questionText: "",
+  type: "MULTIPLE_CHOICE",
+  options: ["", ""],
+  correctOption: 0,
+  trueFalseAnswer: true,
+  points: 1,
+  order: 1,
+};
+
 export default function AdminPackagesPage() {
   const [categories] = useDemoSection("categories");
   const [teachers] = useDemoSection("teachers");
@@ -83,6 +102,21 @@ export default function AdminPackagesPage() {
   const [editingLiveSessionId, setEditingLiveSessionId] = useState(null);
   const [liveSessionError, setLiveSessionError] = useState("");
   const [liveSessionSaving, setLiveSessionSaving] = useState(false);
+  const [assessments, setAssessments] = useState([]);
+  const [assessmentsLoading, setAssessmentsLoading] = useState(false);
+  const [assessmentForm, setAssessmentForm] = useState(EMPTY_ASSESSMENT_FORM);
+  const [editingAssessmentId, setEditingAssessmentId] = useState(null);
+  const [assessmentError, setAssessmentError] = useState("");
+  const [assessmentSaving, setAssessmentSaving] = useState(false);
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
+  const [questionForm, setQuestionForm] = useState(EMPTY_QUESTION_FORM);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [questionError, setQuestionError] = useState("");
+  const [questionSaving, setQuestionSaving] = useState(false);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -107,6 +141,12 @@ export default function AdminPackagesPage() {
   useEffect(() => {
     loadCourses();
   }, [loadCourses]);
+
+  useEffect(() => {
+    if (managerTab !== "ASSESSMENTS" || !selectedAssessmentId) return;
+    loadQuestions(selectedAssessmentId);
+    loadSubmissions(selectedAssessmentId);
+  }, [managerTab, selectedAssessmentId]);
 
   const rows = useMemo(() => {
     return (courses || [])
@@ -264,12 +304,21 @@ export default function AdminPackagesPage() {
     setEditingLiveSessionId(null);
     setLiveSessionForm(EMPTY_LIVE_SESSION_FORM);
     setLiveSessionError("");
+    setEditingAssessmentId(null);
+    setAssessmentForm(EMPTY_ASSESSMENT_FORM);
+    setAssessmentError("");
+    setAssessments([]);
+    setSelectedAssessmentId("");
+    setQuestions([]);
+    setSubmissions([]);
     setLessonsLoading(true);
     setLiveSessionsLoading(true);
+    setAssessmentsLoading(true);
     try {
-      const [lessonsRes, sessionsRes] = await Promise.all([
+      const [lessonsRes, sessionsRes, assessmentsRes] = await Promise.all([
         fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/live-sessions`, { credentials: "include" }),
+        fetch(`/api/admin/courses/${course.id}/assessments`, { credentials: "include" }),
       ]);
 
       const lessonsData = await lessonsRes.json().catch(() => ({}));
@@ -287,9 +336,20 @@ export default function AdminPackagesPage() {
       } else {
         setLiveSessions(Array.isArray(sessionsData.liveSessions) ? sessionsData.liveSessions : []);
       }
+
+      const assessmentsData = await assessmentsRes.json().catch(() => ({}));
+      if (!assessmentsRes.ok || !assessmentsData?.ok) {
+        setAssessmentError(assessmentsData?.message || "تعذّر تحميل الواجبات والاختبارات.");
+        setAssessments([]);
+      } else {
+        const nextAssessments = Array.isArray(assessmentsData.assessments) ? assessmentsData.assessments : [];
+        setAssessments(nextAssessments);
+        if (nextAssessments[0]?.id) setSelectedAssessmentId(nextAssessments[0].id);
+      }
     } finally {
       setLessonsLoading(false);
       setLiveSessionsLoading(false);
+      setAssessmentsLoading(false);
     }
   }
 
@@ -455,6 +515,215 @@ export default function AdminPackagesPage() {
       await openLessonsManager(lessonCourse);
       setManagerTab("LIVE");
     }
+  }
+
+  async function loadQuestions(assessmentId) {
+    if (!assessmentId) return;
+    setQuestionsLoading(true);
+    setQuestionError("");
+    try {
+      const res = await fetch(`/api/admin/assessments/${assessmentId}/questions`, { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setQuestionError(data?.message || "تعذّر تحميل الأسئلة.");
+        setQuestions([]);
+        return;
+      }
+      setQuestions(Array.isArray(data.questions) ? data.questions : []);
+    } finally {
+      setQuestionsLoading(false);
+    }
+  }
+
+  async function loadSubmissions(assessmentId) {
+    if (!assessmentId) return;
+    setSubmissionsLoading(true);
+    try {
+      const res = await fetch(`/api/admin/assessments/${assessmentId}/submissions`, { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setAssessmentError(data?.message || "تعذّر تحميل الإجابات.");
+        setSubmissions([]);
+        return;
+      }
+      setSubmissions(Array.isArray(data.submissions) ? data.submissions : []);
+    } finally {
+      setSubmissionsLoading(false);
+    }
+  }
+
+  async function saveAssessment(e) {
+    e.preventDefault();
+    if (!lessonCourse) return;
+    setAssessmentError("");
+    setAssessmentSaving(true);
+    try {
+      const payload = {
+        ...assessmentForm,
+        dueDate: assessmentForm.dueDate || null,
+      };
+      const isEdit = Boolean(editingAssessmentId);
+      const url = isEdit ? `/api/admin/assessments/${editingAssessmentId}` : `/api/admin/courses/${lessonCourse.id}/assessments`;
+      const method = isEdit ? "PATCH" : "POST";
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setAssessmentError(data?.message || "تعذّر حفظ الواجب/الاختبار.");
+        return;
+      }
+      await openLessonsManager(lessonCourse);
+      setManagerTab("ASSESSMENTS");
+      setEditingAssessmentId(null);
+      setAssessmentForm(EMPTY_ASSESSMENT_FORM);
+      if (data?.assessment?.id) setSelectedAssessmentId(data.assessment.id);
+    } finally {
+      setAssessmentSaving(false);
+    }
+  }
+
+  function openAssessmentEdit(assessment) {
+    setEditingAssessmentId(assessment.id);
+    setAssessmentForm({
+      title: assessment.title || "",
+      description: assessment.description || "",
+      type: assessment.type || "QUIZ",
+      isPublished: assessment.isPublished === true,
+      dueDate: assessment.dueDate ? new Date(assessment.dueDate).toISOString().slice(0, 16) : "",
+      allowRetake: assessment.allowRetake === true,
+    });
+    setAssessmentError("");
+  }
+
+  async function deleteAssessment(assessmentId) {
+    const res = await fetch(`/api/admin/assessments/${assessmentId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setAssessmentError(data?.message || "تعذّر حذف الواجب/الاختبار.");
+      return;
+    }
+    if (lessonCourse) {
+      await openLessonsManager(lessonCourse);
+      setManagerTab("ASSESSMENTS");
+    }
+  }
+
+  async function toggleAssessmentPublish(assessment) {
+    const res = await fetch(`/api/admin/assessments/${assessment.id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublished: !assessment.isPublished }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setAssessmentError(data?.message || "تعذّر تحديث حالة النشر.");
+      return;
+    }
+    if (lessonCourse) {
+      await openLessonsManager(lessonCourse);
+      setManagerTab("ASSESSMENTS");
+      setSelectedAssessmentId(assessment.id);
+    }
+  }
+
+  function openQuestionEdit(question) {
+    const options = Array.isArray(question.options) && question.options.length ? question.options.map((v) => String(v)) : ["", ""];
+    setEditingQuestionId(question.id);
+    setQuestionForm({
+      questionText: question.questionText || "",
+      type: question.type || "MULTIPLE_CHOICE",
+      options,
+      correctOption: Number(question?.correctAnswer?.correctOption ?? 0) || 0,
+      trueFalseAnswer: Boolean(question?.correctAnswer?.value ?? true),
+      points: Number(question.points || 1) || 1,
+      order: Number(question.order || 1) || 1,
+    });
+    setQuestionError("");
+  }
+
+  function resetQuestionForm() {
+    setEditingQuestionId(null);
+    setQuestionForm(EMPTY_QUESTION_FORM);
+    setQuestionError("");
+  }
+
+  async function saveQuestion(e) {
+    e.preventDefault();
+    if (!selectedAssessmentId) return;
+    setQuestionError("");
+    setQuestionSaving(true);
+    try {
+      const payload = {
+        questionText: questionForm.questionText,
+        type: questionForm.type,
+        points: Math.max(0, Number(questionForm.points) || 0),
+        order: Math.max(1, Number(questionForm.order) || 1),
+        options: questionForm.type === "MULTIPLE_CHOICE" ? questionForm.options : null,
+        correctOption: questionForm.type === "MULTIPLE_CHOICE" ? Number(questionForm.correctOption) || 0 : null,
+        correctAnswer: questionForm.type === "TRUE_FALSE" ? Boolean(questionForm.trueFalseAnswer) : null,
+      };
+      const isEdit = Boolean(editingQuestionId);
+      const url = isEdit
+        ? `/api/admin/assessment-questions/${editingQuestionId}`
+        : `/api/admin/assessments/${selectedAssessmentId}/questions`;
+      const method = isEdit ? "PATCH" : "POST";
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setQuestionError(data?.message || "تعذّر حفظ السؤال.");
+        return;
+      }
+      await loadQuestions(selectedAssessmentId);
+      resetQuestionForm();
+    } finally {
+      setQuestionSaving(false);
+    }
+  }
+
+  async function deleteQuestion(questionId) {
+    const res = await fetch(`/api/admin/assessment-questions/${questionId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setQuestionError(data?.message || "تعذّر حذف السؤال.");
+      return;
+    }
+    await loadQuestions(selectedAssessmentId);
+  }
+
+  async function saveSubmissionCorrection(submission) {
+    const answers = (submission.answers || []).map((ans) => ({
+      answerId: ans.id,
+      pointsAwarded: Number(ans.pointsAwarded || 0),
+      correctionNote: ans.correctionNote || "",
+    }));
+    const res = await fetch(`/api/admin/submissions/${submission.id}/correct`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers, scoreOverride: submission.score }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setAssessmentError(data?.message || "تعذّر حفظ التصحيح.");
+      return;
+    }
+    await loadSubmissions(selectedAssessmentId);
   }
 
   function shortText(value, max = 96) {
@@ -688,6 +957,12 @@ export default function AdminPackagesPage() {
               >
                 الحصص المباشرة
               </AdminActionButton>
+              <AdminActionButton
+                onClick={() => setManagerTab("ASSESSMENTS")}
+                tone={managerTab === "ASSESSMENTS" ? "primary" : undefined}
+              >
+                الواجبات والاختبارات
+              </AdminActionButton>
             </div>
 
             {managerTab === "RECORDED" ? (
@@ -760,7 +1035,7 @@ export default function AdminPackagesPage() {
                   </div>
                 ) : null}
               </>
-            ) : (
+            ) : managerTab === "LIVE" ? (
               <>
                 <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveLiveSession}>
                   <AdminFormField label="عنوان الحصة">
@@ -856,6 +1131,185 @@ export default function AdminPackagesPage() {
                         </div>
                       );
                     })}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveAssessment}>
+                  <AdminFormField label="العنوان">
+                    <AdminInput value={assessmentForm.title} onChange={(e) => setAssessmentForm((s) => ({ ...s, title: e.target.value }))} required />
+                  </AdminFormField>
+                  <AdminFormField label="النوع">
+                    <AdminSelect value={assessmentForm.type} onChange={(e) => setAssessmentForm((s) => ({ ...s, type: e.target.value }))}>
+                      <option value="QUIZ">اختبار</option>
+                      <option value="ASSIGNMENT">واجب</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  <AdminFormField label="الوصف (اختياري)">
+                    <AdminInput value={assessmentForm.description} onChange={(e) => setAssessmentForm((s) => ({ ...s, description: e.target.value }))} />
+                  </AdminFormField>
+                  <AdminFormField label="تاريخ الاستحقاق (اختياري)">
+                    <AdminInput type="datetime-local" value={assessmentForm.dueDate} onChange={(e) => setAssessmentForm((s) => ({ ...s, dueDate: e.target.value }))} />
+                  </AdminFormField>
+                  <AdminFormField label="إعادة المحاولة">
+                    <AdminSelect value={assessmentForm.allowRetake ? "1" : "0"} onChange={(e) => setAssessmentForm((s) => ({ ...s, allowRetake: e.target.value === "1" }))}>
+                      <option value="0">لا</option>
+                      <option value="1">نعم</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  <AdminFormField label="النشر">
+                    <AdminSelect value={assessmentForm.isPublished ? "1" : "0"} onChange={(e) => setAssessmentForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}>
+                      <option value="1">منشور</option>
+                      <option value="0">مخفي</option>
+                    </AdminSelect>
+                  </AdminFormField>
+                  {assessmentError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:col-span-2">{assessmentError}</p> : null}
+                  <div className="flex flex-wrap gap-2 md:col-span-2">
+                    <AdminActionButton type="submit" tone="primary" disabled={assessmentSaving}>
+                      {assessmentSaving ? "جاري الحفظ..." : editingAssessmentId ? "تحديث التقييم" : assessmentForm.type === "QUIZ" ? "إضافة اختبار" : "إضافة واجب"}
+                    </AdminActionButton>
+                    {editingAssessmentId ? (
+                      <AdminActionButton type="button" onClick={() => { setEditingAssessmentId(null); setAssessmentForm(EMPTY_ASSESSMENT_FORM); }}>
+                        إلغاء
+                      </AdminActionButton>
+                    ) : null}
+                  </div>
+                </form>
+
+                {assessmentsLoading ? <p className="mt-4 text-sm text-slate-600">جاري تحميل الواجبات والاختبارات...</p> : null}
+                {!assessmentsLoading && !assessments.length ? <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">لا توجد عناصر بعد.</p> : null}
+                {!assessmentsLoading && assessments.length ? (
+                  <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
+                    <div className="space-y-2">
+                      {assessments.map((assessment) => (
+                        <div key={assessment.id} className={`rounded-xl border px-3 py-3 text-sm ${selectedAssessmentId === assessment.id ? "border-brand-500 bg-brand-50/30" : "border-slate-200 bg-white"}`}>
+                          <p className="font-semibold text-slate-900">{assessment.title}</p>
+                          <p className="mt-1 text-xs text-slate-500">{assessment.type === "QUIZ" ? "اختبار" : "واجب"} - {assessment.questionsCount} سؤال</p>
+                          <p className="mt-1 text-xs text-slate-500">الموعد: {assessment.dueDate ? new Date(assessment.dueDate).toLocaleString("ar-DZ") : "بدون تاريخ"}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <AdminBadge tone={assessment.isPublished ? "success" : "warning"}>{assessment.isPublished ? "منشور" : "مخفي"}</AdminBadge>
+                            <AdminBadge tone="brand">الإجابات: {assessment.submissionsCount}</AdminBadge>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <AdminActionButton onClick={() => { setSelectedAssessmentId(assessment.id); loadQuestions(assessment.id); loadSubmissions(assessment.id); }}>عرض الإجابات</AdminActionButton>
+                            <AdminActionButton onClick={() => openAssessmentEdit(assessment)}>تعديل</AdminActionButton>
+                            <AdminActionButton onClick={() => toggleAssessmentPublish(assessment)}>{assessment.isPublished ? "إلغاء النشر" : "نشر"}</AdminActionButton>
+                            <AdminActionButton onClick={() => deleteAssessment(assessment.id)} tone="danger">حذف</AdminActionButton>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/40 p-3">
+                      <h3 className="text-sm font-extrabold text-slate-900">الأسئلة والإجابات</h3>
+                      {!selectedAssessmentId ? <p className="text-xs text-slate-500">اختر تقييمًا لعرض الأسئلة والإجابات.</p> : null}
+                      {selectedAssessmentId ? (
+                        <>
+                          <form className="grid gap-2 rounded-xl border border-slate-200 bg-white p-3" onSubmit={saveQuestion}>
+                            <AdminFormField label="نص السؤال">
+                              <AdminInput value={questionForm.questionText} onChange={(e) => setQuestionForm((s) => ({ ...s, questionText: e.target.value }))} required />
+                            </AdminFormField>
+                            <div className="grid gap-2 md:grid-cols-3">
+                              <AdminFormField label="النوع">
+                                <AdminSelect value={questionForm.type} onChange={(e) => setQuestionForm((s) => ({ ...s, type: e.target.value }))}>
+                                  <option value="MULTIPLE_CHOICE">اختيار متعدد</option>
+                                  <option value="TRUE_FALSE">صح/خطأ</option>
+                                  <option value="WRITTEN">سؤال كتابي</option>
+                                </AdminSelect>
+                              </AdminFormField>
+                              <AdminFormField label="النقاط">
+                                <AdminInput type="number" min="0" value={questionForm.points} onChange={(e) => setQuestionForm((s) => ({ ...s, points: Number(e.target.value) || 0 }))} />
+                              </AdminFormField>
+                              <AdminFormField label="الترتيب">
+                                <AdminInput type="number" min="1" value={questionForm.order} onChange={(e) => setQuestionForm((s) => ({ ...s, order: Number(e.target.value) || 1 }))} />
+                              </AdminFormField>
+                            </div>
+                            {questionForm.type === "MULTIPLE_CHOICE" ? (
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-slate-700">خيارات السؤال</p>
+                                {(questionForm.options || []).map((opt, i) => (
+                                  <div key={`opt-${i}`} className="flex items-center gap-2">
+                                    <input type="radio" checked={Number(questionForm.correctOption) === i} onChange={() => setQuestionForm((s) => ({ ...s, correctOption: i }))} />
+                                    <AdminInput value={opt} onChange={(e) => setQuestionForm((s) => ({ ...s, options: s.options.map((o, idx) => (idx === i ? e.target.value : o)) }))} placeholder={`الخيار ${i + 1}`} />
+                                    <AdminActionButton type="button" onClick={() => setQuestionForm((s) => ({ ...s, options: s.options.filter((_, idx) => idx !== i), correctOption: Math.max(0, Math.min(Number(s.correctOption) || 0, s.options.length - 2)) }))} disabled={(questionForm.options || []).length <= 2}>حذف</AdminActionButton>
+                                  </div>
+                                ))}
+                                <AdminActionButton type="button" onClick={() => setQuestionForm((s) => ({ ...s, options: [...s.options, ""] }))} disabled={(questionForm.options || []).length >= 6}>
+                                  إضافة خيار
+                                </AdminActionButton>
+                              </div>
+                            ) : null}
+                            {questionForm.type === "TRUE_FALSE" ? (
+                              <AdminFormField label="الإجابة الصحيحة">
+                                <AdminSelect value={questionForm.trueFalseAnswer ? "1" : "0"} onChange={(e) => setQuestionForm((s) => ({ ...s, trueFalseAnswer: e.target.value === "1" }))}>
+                                  <option value="1">صح</option>
+                                  <option value="0">خطأ</option>
+                                </AdminSelect>
+                              </AdminFormField>
+                            ) : null}
+                            {questionError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{questionError}</p> : null}
+                            <div className="flex flex-wrap gap-2">
+                              <AdminActionButton type="submit" tone="primary" disabled={questionSaving}>{questionSaving ? "..." : editingQuestionId ? "تحديث السؤال" : "إضافة سؤال"}</AdminActionButton>
+                              {editingQuestionId ? <AdminActionButton type="button" onClick={resetQuestionForm}>إلغاء</AdminActionButton> : null}
+                            </div>
+                          </form>
+
+                          {questionsLoading ? <p className="text-xs text-slate-500">جاري تحميل الأسئلة...</p> : null}
+                          {!questionsLoading && !questions.length ? <p className="text-xs text-slate-500">لا توجد أسئلة بعد.</p> : null}
+                          {!questionsLoading && questions.length ? (
+                            <div className="space-y-2">
+                              {questions.map((q) => (
+                                <div key={q.id} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+                                  <p className="font-semibold text-slate-900">{q.order}. {q.questionText}</p>
+                                  <p className="mt-1 text-xs text-slate-500">{q.type} - {q.points} نقطة</p>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    <AdminActionButton onClick={() => openQuestionEdit(q)}>تعديل</AdminActionButton>
+                                    <AdminActionButton onClick={() => deleteQuestion(q.id)} tone="danger">حذف</AdminActionButton>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+
+                          <div className="rounded-xl border border-slate-200 bg-white p-3">
+                            <p className="text-sm font-extrabold text-slate-900">عرض الإجابات</p>
+                            {submissionsLoading ? <p className="mt-2 text-xs text-slate-500">جاري تحميل الإجابات...</p> : null}
+                            {!submissionsLoading && !submissions.length ? <p className="mt-2 text-xs text-slate-500">لا توجد إجابات طلاب بعد.</p> : null}
+                            {!submissionsLoading && submissions.length ? (
+                              <div className="mt-2 space-y-2">
+                                {submissions.map((sub) => (
+                                  <div key={sub.id} className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs">
+                                    <p className="font-bold text-slate-900">{sub.student?.fullName || sub.student?.email}</p>
+                                    <p className="text-slate-500">آخر رسالة: {sub.submittedAt ? new Date(sub.submittedAt).toLocaleString("ar-DZ") : "-"}</p>
+                                    <p className="text-slate-700">النتيجة: {sub.score}/{sub.maxScore} - {sub.status}</p>
+                                    <div className="mt-2 space-y-2">
+                                      {(sub.answers || []).map((ans) => (
+                                        <div key={ans.id} className="rounded border border-slate-200 bg-white p-2">
+                                          <p className="font-semibold text-slate-800">{ans.question?.questionText}</p>
+                                          <p className="mt-1 text-slate-500">الإجابة: {typeof ans.answer === "object" ? JSON.stringify(ans.answer) : String(ans.answer || "-")}</p>
+                                          {ans.question?.type === "WRITTEN" ? (
+                                            <div className="mt-1 grid gap-1 md:grid-cols-2">
+                                              <AdminInput type="number" min="0" max={ans.question?.points || 0} value={ans.pointsAwarded || 0} onChange={(e) => setSubmissions((prev) => prev.map((row) => row.id === sub.id ? { ...row, answers: row.answers.map((a) => a.id === ans.id ? { ...a, pointsAwarded: Number(e.target.value) || 0 } : a) } : row))} />
+                                              <AdminInput value={ans.correctionNote || ""} placeholder="ملاحظة التصحيح" onChange={(e) => setSubmissions((prev) => prev.map((row) => row.id === sub.id ? { ...row, answers: row.answers.map((a) => a.id === ans.id ? { ...a, correctionNote: e.target.value } : a) } : row))} />
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className="mt-2 flex items-center gap-2">
+                                      <span className="text-slate-600">تعديل النتيجة:</span>
+                                      <AdminInput type="number" min="0" value={sub.score || 0} onChange={(e) => setSubmissions((prev) => prev.map((row) => row.id === sub.id ? { ...row, score: Number(e.target.value) || 0 } : row))} className="max-w-[120px]" />
+                                      <AdminActionButton onClick={() => saveSubmissionCorrection(sub)} tone="primary">حفظ التصحيح</AdminActionButton>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
               </>
