@@ -7,6 +7,7 @@ import {
   clearAllSessionCookies,
 } from "@/lib/auth/session";
 import type { SessionPayload } from "@/lib/auth/jwt";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
     const password = String(body.password || "");
     const intent = parseIntent(body.intent, req);
 
-    console.log(`[login] intent=${intent} email=${email}`);
+    const ip = getClientIp(req);
 
     step = "validate";
     if (!email || !password) {
@@ -47,31 +48,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "أدخل البريد وكلمة المرور." }, { status: 400 });
     }
 
+    const rate = checkRateLimit({
+      key: `login:${ip}:${email || "unknown"}`,
+      limit: 8,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "عدد محاولات تسجيل الدخول كبير. حاول بعد قليل." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
+
     step = "find-user";
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      console.log(`[login] REJECT: user not found for email=${email}`);
       return NextResponse.json({ ok: false, message: "بيانات الدخول غير صحيحة." }, { status: 401 });
     }
 
-    console.log(`[login] user found: id=${user.id} role=${user.role} status=${user.status}`);
-
     if (user.status !== "ACTIVE") {
-      console.log(`[login] REJECT: user status=${user.status}`);
       return NextResponse.json({ ok: false, message: "الحساب غير مفعّل." }, { status: 403 });
     }
 
     step = "verify-password";
     const passwordOk = await verifyPassword(password, user.passwordHash);
-    console.log(`[login] password match=${passwordOk} hashPrefix=${user.passwordHash.substring(0, 7)}`);
     if (!passwordOk) {
-      console.log("[login] REJECT: password mismatch");
       return NextResponse.json({ ok: false, message: "بيانات الدخول غير صحيحة." }, { status: 401 });
     }
 
     step = "check-intent";
     if (intent === "admin" && user.role !== "ADMIN") {
-      console.log(`[login] REJECT: intent=admin but role=${user.role}`);
       const res = NextResponse.json(
         { ok: false, code: "ADMIN_PORTAL_STUDENT_ACCOUNT", message: "هذا الحساب ليس حساب إدارة" },
         { status: 403 },
@@ -80,7 +86,6 @@ export async function POST(req: Request) {
       return res;
     }
     if (intent === "student" && user.role !== "STUDENT") {
-      console.log(`[login] REJECT: intent=student but role=${user.role}`);
       const res = NextResponse.json(
         { ok: false, code: "STUDENT_PORTAL_ADMIN_ACCOUNT", message: "هذا الحساب خاص بالإدارة" },
         { status: 403 },
@@ -108,12 +113,9 @@ export async function POST(req: Request) {
 
     await setSessionCookie(response, session);
     clearOtherSessionCookie(response, role);
-    console.log(`[login] SUCCESS: role=${role} email=${email}`);
     return response;
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error(`[login] FAILED at step="${step}":`, msg);
-    if (e instanceof Error && e.stack) console.error("[login] stack:", e.stack);
+    console.error(`[login] failed at step="${step}"`);
     return NextResponse.json({ ok: false, message: "تعذّر تسجيل الدخول." }, { status: 500 });
   }
 }

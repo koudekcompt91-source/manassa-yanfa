@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { getStudentSessionFromCookies } from "@/lib/auth/session";
+import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { prisma } from "@/lib/prisma";
 import { notifyAdminsStudentChatMessage } from "@/lib/server-notifications";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -45,8 +46,9 @@ function normalizeMessage(row: {
 }
 
 export async function GET(_: Request, { params }: { params: { slug: string } }) {
-  const session = await getStudentSessionFromCookies();
-  if (!session) return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 401 });
+  const guard = await requireStudentApiSession();
+  if (!guard.ok) return guard.response;
+  const session = guard.session;
 
   try {
     const ref = decodeURIComponent(String(params.slug || "")).trim();
@@ -116,10 +118,23 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
 }
 
 export async function POST(req: Request, { params }: { params: { slug: string } }) {
-  const session = await getStudentSessionFromCookies();
-  if (!session) return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 401 });
+  const guard = await requireStudentApiSession();
+  if (!guard.ok) return guard.response;
+  const session = guard.session;
 
   try {
+    const rate = checkRateLimit({
+      key: `chat-send:${getClientIp(req)}:${session.sub}`,
+      limit: 12,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "الرجاء التمهل قبل إرسال رسائل جديدة." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
+
     const body = await req.json();
     const text = String(body?.body || "").trim();
     if (!text) return NextResponse.json({ ok: false, message: "نص الرسالة مطلوب." }, { status: 400 });

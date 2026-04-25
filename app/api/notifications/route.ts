@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStudentSessionFromCookies } from "@/lib/auth/session";
+import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -22,8 +22,9 @@ function normalizeNotification(row: {
 }
 
 export async function GET(req: Request) {
-  const session = await getStudentSessionFromCookies();
-  if (!session) return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 401 });
+  const guard = await requireStudentApiSession();
+  if (!guard.ok) return guard.response;
+  const session = guard.session;
 
   try {
     const url = new URL(req.url);

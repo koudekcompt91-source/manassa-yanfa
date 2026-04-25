@@ -1,15 +1,29 @@
 import { NextResponse } from "next/server";
-import { getAdminSessionFromCookies } from "@/lib/auth/session";
+import { requireAdminApiSession } from "@/lib/auth/api-guards";
 import { prisma } from "@/lib/prisma";
 import { notifyStudentAdminReply } from "@/lib/server-notifications";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 const MAX_MESSAGE_LEN = 1000;
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const session = await getAdminSessionFromCookies();
-  if (!session) return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 403 });
+  const guard = await requireAdminApiSession();
+  if (!guard.ok) return guard.response;
+  const session = guard.session;
 
   try {
+    const rate = checkRateLimit({
+      key: `admin-chat-reply:${getClientIp(req)}:${session.sub}`,
+      limit: 30,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "عدد الرسائل كبير. حاول بعد قليل." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
+
     const body = await req.json();
     const text = String(body?.body || "").trim();
     if (!text) return NextResponse.json({ ok: false, message: "نص الرد مطلوب." }, { status: 400 });

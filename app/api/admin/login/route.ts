@@ -7,6 +7,7 @@ import {
   clearAllSessionCookies,
 } from "@/lib/auth/session";
 import type { SessionPayload } from "@/lib/auth/jwt";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -19,8 +20,7 @@ export async function POST(req: Request) {
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
 
-    console.log(`[admin-login] email=${email}`);
-    console.log("[admin-login] entered password length=", password.length);
+    const ip = getClientIp(req);
 
     step = "validate";
     if (!email || !password) {
@@ -30,28 +30,29 @@ export async function POST(req: Request) {
       );
     }
 
+    const rate = checkRateLimit({
+      key: `admin-login:${ip}:${email || "unknown"}`,
+      limit: 8,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "عدد محاولات تسجيل الدخول كبير. حاول بعد قليل." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
+
     step = "find-user";
     const user = await prisma.user.findUnique({ where: { email } });
 
-    console.log("[admin-login] user exists=", !!user);
-
     if (!user) {
-      console.log("[admin-login] user-not-found");
       return NextResponse.json(
         { ok: false, message: "بيانات الدخول غير صحيحة." },
         { status: 401 }
       );
     }
 
-    console.log("[admin-login] db role=", user.role);
-    console.log("[admin-login] db status=", user.status);
-    console.log(
-      "[admin-login] hash prefix=",
-      String(user.passwordHash || "").slice(0, 20)
-    );
-
     if (user.role !== "ADMIN") {
-      console.log(`[admin-login] role-not-admin role=${user.role}`);
       const res = NextResponse.json(
         {
           ok: false,
@@ -65,7 +66,6 @@ export async function POST(req: Request) {
     }
 
     if (user.status !== "ACTIVE") {
-      console.log(`[admin-login] inactive-user status=${user.status}`);
       return NextResponse.json(
         { ok: false, message: "الحساب غير مفعّل." },
         { status: 403 }
@@ -74,10 +74,8 @@ export async function POST(req: Request) {
 
     step = "verify-password";
     const passwordOk = await verifyPassword(password, user.passwordHash);
-    console.log("[admin-login] passwordOk=", passwordOk);
 
     if (!passwordOk) {
-      console.log("[admin-login] password-mismatch");
       return NextResponse.json(
         { ok: false, message: "بيانات الدخول غير صحيحة." },
         { status: 401 }
@@ -103,15 +101,9 @@ export async function POST(req: Request) {
 
     await setSessionCookie(res, session);
     clearOtherSessionCookie(res, "ADMIN");
-
-    console.log("[admin-login] SUCCESS");
     return res;
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error(`[admin-login] FAILED at step="${step}":`, msg);
-    if (e instanceof Error && e.stack) {
-      console.error("[admin-login] stack:", e.stack);
-    }
+    console.error(`[admin-login] failed at step="${step}"`);
     return NextResponse.json(
       { ok: false, message: "تعذّر تسجيل دخول الإدارة." },
       { status: 500 }

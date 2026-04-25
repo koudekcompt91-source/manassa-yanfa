@@ -7,6 +7,7 @@ import {
   mapArabicLabelToStudentLevelCode,
   mapStudentLevelCodeToArabic,
 } from "@/lib/student-level-codes";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,21 @@ export async function POST(req: Request) {
     step = "validate";
     if (!fullName || !email) {
       return NextResponse.json({ ok: false, message: "البيانات غير مكتملة." }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ ok: false, message: "صيغة البريد الإلكتروني غير صحيحة." }, { status: 400 });
+    }
+    const ip = getClientIp(req);
+    const rate = checkRateLimit({
+      key: `register:${ip}:${email || "unknown"}`,
+      limit: 5,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "عدد محاولات التسجيل كبير. حاول بعد قليل." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
     }
     if (password.length < 6) {
       return NextResponse.json({ ok: false, message: "كلمة المرور يجب ألا تقل عن 6 أحرف." }, { status: 400 });
@@ -77,9 +93,7 @@ export async function POST(req: Request) {
       message: "تم إنشاء الحساب بنجاح. سجّل دخولك الآن.",
     });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error(`[register] FAILED at step="${step}":`, msg);
-    if (e instanceof Error && e.stack) console.error("[register] stack:", e.stack);
+    console.error(`[register] failed at step="${step}"`);
     return NextResponse.json({ ok: false, message: "تعذّر إنشاء الحساب." }, { status: 500 });
   }
 }

@@ -1,12 +1,13 @@
 import { NotificationType } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { getAdminSessionFromCookies } from "@/lib/auth/session";
+import { requireAdminApiSession } from "@/lib/auth/api-guards";
 import {
   createNotificationsForUsers,
   getAllActiveStudentIds,
   getEnrolledStudentIdsByCourseId,
 } from "@/lib/server-notifications";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 function parsePayload(body: any) {
   const title = String(body?.title || "").trim();
@@ -28,10 +29,23 @@ function parsePayload(body: any) {
 }
 
 export async function POST(req: Request) {
-  const session = await getAdminSessionFromCookies();
-  if (!session) return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 403 });
+  const guard = await requireAdminApiSession();
+  if (!guard.ok) return guard.response;
+  const session = guard.session;
 
   try {
+    const rate = checkRateLimit({
+      key: `admin-notify:${getClientIp(req)}:${session.sub}`,
+      limit: 20,
+      windowMs: 60_000,
+    });
+    if (!rate.ok) {
+      return NextResponse.json(
+        { ok: false, message: "عدد عمليات الإرسال كبير. حاول بعد قليل." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+      );
+    }
+
     const valid = parsePayload(await req.json());
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
 

@@ -9,7 +9,19 @@ export const runtime = "nodejs";
  * DELETE THIS FILE after use.
  * GET /api/admin/reset-pw
  */
-export async function GET() {
+export async function GET(req: Request) {
+  // Never expose this helper in production.
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ ok: false, message: "غير متاح." }, { status: 404 });
+  }
+
+  const url = new URL(req.url);
+  const token = String(url.searchParams.get("token") || "");
+  const expected = String(process.env.ADMIN_RESET_TOKEN || "");
+  if (!expected || token !== expected) {
+    return NextResponse.json({ ok: false, message: "غير مصرح." }, { status: 401 });
+  }
+
   const email = "admin@yanfa.app";
   const newPassword = "Admin123456!";
 
@@ -34,7 +46,7 @@ export async function GET() {
         id: created.id,
         email: created.email,
         role: created.role,
-        password: newPassword,
+        message: "تم إنشاء حساب الإدارة بنجاح. استخدم كلمة المرور الافتراضية من الإعدادات الآمنة.",
       });
     }
 
@@ -51,11 +63,10 @@ export async function GET() {
       email: user.email,
       role: "ADMIN",
       previousRole: user.role,
-      password: newPassword,
+      message: "تم تحديث كلمة مرور الإدارة بنجاح.",
     });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error("[reset-pw]", msg);
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+    console.error("[reset-pw] failed");
+    return NextResponse.json({ ok: false, message: "تعذّر تنفيذ العملية." }, { status: 500 });
   }
 }
