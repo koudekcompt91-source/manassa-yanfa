@@ -137,6 +137,10 @@ export default function PackageDetailsPage() {
     }
     if (tab === "assessments" || tab === "quiz") {
       setActiveTab("ASSESSMENTS");
+      return;
+    }
+    if (tab === "certificate" || tab === "cert") {
+      setActiveTab("CERTIFICATE");
     }
   }, [searchParams]);
 
@@ -147,7 +151,7 @@ export default function PackageDetailsPage() {
   const priceMad = Number(course?.priceMad || course?.price || 0) || 0;
   const isPaid = course?.accessType === "PAID" || priceMad > 0;
   const categoryName = (categories || []).find((c) => c.id === course?.categoryId)?.name || "-";
-  const teacherName = (teachers || []).find((t) => t.id === course?.teacherId)?.name || "طاقم yanfa3 Education";
+  const teacherName = (teachers || []).find((t) => t.id === course?.teacherId)?.name || "يوسف مادن";
   const firstLesson = lessons[0];
   const firstLessonHref = firstLesson ? `/packages/${course?.slug}/lesson/${firstLesson.id}` : null;
   const freePreviewCount = lessons.filter((lesson) => lesson.isFreePreview).length;
@@ -218,7 +222,23 @@ export default function PackageDetailsPage() {
             <p className="mt-1 text-2xl font-black text-brand-700">{isPaid ? formatDzd(priceMad) : "مجانية"}</p>
             <p className="mt-2 text-xs text-slate-500">دروس الدورة: {lessons.length}</p>
             <p className="mt-1 text-xs text-slate-500">معاينة مجانية: {freePreviewCount}</p>
+            <p className="mt-1 text-xs text-slate-500">{courseState.canAccessPaid ? "مشترك في الدورة" : "الوصول مقيد"}</p>
           </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {continueLesson ? (
+            <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
+              واصل التعلم
+            </Link>
+          ) : null}
+          <button type="button" onClick={() => setActiveTab("CHAT")} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+            راسل الأستاذ
+          </button>
+          {progress?.isCompleted && certificateState.certificate?.certificateCode ? (
+            <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800 no-underline">
+              عرض الشهادة
+            </Link>
+          ) : null}
         </div>
       </header>
 
@@ -365,6 +385,13 @@ export default function PackageDetailsPage() {
           >
             الواجبات والاختبارات
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("CERTIFICATE")}
+            className={`rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CERTIFICATE" ? "bg-brand-600 text-white" : "border border-slate-200 text-slate-700"}`}
+          >
+            الشهادة
+          </button>
         </div>
 
         {activeTab === "RECORDED" ? (
@@ -379,6 +406,7 @@ export default function PackageDetailsPage() {
                         {lesson.order}. {lesson.title}
                       </p>
                       <p className="mt-1 text-sm text-slate-600">{lesson.description || "لا يوجد وصف لهذا الدرس."}</p>
+                      <p className="mt-1 text-xs text-slate-500">المدة: {Math.ceil((Number(lesson.durationSec || 0) || 0) / 60)} دقيقة</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {completedLessonIds.has(lesson.id) ? (
@@ -389,7 +417,7 @@ export default function PackageDetailsPage() {
                         href={`/packages/${course.slug}/lesson/${lesson.id}`}
                         className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline"
                       >
-                        فتح الدرس
+                        تشغيل الدرس
                       </Link>
                     </div>
                   </div>
@@ -446,13 +474,43 @@ export default function PackageDetailsPage() {
             canAccessChat={courseState.canAccessPaid}
             myUserId={meState?.user?.id || ""}
           />
-        ) : (
+        ) : activeTab === "ASSESSMENTS" ? (
           <CourseAssessmentsPanel
             courseSlug={course.slug}
             authedStudent={authedStudent}
             canAccess={courseState.canAccessPaid}
             onProgressChange={loadProgress}
           />
+        ) : (
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            {progress?.isCompleted ? (
+              <>
+                <p className="text-lg font-extrabold text-emerald-800">أكملت هذه الدورة بنجاح</p>
+                <p className="mt-1 text-sm text-slate-600">شهادتك متاحة الآن.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {certificateState.certificate?.certificateCode ? (
+                    <>
+                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white no-underline">
+                        عرض الشهادة
+                      </Link>
+                      <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-bold text-emerald-800 no-underline">
+                        تحميل الشهادة
+                      </Link>
+                    </>
+                  ) : (
+                    <button type="button" onClick={loadCertificate} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">
+                      عرض الشهادة
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-base font-bold text-slate-700">أكمل الدورة للحصول على الشهادة</p>
+                <p className="mt-1 text-sm text-slate-600">نسبة التقدم الحالية: {progress?.progressPercent || 0}%</p>
+              </>
+            )}
+          </div>
         )}
       </section>
 

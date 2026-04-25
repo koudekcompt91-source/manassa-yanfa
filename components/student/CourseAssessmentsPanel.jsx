@@ -214,11 +214,15 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
                 disabled={submitting}
                 className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
-                {submitting ? "جاري الإرسال..." : detail.submission ? "ابدأ الاختبار" : "ابدأ الاختبار"}
+                {submitting ? "جاري الإرسال..." : "ابدأ"}
               </button>
             ) : null}
-            {detail.submission && !detail.canSubmit ? <p className="text-sm font-semibold text-slate-600">تم الإرسال</p> : null}
-            {detail.submission ? <p className="text-sm font-semibold text-brand-700">عرض النتيجة: {detail.submission.score}/{detail.submission.maxScore}</p> : null}
+            {detail.submission && !detail.canSubmit ? (
+              <p className="text-sm font-semibold text-slate-600">
+                {detail.submission.status === "PENDING_CORRECTION" ? "في انتظار التصحيح" : "عرض النتيجة"}
+              </p>
+            ) : null}
+            {detail.submission ? <p className="text-sm font-semibold text-brand-700">النتيجة: {detail.submission.score}/{detail.submission.maxScore}</p> : null}
           </div>
         ) : null}
       </section>

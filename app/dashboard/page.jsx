@@ -23,6 +23,11 @@ function DashboardPageInner() {
   const [dashboardProgress, setDashboardProgress] = useState([]);
   const [dashboardProgressLoading, setDashboardProgressLoading] = useState(true);
   const [issuingCourseId, setIssuingCourseId] = useState("");
+  const [overview, setOverview] = useState({
+    summary: null,
+    upcomingLiveSessions: [],
+    pendingAssessments: [],
+  });
   const [clientStorageTick, setClientStorageTick] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
@@ -45,6 +50,23 @@ function DashboardPageInner() {
       })
       .catch(() => setDashboardProgress([]))
       .finally(() => setDashboardProgressLoading(false));
+  }, []);
+
+  const loadOverview = useCallback(() => {
+    fetch("/api/dashboard/overview", { credentials: "include", cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok) {
+          setOverview({ summary: null, upcomingLiveSessions: [], pendingAssessments: [] });
+          return;
+        }
+        setOverview({
+          summary: data.summary || null,
+          upcomingLiveSessions: Array.isArray(data.upcomingLiveSessions) ? data.upcomingLiveSessions : [],
+          pendingAssessments: Array.isArray(data.pendingAssessments) ? data.pendingAssessments : [],
+        });
+      })
+      .catch(() => setOverview({ summary: null, upcomingLiveSessions: [], pendingAssessments: [] }));
   }, []);
 
   const openCertificate = useCallback(
@@ -77,7 +99,8 @@ function DashboardPageInner() {
   useEffect(() => {
     loadMe();
     loadDashboardProgress();
-  }, [loadMe, loadDashboardProgress]);
+    loadOverview();
+  }, [loadMe, loadDashboardProgress, loadOverview]);
 
   const rechargeParam = searchParams.get("recharge");
   useEffect(() => {
@@ -136,6 +159,29 @@ function DashboardPageInner() {
   const lessonsAvailableCount = lessonsInEnrolledPackages.length;
 
   const continueLearning = useMemo(() => {
+    const recent = (dashboardProgress || [])
+      .filter((row) => row?.slug)
+      .slice()
+      .sort((a, b) => {
+        const at = a?.lastActivityAt ? new Date(a.lastActivityAt).getTime() : 0;
+        const bt = b?.lastActivityAt ? new Date(b.lastActivityAt).getTime() : 0;
+        return bt - at;
+      })[0];
+    if (recent?.slug && recent?.lastLessonId) {
+      return {
+        href: `/packages/${recent.slug}/lesson/${recent.lastLessonId}`,
+        lessonTitle: (recent.lastLessonTitle || "آخر درس").trim(),
+        packageTitle: (recent.title || "").trim(),
+      };
+    }
+    if (recent?.slug) {
+      return {
+        href: `/packages/${recent.slug}`,
+        lessonTitle: "",
+        packageTitle: (recent.title || "").trim(),
+      };
+    }
+
     if (!publishedPackages.length || !enrolledPackageIds.size) {
       return { href: "/courses", lessonTitle: "", packageTitle: "" };
     }
@@ -159,7 +205,7 @@ function DashboardPageInner() {
       lessonTitle: (target.title || "درس").trim(),
       packageTitle: (pkg.title || "").trim(),
     };
-  }, [myEnrollments, publishedPackages, publishedLessons, enrolledPackageIds, hydrated]);
+  }, [dashboardProgress, myEnrollments, publishedPackages, publishedLessons, enrolledPackageIds, hydrated]);
 
   const recommendedPackages = useMemo(() => {
     const out = [];
@@ -252,18 +298,22 @@ function DashboardPageInner() {
   };
 
   const statCards = [
-    { label: "الرصيد", value: formatDzd(walletBalance), sub: "بالدينار الجزائري" },
-    { label: "الدورات المشتركة", value: enrolledCourses, sub: "دورة" },
-    { label: "الدروس المتاحة", value: lessonsAvailableCount, sub: "ضمن دوراتك" },
-    { label: "نقاط التفاعل", value: engagement.points, sub: "نقاط" },
+    { label: "دوراتي", value: overview.summary?.myCourses ?? enrolledCourses, sub: "دورة" },
+    { label: "دورات مكتملة", value: overview.summary?.completedCourses ?? 0, sub: "مكتملة" },
+    { label: "قيد التقدم", value: overview.summary?.inProgressCourses ?? 0, sub: "دورة" },
+    { label: "شهاداتي", value: overview.summary?.certificatesAvailable ?? 0, sub: "شهادة" },
+    { label: "الحصص القادمة", value: overview.summary?.upcomingLiveSessions ?? 0, sub: "حصة" },
+    { label: "إشعارات غير مقروءة", value: overview.summary?.unreadNotifications ?? 0, sub: "إشعار" },
+    { label: "واجبات قيد الانتظار", value: overview.summary?.pendingAssessments ?? 0, sub: "تقييم" },
+    { label: "الرصيد", value: formatDzd(walletBalance), sub: "دج" },
   ];
 
   return (
     <div className="flex w-full flex-col gap-8">
       <header className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-medium text-slate-400">لوحة التعلّم</p>
+        <p className="text-sm font-medium text-slate-400">منصة ينفع</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا، {displayName}</h1>
-        <p className="mt-2 text-base text-slate-500">متابعة تقدّمك ودوراتك.</p>
+        <p className="mt-2 text-base text-slate-500">واصل تعلمك وتابع تقدمك في الدورات.</p>
         {displayEmail ? (
           <p className="mt-2 text-sm text-slate-400" dir="ltr">
             {displayEmail}
@@ -350,7 +400,7 @@ function DashboardPageInner() {
       </section>
 
       <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">تابع من حيث توقفت</h2>
+        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">واصل من حيث توقفت</h2>
         {continueLearning.lessonTitle ? (
           <>
             <p className="mt-3 text-sm text-slate-400">{continueLearning.packageTitle}</p>
@@ -359,17 +409,17 @@ function DashboardPageInner() {
               href={continueLearning.href}
               className="mt-6 inline-block rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
             >
-              متابعة الدرس
+              واصل التعلم
             </Link>
           </>
         ) : (
           <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-            <p className="text-sm text-slate-600">لا يوجد درس للمتابعة بعد</p>
+            <p className="text-sm text-slate-600">ابدأ أول دورة لك الآن</p>
             <Link
               href={continueLearning.href}
               className="mt-4 inline-block rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
             >
-              استكشاف الدورات
+              استكشف الدورات
             </Link>
           </div>
         )}
@@ -399,10 +449,20 @@ function DashboardPageInner() {
                   : `/packages/${row.slug}`;
                 return (
                   <li key={row.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="h-14 w-20 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-indigo-100">
+                        {row.coverImage ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={row.coverImage} alt={row.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs font-bold text-brand-700">الدورات</div>
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-base font-bold text-slate-900">{row.title}</p>
                         {row.isCompleted ? <p className="mt-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">مكتملة</p> : null}
+                        {!row.isCompleted && row.progressPercent > 0 ? <p className="mt-1 inline-flex rounded-full bg-brand-100 px-2 py-0.5 text-[11px] font-bold text-brand-800">قيد التقدم</p> : null}
+                        <p className="mt-1 text-xs text-slate-500">الأستاذ: يوسف مادن</p>
                         <p className="mt-1 text-sm text-slate-500">
                           {row.totalLessons} درس · أكملت {row.completedLessons}
                         </p>
@@ -437,7 +497,7 @@ function DashboardPageInner() {
                           disabled={issuingCourseId === row.id}
                           className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 disabled:opacity-50"
                         >
-                          {issuingCourseId === row.id ? "جاري تجهيز الشهادة..." : "شهادتي"}
+                          {issuingCourseId === row.id ? "جاري تجهيز الشهادة..." : "عرض الشهادة"}
                         </button>
                       ) : null}
                     </div>
@@ -449,17 +509,62 @@ function DashboardPageInner() {
         </section>
 
         <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-lg font-bold text-slate-900 sm:text-xl">التفاعل والنقاط</h2>
-          <p className="mt-4 text-3xl font-bold tracking-tight text-slate-900">{engagement.points}</p>
-          <p className="mt-2 text-sm text-slate-400">نقاطك الإجمالية</p>
-          {engagement.streak > 0 ? (
-            <p className="mt-4 text-sm text-slate-600">
-              سلسلة الأيام: <span className="font-bold text-brand-600">{engagement.streak}</span>
-            </p>
-          ) : (
-            <p className="mt-4 text-sm text-slate-500">سجّل دخولك يوميًا لبناء سلسلة أيام.</p>
-          )}
-          <div className="mt-4 flex flex-wrap gap-2">
+          <h2 className="text-lg font-bold text-slate-900 sm:text-xl">الحصص القادمة والواجبات</h2>
+          <div className="mt-4">
+            <p className="text-sm font-semibold text-slate-700">الحصص المباشرة القادمة</p>
+            {!overview.upcomingLiveSessions.length ? (
+              <p className="mt-2 text-sm text-slate-500">لا توجد حصص مباشرة قادمة حاليًا.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {overview.upcomingLiveSessions.slice(0, 4).map((row) => (
+                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                    <p className="font-semibold text-slate-900">{row.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
+                    <p className="mt-1 text-xs text-slate-500">{new Date(row.startsAt).toLocaleString("ar-DZ")}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${row.status === "LIVE" ? "bg-emerald-100 text-emerald-700" : "bg-brand-100 text-brand-700"}`}>
+                        {row.status === "LIVE" ? "مباشر الآن" : "قادمة"}
+                      </span>
+                      <Link href={`/packages/${row.courseSlug}?tab=live`} className="text-xs font-bold text-brand-700 underline">
+                        {row.status === "LIVE" ? "انضم إلى الحصة" : "عرض التفاصيل"}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <p className="text-sm font-semibold text-slate-700">واجبات قيد الانتظار</p>
+            {!overview.pendingAssessments.length ? (
+              <p className="mt-2 text-sm text-slate-500">لا توجد واجبات أو اختبارات معلّقة.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {overview.pendingAssessments.slice(0, 4).map((row) => (
+                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                    <p className="font-semibold text-slate-900">{row.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
+                    <p className="mt-1 text-xs text-slate-500">{row.dueDate ? `الموعد: ${new Date(row.dueDate).toLocaleString("ar-DZ")}` : "بدون موعد محدد"}</p>
+                    <Link href={`/packages/${row.courseSlug}?tab=assessments`} className="mt-2 inline-block text-xs font-bold text-brand-700 underline">
+                      حل الآن
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <p className="text-sm font-semibold text-slate-700">التفاعل والنقاط</p>
+            <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">{engagement.points}</p>
+            {engagement.streak > 0 ? (
+              <p className="mt-2 text-sm text-slate-600">
+                سلسلة الأيام: <span className="font-bold text-brand-600">{engagement.streak}</span>
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-slate-500">سجّل دخولك يوميًا لبناء سلسلة أيام.</p>
+            )}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
             {(engagement.badges || []).length ? (
               engagement.badges.map((b) => (
                 <span
