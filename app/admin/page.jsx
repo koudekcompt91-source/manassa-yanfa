@@ -1,24 +1,87 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
-import { useDemoSection } from "@/lib/demo-store";
 
 export default function AdminOverviewPage() {
-  const [announcements] = useDemoSection("announcements");
-  const [packages] = useDemoSection("packages");
-  const [teachers] = useDemoSection("teachers");
-  const [students] = useDemoSection("students");
-  const [subscriptionPlans] = useDemoSection("plans");
+  const [state, setState] = useState({
+    loading: true,
+    error: "",
+    stats: null,
+    recentActivities: [],
+    coursePerformance: [],
+    studentProgressOverview: null,
+    alerts: null,
+  });
 
-  const cards = [
-    { label: "إجمالي الطلاب", value: (students || []).length },
-    { label: "إجمالي الدورات", value: (packages || []).length },
-    { label: "إجمالي الأساتذة", value: (teachers || []).length },
-    { label: "الاشتراكات النشطة", value: (subscriptionPlans || []).filter((plan) => plan.active ?? plan.isActive).length },
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/dashboard/stats", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok || !data?.ok) {
+          setState((s) => ({ ...s, loading: false, error: data?.message || "تعذّر تحميل الإحصائيات." }));
+          return;
+        }
+        setState({
+          loading: false,
+          error: "",
+          stats: data.stats || null,
+          recentActivities: Array.isArray(data.recentActivities) ? data.recentActivities : [],
+          coursePerformance: Array.isArray(data.coursePerformance) ? data.coursePerformance : [],
+          studentProgressOverview: data.studentProgressOverview || null,
+          alerts: data.alerts || null,
+        });
+      } catch {
+        if (!cancelled) {
+          setState((s) => ({ ...s, loading: false, error: "تعذّر تحميل إحصائيات لوحة الإدارة." }));
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const statCards = useMemo(() => {
+    const s = state.stats || {};
+    return [
+      { label: "إجمالي الطلاب", value: s.totalStudents ?? 0 },
+      { label: "إجمالي الدورات", value: s.totalCourses ?? 0 },
+      { label: "الدورات المنشورة", value: s.publishedCourses ?? 0 },
+      { label: "الدورات المدفوعة", value: s.paidCourses ?? 0 },
+      { label: "الدورات المجانية", value: s.freeCourses ?? 0 },
+      { label: "إجمالي الدروس", value: s.totalLessons ?? 0 },
+      { label: "الحصص المباشرة", value: s.totalLiveSessions ?? 0 },
+      { label: "الحصص القادمة", value: s.upcomingLiveSessions ?? 0 },
+      { label: "الواجبات والاختبارات", value: s.totalAssessments ?? 0 },
+      { label: "إجابات الطلاب", value: s.totalSubmissions ?? 0 },
+      { label: "الشهادات", value: s.totalCertificates ?? 0 },
+      { label: "الشهادات الصالحة", value: s.activeCertificates ?? 0 },
+      { label: "المحادثات", value: s.totalChatConversations ?? 0 },
+      { label: "رسائل غير مقروءة", value: s.unreadStudentMessages ?? 0 },
+      { label: "الإشعارات", value: s.totalNotificationsSent ?? 0 },
+      { label: "طلبات الشحن", value: s.totalRechargeRequests ?? 0 },
+      { label: "الإيرادات", value: `${Number(s.totalRevenue ?? 0)} دج` },
+    ];
+  }, [state.stats]);
+
+  const quickActions = [
+    { href: "/admin/packages", label: "إضافة دورة" },
+    { href: "/admin/lessons", label: "إضافة درس" },
+    { href: "/admin/packages", label: "إضافة حصة مباشرة" },
+    { href: "/admin/notifications", label: "إرسال إشعار" },
+    { href: "/admin/dashboard/messages", label: "محادثات الطلاب" },
+    { href: "/admin/packages", label: "إدارة الاختبارات" },
+    { href: "/admin/packages", label: "عرض الشهادات" },
+    { href: "/admin/recharge-requests", label: "طلبات الشحن" },
   ];
-
-  const featuredCourses = (packages || []).filter((item) => item.isFeatured);
-  const toCourseLabel = (value) => String(value || "").replace(/باقة/g, "دورة").replace(/الباقات/g, "الدورات");
 
   return (
     <AdminShell
@@ -26,56 +89,148 @@ export default function AdminOverviewPage() {
       subtitle="متابعة أداء المنصة وإدارة المحتوى التعليمي من لوحة موحدة."
     >
       <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-medium text-slate-400">لوحة التشغيل</p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا بك في إدارة yanfa3 Education</h2>
-        <p className="mt-2 text-base text-slate-500">تحكم في الدورات والأساتذة والطلاب ومحتوى المنصة بنفس تجربة الواجهة الموحدة.</p>
+        <p className="text-sm font-medium text-slate-400">لوحة التحليلات</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مراقبة شاملة لأداء المنصة</h2>
+        <p className="mt-2 text-base text-slate-500">مؤشرات التشغيل اليومية، تنبيهات النظام، وأداء الدورات في مكان واحد.</p>
+        {state.loading ? <p className="mt-4 text-sm text-slate-500">جاري تحميل البيانات...</p> : null}
+        {state.error ? <p className="mt-4 text-sm text-red-700">{state.error}</p> : null}
       </section>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6" aria-label="مؤشرات لوحة الإدارة">
-        {cards.map((card) => (
-          <article key={card.label} className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="مؤشرات لوحة الإدارة">
+        {statCards.map((card) => (
+          <article key={card.label} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-400">{card.label}</p>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{card.value}</p>
+            <p className="mt-2 text-2xl font-extrabold text-slate-900">{card.value}</p>
           </article>
         ))}
       </section>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-lg font-bold text-slate-900">أحدث الإعلانات</h2>
-          <p className="mt-1 text-sm text-slate-400">آخر التحديثات والتنبيهات المنشورة للإدارة والطلاب.</p>
-          {!(announcements || []).length ? (
-            <p className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/40 px-4 py-6 text-center text-sm text-slate-500">
-              لا توجد إعلانات حالية.
-            </p>
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-900">إجراءات سريعة</h3>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {quickActions.map((item) => (
+            <Link
+              key={`${item.href}-${item.label}`}
+              href={item.href}
+              className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 no-underline hover:bg-slate-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-900">آخر النشاطات</h3>
+          {!state.recentActivities.length ? (
+            <p className="mt-4 text-sm text-slate-500">لا يوجد نشاط حديث حاليًا.</p>
           ) : (
-            <ul className="mt-6 space-y-3 text-sm text-slate-700">
-              {(announcements || []).map((item) => (
-                <li key={item.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 px-4 py-3">
-                  {item.title} - {item.date}
+            <ul className="mt-4 space-y-2">
+              {state.recentActivities.slice(0, 12).map((item, idx) => (
+                <li key={`${item.type}-${item.timestamp}-${idx}`} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm">
+                  <p className="font-semibold text-slate-900">{item.title}</p>
+                  <p className="mt-1 text-xs text-slate-600">
+                    {item.studentName ? `الطالب: ${item.studentName}` : "—"}
+                    {item.courseTitle ? ` • الدورة: ${item.courseTitle}` : ""}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-500">{new Date(item.timestamp).toLocaleString("ar-DZ")}</p>
                 </li>
               ))}
             </ul>
           )}
         </section>
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-lg font-bold text-slate-900">أكثر الدورات ظهورًا</h2>
-          <p className="mt-1 text-sm text-slate-400">الدورات الأكثر تمييزًا وظهورًا في واجهة المنصة.</p>
-          {!featuredCourses.length ? (
-            <p className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/40 px-4 py-6 text-center text-sm text-slate-500">
-              لا توجد دورات مميزة حاليًا.
-            </p>
-          ) : (
-            <ul className="mt-6 space-y-3 text-sm text-slate-700">
-              {featuredCourses.map((item) => (
-                <li key={item.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 px-4 py-3">
-                  {toCourseLabel(item.title)}
-                </li>
-              ))}
-            </ul>
-          )}
+
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-900">تنبيهات مهمة</h3>
+          <div className="mt-4 space-y-2 text-sm">
+            <AlertRow label="محادثات بلا رد إداري" value={state.alerts?.unansweredChatConversations ?? 0} />
+            <AlertRow label="حصص مباشرة اليوم" value={state.alerts?.upcomingLiveSessionsToday ?? 0} />
+            <AlertRow label="تصحيحات معلقة" value={state.alerts?.pendingAssessmentCorrections ?? 0} />
+            <AlertRow label="طلبات شحن معلقة" value={state.alerts?.pendingRechargeRequests ?? 0} />
+            <AlertRow label="دورات غير منشورة" value={state.alerts?.draftCourses ?? 0} />
+            <AlertRow label="دروس غير منشورة" value={state.alerts?.unpublishedLessons ?? 0} />
+          </div>
         </section>
       </div>
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-900">أداء الدورات</h3>
+        {!state.coursePerformance.length ? (
+          <p className="mt-4 text-sm text-slate-500">لا توجد بيانات كافية لعرض أداء الدورات.</p>
+        ) : (
+          <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-right text-xs font-semibold text-slate-500">
+                  <th className="px-3 py-2">الدورة</th>
+                  <th className="px-3 py-2">المشتركون</th>
+                  <th className="px-3 py-2">متوسط التقدم</th>
+                  <th className="px-3 py-2">الدروس</th>
+                  <th className="px-3 py-2">الاختبارات</th>
+                  <th className="px-3 py-2">الشهادات</th>
+                  <th className="px-3 py-2">الإيراد</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.coursePerformance.map((row) => (
+                  <tr key={row.courseId} className="border-t border-slate-100">
+                    <td className="px-3 py-2 font-semibold text-slate-900">{row.courseTitle}</td>
+                    <td className="px-3 py-2">{row.enrolledStudents}</td>
+                    <td className="px-3 py-2">{row.averageProgress}%</td>
+                    <td className="px-3 py-2">{row.lessonsCount}</td>
+                    <td className="px-3 py-2">{row.assessmentsCount}</td>
+                    <td className="px-3 py-2">{row.certificatesIssued}</td>
+                    <td className="px-3 py-2">{row.revenue} دج</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-900">متابعة تقدم الطلاب</h3>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <article className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+            <p className="text-xs text-slate-500">طلاب لم يبدأوا</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{state.studentProgressOverview?.studentsNotStarted ?? 0}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+            <p className="text-xs text-slate-500">طلاب قيد التقدم</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{state.studentProgressOverview?.studentsInProgress ?? 0}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+            <p className="text-xs text-slate-500">دورات مكتملة</p>
+            <p className="mt-2 text-2xl font-black text-slate-900">{state.studentProgressOverview?.studentsCompletedCourses ?? 0}</p>
+          </article>
+        </div>
+        <div className="mt-4">
+          <p className="text-sm font-semibold text-slate-700">آخر الدورات المكتملة</p>
+          {!state.studentProgressOverview?.latestCompletedCourses?.length ? (
+            <p className="mt-2 text-sm text-slate-500">لا توجد دورات مكتملة حديثًا.</p>
+          ) : (
+            <ul className="mt-2 space-y-2">
+              {state.studentProgressOverview.latestCompletedCourses.map((row, idx) => (
+                <li key={`${row.studentName}-${row.courseTitle}-${idx}`} className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm">
+                  <p className="font-semibold text-slate-900">{row.studentName} - {row.courseTitle}</p>
+                  <p className="text-xs text-slate-500">{new Date(row.issuedAt).toLocaleString("ar-DZ")}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
     </AdminShell>
+  );
+}
+
+function AlertRow({ label, value }) {
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2">
+      <span className="text-slate-700">{label}</span>
+      <span className="font-extrabold text-brand-700">{value}</span>
+    </div>
   );
 }
