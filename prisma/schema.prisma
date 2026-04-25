@@ -70,6 +70,11 @@ enum LessonProgressStatus {
   COMPLETED
 }
 
+enum CertificateStatus {
+  ACTIVE
+  REVOKED
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -93,6 +98,7 @@ model User {
   chatConversations  ChatConversation[]  @relation("ChatConversationStudent")
   assessmentSubmissions AssessmentSubmission[]
   lessonProgresses   LessonProgress[]
+  certificates       Certificate[]
 }
 
 model RechargeRequest {
@@ -163,6 +169,7 @@ model Course {
   chatConversations ChatConversation[]
   assessments  Assessment[]
   lessonProgresses LessonProgress[]
+  certificates      Certificate[]
 }
 
 model Lesson {
@@ -340,4 +347,23 @@ model LessonProgress {
   @@unique([studentId, lessonId])
   @@index([studentId, courseId, status])
   @@index([courseId, status, updatedAt])
+}
+
+model Certificate {
+  id              String            @id @default(cuid())
+  certificateCode String            @unique
+  studentId       String
+  student         User              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId        String
+  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  issuedAt        DateTime          @default(now())
+  completedAt     DateTime
+  status          CertificateStatus @default(ACTIVE)
+  revokedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([studentId, courseId])
+  @@index([certificateCode, status])
+  @@index([courseId, status, issuedAt])
 }

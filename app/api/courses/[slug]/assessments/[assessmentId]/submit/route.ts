@@ -4,6 +4,7 @@ import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { resolveStudentCourseAccessByRef } from "@/lib/course-access";
 import { prisma } from "@/lib/prisma";
 import { sanitizeAssessmentAnswer } from "@/lib/assessments";
+import { issueCertificateIfEligible } from "@/lib/certificates";
 
 export async function POST(req: Request, { params }: { params: { slug: string; assessmentId: string } }) {
   const guard = await requireStudentApiSession();
@@ -112,6 +113,8 @@ export async function POST(req: Request, { params }: { params: { slug: string; a
         },
       });
     });
+
+    await issueCertificateIfEligible(access.course.id, session.sub);
 
     return NextResponse.json({
       ok: true,

@@ -24,6 +24,10 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
       where: { studentId: session.sub, courseId: access.course.id },
       select: { lessonId: true, status: true },
     });
+    const certificate = await prisma.certificate.findUnique({
+      where: { studentId_courseId: { studentId: session.sub, courseId: access.course.id } },
+      select: { certificateCode: true, status: true, issuedAt: true },
+    });
     return NextResponse.json({
       ok: true,
       progress: {
@@ -32,6 +36,9 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         completedAt: progress.completedAt ? progress.completedAt.toISOString() : null,
         completedLessonIds: lessonProgressRows.filter((row) => row.status === "COMPLETED").map((row) => row.lessonId),
         startedLessonIds: lessonProgressRows.map((row) => row.lessonId),
+        certificateCode: certificate?.certificateCode || null,
+        certificateStatus: certificate?.status || null,
+        certificateIssuedAt: certificate?.issuedAt ? certificate.issuedAt.toISOString() : null,
       },
     });
   } catch (e) {

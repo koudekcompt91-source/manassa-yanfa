@@ -22,6 +22,7 @@ function DashboardPageInner() {
   const [sessionData, setSessionData] = useState(null);
   const [dashboardProgress, setDashboardProgress] = useState([]);
   const [dashboardProgressLoading, setDashboardProgressLoading] = useState(true);
+  const [issuingCourseId, setIssuingCourseId] = useState("");
   const [clientStorageTick, setClientStorageTick] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
@@ -45,6 +46,33 @@ function DashboardPageInner() {
       .catch(() => setDashboardProgress([]))
       .finally(() => setDashboardProgressLoading(false));
   }, []);
+
+  const openCertificate = useCallback(
+    async (row) => {
+      if (!row?.slug || issuingCourseId) return;
+      if (row.certificateCode) {
+        router.push(`/dashboard/certificates/${encodeURIComponent(row.certificateCode)}`);
+        return;
+      }
+      setIssuingCourseId(row.id);
+      try {
+        const res = await fetch(`/api/courses/${encodeURIComponent(row.slug)}/certificate`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.ok && data?.certificate?.certificateCode) {
+          router.push(`/dashboard/certificates/${encodeURIComponent(data.certificate.certificateCode)}`);
+          return;
+        }
+        await loadDashboardProgress();
+      } finally {
+        setIssuingCourseId("");
+      }
+    },
+    [issuingCourseId, loadDashboardProgress, router]
+  );
 
   useEffect(() => {
     loadMe();
@@ -374,6 +402,7 @@ function DashboardPageInner() {
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="text-base font-bold text-slate-900">{row.title}</p>
+                        {row.isCompleted ? <p className="mt-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">مكتملة</p> : null}
                         <p className="mt-1 text-sm text-slate-500">
                           {row.totalLessons} درس · أكملت {row.completedLessons}
                         </p>
@@ -401,6 +430,16 @@ function DashboardPageInner() {
                       >
                         تفاصيل الدورة
                       </Link>
+                      {row.isCompleted ? (
+                        <button
+                          type="button"
+                          onClick={() => void openCertificate(row)}
+                          disabled={issuingCourseId === row.id}
+                          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 disabled:opacity-50"
+                        >
+                          {issuingCourseId === row.id ? "جاري تجهيز الشهادة..." : "شهادتي"}
+                        </button>
+                      ) : null}
                     </div>
                   </li>
                 );

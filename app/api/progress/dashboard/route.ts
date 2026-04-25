@@ -28,6 +28,11 @@ export async function GET() {
         progress: await getCourseProgressForStudent(course.id, session.sub),
       }))
     );
+    const certificates = await prisma.certificate.findMany({
+      where: { studentId: session.sub, courseId: { in: courseIds } },
+      select: { courseId: true, certificateCode: true, status: true },
+    });
+    const certByCourseId = new Map(certificates.map((row) => [row.courseId, row]));
 
     const lastLessonIds = progressRows
       .map((row) => row.progress.lastLessonId)
@@ -56,6 +61,8 @@ export async function GET() {
         lastLessonId: row.progress.lastLessonId,
         lastLessonTitle: row.progress.lastLessonId ? lessonTitleById.get(row.progress.lastLessonId) || "" : "",
         isCompleted: row.progress.isCompleted,
+        certificateCode: certByCourseId.get(row.course.id)?.certificateCode || null,
+        certificateStatus: certByCourseId.get(row.course.id)?.status || null,
       })),
     });
   } catch (e) {

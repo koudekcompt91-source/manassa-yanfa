@@ -21,6 +21,7 @@ export default function PackageDetailsPage() {
   const [activeTab, setActiveTab] = useState("RECORDED");
   const [liveState, setLiveState] = useState({ loading: true, sessions: [], canJoinZoom: false });
   const [progressState, setProgressState] = useState({ loading: true, progress: null });
+  const [certificateState, setCertificateState] = useState({ loading: false, certificate: null, error: "" });
 
   const loadMe = useCallback(async () => {
     const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -89,12 +90,36 @@ export default function PackageDetailsPage() {
     }
   }, [slug]);
 
+  const loadCertificate = useCallback(async () => {
+    if (!slug || !courseState.canAccessPaid) return;
+    setCertificateState((s) => ({ ...s, loading: true, error: "" }));
+    try {
+      const res = await fetch(`/api/courses/${encodeURIComponent(slug)}/certificate`, {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setCertificateState({ loading: false, certificate: null, error: data?.message || "تعذّر تحميل الشهادة." });
+        return;
+      }
+      setCertificateState({ loading: false, certificate: data.certificate || null, error: "" });
+    } catch {
+      setCertificateState({ loading: false, certificate: null, error: "تعذّر تحميل الشهادة." });
+    }
+  }, [slug, courseState.canAccessPaid]);
+
   useEffect(() => {
     loadMe();
     loadCourse();
     loadLiveSessions();
     loadProgress();
   }, [loadMe, loadCourse, loadLiveSessions, loadProgress]);
+
+  useEffect(() => {
+    if (!courseState.canAccessPaid || !progressState.progress?.isCompleted) return;
+    loadCertificate();
+  }, [courseState.canAccessPaid, progressState.progress?.isCompleted, loadCertificate]);
 
   useEffect(() => {
     const tab = String(searchParams?.get("tab") || "").toLowerCase();
@@ -264,6 +289,41 @@ export default function PackageDetailsPage() {
           <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
             <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-all" style={{ width: `${progress?.progressPercent || 0}%` }} />
           </div>
+          {progress?.isCompleted ? (
+            <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <p className="text-base font-extrabold text-emerald-800">أكملت هذه الدورة بنجاح</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {certificateState.certificate?.certificateCode ? (
+                  <>
+                    <Link
+                      href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
+                      className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white no-underline"
+                    >
+                      عرض الشهادة
+                    </Link>
+                    <Link
+                      href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
+                      className="rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-bold text-emerald-800 no-underline"
+                    >
+                      تحميل الشهادة
+                    </Link>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={loadCertificate}
+                    disabled={certificateState.loading}
+                    className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                  >
+                    {certificateState.loading ? "جاري تجهيز الشهادة..." : "عرض الشهادة"}
+                  </button>
+                )}
+              </div>
+              {certificateState.error ? <p className="mt-2 text-xs text-rose-700">{certificateState.error}</p> : null}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-slate-600">الشهادة غير متاحة بعد. أكمل الدورة للحصول على الشهادة.</p>
+          )}
           {continueLesson ? (
             <div className="mt-4">
               <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="inline-flex rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">

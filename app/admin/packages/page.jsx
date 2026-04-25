@@ -120,6 +120,9 @@ export default function AdminPackagesPage() {
   const [progressRows, setProgressRows] = useState([]);
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressFilter, setProgressFilter] = useState("all");
+  const [certificateRows, setCertificateRows] = useState([]);
+  const [certificatesLoading, setCertificatesLoading] = useState(false);
+  const [certificateStatusFilter, setCertificateStatusFilter] = useState("all");
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -316,16 +319,20 @@ export default function AdminPackagesPage() {
     setSubmissions([]);
     setProgressRows([]);
     setProgressFilter("all");
+    setCertificateRows([]);
+    setCertificateStatusFilter("all");
     setLessonsLoading(true);
     setLiveSessionsLoading(true);
     setAssessmentsLoading(true);
     setProgressLoading(true);
+    setCertificatesLoading(true);
     try {
-      const [lessonsRes, sessionsRes, assessmentsRes, progressRes] = await Promise.all([
+      const [lessonsRes, sessionsRes, assessmentsRes, progressRes, certificatesRes] = await Promise.all([
         fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/live-sessions`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/assessments`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/progress?filter=all`, { credentials: "include" }),
+        fetch(`/api/admin/certificates?courseId=${encodeURIComponent(course.id)}`, { credentials: "include" }),
       ]);
 
       const lessonsData = await lessonsRes.json().catch(() => ({}));
@@ -360,11 +367,19 @@ export default function AdminPackagesPage() {
       } else {
         setProgressRows(Array.isArray(progressData.students) ? progressData.students : []);
       }
+
+      const certificatesData = await certificatesRes.json().catch(() => ({}));
+      if (!certificatesRes.ok || !certificatesData?.ok) {
+        setCertificateRows([]);
+      } else {
+        setCertificateRows(Array.isArray(certificatesData.certificates) ? certificatesData.certificates : []);
+      }
     } finally {
       setLessonsLoading(false);
       setLiveSessionsLoading(false);
       setAssessmentsLoading(false);
       setProgressLoading(false);
+      setCertificatesLoading(false);
     }
   }
 
@@ -381,6 +396,39 @@ export default function AdminPackagesPage() {
     } finally {
       setProgressLoading(false);
     }
+  }
+
+  async function loadCourseCertificates(courseId, status = "all") {
+    setCertificatesLoading(true);
+    try {
+      const statusParam = status === "all" ? "" : `&status=${encodeURIComponent(status)}`;
+      const res = await fetch(`/api/admin/certificates?courseId=${encodeURIComponent(courseId)}${statusParam}`, {
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setCertificateRows([]);
+        return;
+      }
+      setCertificateRows(Array.isArray(data.certificates) ? data.certificates : []);
+    } finally {
+      setCertificatesLoading(false);
+    }
+  }
+
+  async function updateCertificateStatus(certificateId, action) {
+    const res = await fetch(`/api/admin/certificates/${certificateId}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      setBanner({ type: "error", text: data?.message || "تعذّر تحديث حالة الشهادة." });
+      return;
+    }
+    if (lessonCourse?.id) await loadCourseCertificates(lessonCourse.id, certificateStatusFilter);
   }
 
   function openLessonEdit(lesson) {
@@ -1002,6 +1050,15 @@ export default function AdminPackagesPage() {
               >
                 تقدم الطلاب
               </AdminActionButton>
+              <AdminActionButton
+                onClick={() => {
+                  setManagerTab("CERTIFICATES");
+                  if (lessonCourse?.id) loadCourseCertificates(lessonCourse.id, certificateStatusFilter);
+                }}
+                tone={managerTab === "CERTIFICATES" ? "primary" : undefined}
+              >
+                الشهادات
+              </AdminActionButton>
             </div>
 
             {managerTab === "RECORDED" ? (
@@ -1228,6 +1285,84 @@ export default function AdminPackagesPage() {
                               <AdminBadge tone={row.isCompleted ? "success" : row.progressPercent > 0 ? "brand" : "warning"}>
                                 {row.isCompleted ? "مكتمل" : row.progressPercent > 0 ? "قيد التقدم" : "لم يبدأ"}
                               </AdminBadge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : managerTab === "CERTIFICATES" ? (
+              <div className="mt-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-700">الحالة:</span>
+                  <AdminSelect
+                    value={certificateStatusFilter}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setCertificateStatusFilter(next);
+                      if (lessonCourse?.id) loadCourseCertificates(lessonCourse.id, next);
+                    }}
+                  >
+                    <option value="all">الكل</option>
+                    <option value="ACTIVE">صالحة</option>
+                    <option value="REVOKED">ملغاة</option>
+                  </AdminSelect>
+                </div>
+                {certificatesLoading ? <p className="text-sm text-slate-600">جاري تحميل الشهادات...</p> : null}
+                {!certificatesLoading && !certificateRows.length ? (
+                  <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                    لا توجد شهادات لهذه الدورة بعد.
+                  </p>
+                ) : null}
+                {!certificatesLoading && certificateRows.length ? (
+                  <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-50/70 text-right text-xs font-semibold text-slate-500">
+                          <th className="px-3 py-2">الطالب</th>
+                          <th className="px-3 py-2">البريد</th>
+                          <th className="px-3 py-2">الدورة</th>
+                          <th className="px-3 py-2">تاريخ الإكمال</th>
+                          <th className="px-3 py-2">رقم الشهادة</th>
+                          <th className="px-3 py-2">الحالة</th>
+                          <th className="px-3 py-2">الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {certificateRows.map((row) => (
+                          <tr key={row.id} className="border-b border-slate-100 text-slate-700">
+                            <td className="px-3 py-2 font-semibold text-slate-900">{row.studentName || "-"}</td>
+                            <td className="px-3 py-2">{row.studentEmail || "-"}</td>
+                            <td className="px-3 py-2">{row.courseTitle || "-"}</td>
+                            <td className="px-3 py-2 text-xs">{row.completedAt ? new Date(row.completedAt).toLocaleDateString("ar-DZ") : "-"}</td>
+                            <td className="px-3 py-2 font-mono text-xs">{row.certificateCode}</td>
+                            <td className="px-3 py-2">
+                              <AdminBadge tone={row.status === "ACTIVE" ? "success" : "warning"}>
+                                {row.status === "ACTIVE" ? "صالحة" : "ملغاة"}
+                              </AdminBadge>
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="flex flex-wrap gap-2">
+                                <a
+                                  href={`/verify-certificate/${encodeURIComponent(row.certificateCode)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 no-underline"
+                                >
+                                  عرض
+                                </a>
+                                {row.status === "ACTIVE" ? (
+                                  <AdminActionButton onClick={() => updateCertificateStatus(row.id, "REVOKE")} tone="danger">
+                                    إلغاء
+                                  </AdminActionButton>
+                                ) : (
+                                  <AdminActionButton onClick={() => updateCertificateStatus(row.id, "REISSUE")} tone="primary">
+                                    إعادة إصدار
+                                  </AdminActionButton>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         ))}

@@ -50,6 +50,13 @@ function IconBell({ className }) {
     </svg>
   );
 }
+function IconCertificate({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12l-3-2-2 2-2-2-2 2-3-2V6a2 2 0 012-2z" />
+    </svg>
+  );
+}
 
 const NAV = [
   { href: "/dashboard", label: "الرئيسية", id: "home", Icon: IconHome },
@@ -57,6 +64,7 @@ const NAV = [
   { href: "/courses", label: "الدورات", id: "explore", Icon: IconExplore },
   { href: "/dashboard#wallet", label: "المحفظة", id: "wallet", Icon: IconWallet },
   { href: "/dashboard/notifications", label: "الإشعارات", id: "notifications", Icon: IconBell },
+  { href: "/dashboard/certificates", label: "الشهادات", id: "certificates", Icon: IconCertificate },
   { href: "/profile", label: "حسابي", id: "account", Icon: IconUser },
 ];
 
@@ -79,6 +87,7 @@ function navActive(pathname, hash, item) {
   if (item.id === "my-courses") return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
   if (item.id === "wallet") return pathname === "/dashboard" && hash === "#wallet";
   if (item.id === "notifications") return pathname === "/dashboard/notifications";
+  if (item.id === "certificates") return pathname === "/dashboard/certificates" || pathname.startsWith("/dashboard/certificates/");
   return false;
 }
 

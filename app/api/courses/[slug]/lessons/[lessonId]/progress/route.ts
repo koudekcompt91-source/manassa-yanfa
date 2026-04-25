@@ -3,6 +3,7 @@ import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { resolveStudentCourseAccessByRef } from "@/lib/course-access";
 import { prisma } from "@/lib/prisma";
 import { getCourseProgressForStudent } from "@/lib/progress";
+import { issueCertificateIfEligible } from "@/lib/certificates";
 
 export async function POST(req: Request, { params }: { params: { slug: string; lessonId: string } }) {
   const guard = await requireStudentApiSession();
@@ -47,12 +48,15 @@ export async function POST(req: Request, { params }: { params: { slug: string; l
     });
 
     const progress = await getCourseProgressForStudent(access.course.id, session.sub);
+    const certificate = progress.isCompleted ? await issueCertificateIfEligible(access.course.id, session.sub) : null;
     return NextResponse.json({
       ok: true,
       progress: {
         ...progress,
         lastActivityAt: progress.lastActivityAt ? progress.lastActivityAt.toISOString() : null,
         completedAt: progress.completedAt ? progress.completedAt.toISOString() : null,
+        certificateCode: certificate?.certificateCode || null,
+        certificateStatus: certificate?.status || null,
       },
     });
   } catch (e) {
