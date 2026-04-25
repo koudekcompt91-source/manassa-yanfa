@@ -71,8 +71,8 @@ export default function RegisterPage() {
 
   return (
     <AuthPageShell
-      title="إنشاء حساب"
-      subtitle="انضم إلى yanfa3 Education وابدأ مسارك الأكاديمي في الأدب العربي بخطوات واضحة وآمنة."
+      title="إنشاء حساب جديد"
+      subtitle="ابدأ رحلتك التعليمية الآن."
     >
       <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-[1.375rem]" noValidate>
         <div className="group">

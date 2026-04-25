@@ -200,7 +200,7 @@ export default function HomeLanding() {
   const [packages] = useDemoSection("packages");
   const [settings] = useDemoSection("settings");
   const homeButtons = (ctaButtons || []).filter((row: { placement?: string; visible?: boolean }) => row.placement === "homepage" && row.visible);
-  const featuredCourses = (packages || []).filter((row: { isFeatured?: boolean }) => row.isFeatured).slice(0, 4);
+  const featuredCourses = (packages || []).filter((row: { isPublished?: boolean }) => row.isPublished).slice(0, 6);
 
   const { nudge, scrollShift, motionOk } = useHeroAmbient("hero", authGate === "guest");
   const sectionIoRef = useRef<IntersectionObserver | null>(null);
@@ -283,10 +283,8 @@ export default function HomeLanding() {
               >
                 {heroTitle || (
                   <>
-                    رحلة أدبية{" "}
-                    <span className="font-black text-sky-200/95">عميقة وأنيقة</span>
-                    <br className="hidden sm:block" />
-                    تبدأ من هنا
+                    تعلّم الأدب العربي{" "}
+                    <span className="font-black text-sky-200/95">بطريقة حديثة ومنظمة</span>
                   </>
                 )}
               </h1>
@@ -296,7 +294,7 @@ export default function HomeLanding() {
                 style={{ animationDelay: "0.28s" }}
               >
                 {heroSubtitle ||
-                  "yanfa3 Education تقدّم لك درسًا أدبيًا مركزًا: نحوًا وبلاغةً وشعرًا ونقدًا، بأسلوب أكاديمي هادئ يبني فهمًا تدريجيًا — مع الأستاذ يوسف مادن كمرجعك الأول في المسار."}
+                  "دورات، دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
               </p>
 
               <div
@@ -304,10 +302,10 @@ export default function HomeLanding() {
                 style={{ animationDelay: "0.4s" }}
               >
                 <Link href="/courses" className={btnHeroPrimary}>
-                  ابدأ التعلم
+                  ابدأ التعلم الآن
                 </Link>
                 <Link href="/courses" className={btnHeroGhost}>
-                  تصفح الدورات
+                  استكشف الدورات
                 </Link>
                 <Link href="/register" className={btnHeroBrand}>
                   إنشاء حساب
@@ -389,27 +387,39 @@ export default function HomeLanding() {
       <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-bold text-brand-700">لماذا yanfa3 Education؟</p>
+              <p className="text-sm font-bold text-brand-700">مزايا منصة ينفع</p>
             <h2 id="why-yanfa" className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-              أدبٌ بروح أكاديمية، وبلاغةٌ بلا ضجيج
+                تجربة تعلّم موثوقة ومتكاملة
             </h2>
             <p className="mt-4 text-pretty text-slate-600 sm:text-lg">
-              نصمّم التعلّم ليكون هادئًا ومتدرجًا: قراءة، تحليل، ثم إتقان — بعيدًا عن الفوضى المعلوماتية وبقرب من نصّك العربي.
+                الدرس المسجّل، الحصة المباشرة، الاختبار، التقدم، الشهادة، والتواصل المباشر — كلها داخل منصة واحدة.
             </p>
           </div>
           <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                t: "عمق أدبي منظم",
-                d: "مسارات واضحة في النحو والبلاغة والشعر والنقد، تربط بين المفهوم والتطبيق على النص.",
+                t: "دروس مسجلة",
+                d: "دروس YouTube منظمة داخل الدورة مع ترتيب واضح ومتابعة مستمرة.",
               },
               {
-                t: "تحليل نصّي يُعلّمك التفكير",
-                d: "تمارين موجهة ترسّخ أدوات القراءة: السياق، البنية، الدلالة، والصورة البيانية.",
+                t: "حصص مباشرة",
+                d: "حصص Zoom مباشرة للمشتركين مع متابعة زمنية وتنبيهات داخل المنصة.",
               },
               {
-                t: "تجربة عربية راقية",
-                d: "واجهة RTL مريحة، ولغة واجهة أدبية، وتفاصيل بصرية تمنحك إحساس الأكاديمية الحديثة.",
+                t: "اختبارات وواجبات",
+                d: "تقييمات دورية تساعدك على قياس الفهم وتثبيت المهارات الأدبية.",
+              },
+              {
+                t: "متابعة التقدم",
+                d: "لوحة طالب حديثة تعرض نسبة الإنجاز، آخر نشاط، وخطة الاستمرار.",
+              },
+              {
+                t: "شهادات إتمام",
+                d: "بعد إكمال الدورة تحصل على شهادة يمكن عرضها والتحقق منها.",
+              },
+              {
+                t: "تواصل مع الأستاذ",
+                d: "محادثة مباشرة داخل كل دورة لطرح الأسئلة والمتابعة الأكاديمية.",
               },
             ].map((item) => (
               <li
@@ -515,9 +525,9 @@ export default function HomeLanding() {
             <div>
               <p className="text-sm font-bold text-brand-700">الدورات المتاحة</p>
               <h2 id="courses-block" className="mt-2 text-3xl font-black text-slate-900 sm:text-4xl">
-                مسارات تلتقي مع اهتمامك الأدبي
+                دورات جاهزة للبدء الآن
               </h2>
-              <p className="mt-3 max-w-2xl text-slate-600 sm:text-lg">دورات مختارة بعناية — يمكنك الاطلاع والتسجيل عندما تكون جاهزًا.</p>
+              <p className="mt-3 max-w-2xl text-slate-600 sm:text-lg">دورات منشورة تجمع بين الدروس المسجلة والحصص المباشرة والمتابعة الأكاديمية.</p>
             </div>
             <Link href="/courses" className={btnMutedOutline}>
               عرض كل الدورات
@@ -525,16 +535,24 @@ export default function HomeLanding() {
           </div>
 
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {(featuredCourses.length ? featuredCourses : []).map((c: { id: string; title: string; description?: string; slug?: string }) => {
+            {(featuredCourses.length ? featuredCourses : []).map((c: { id: string; title: string; description?: string; slug?: string; price?: number; priceMad?: number }) => {
               const slug = String(c.slug || c.id || "").trim();
               const href = slug ? `/packages/${encodeURIComponent(slug)}` : "/courses";
+              const price = Number(c.priceMad ?? c.price ?? 0) || 0;
+              const isFree = price <= 0;
               return (
                 <Link key={c.id} href={href} className={`group flex flex-col p-6 ${cardLuxury}`}>
-                  <p className="text-xs font-bold uppercase tracking-wide text-brand-700">مع {TEACHER_NAME}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-bold uppercase tracking-wide text-brand-700">مع {TEACHER_NAME}</p>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${isFree ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>
+                      {isFree ? "مجانية" : "مدفوعة"}
+                    </span>
+                  </div>
                   <h3 className="mt-2 line-clamp-2 text-lg font-extrabold text-slate-900 group-hover:text-brand-800">{c.title}</h3>
                   <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{c.description || "دورة أدبية منظمة داخل المنصة."}</p>
+                  <p className="mt-3 text-sm font-black text-brand-700">{isFree ? "مجانية" : `${price} دج`}</p>
                   <span className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-brand-700">
-                    تفاصيل الدورة
+                    عرض الدورة
                     <span aria-hidden className="text-base leading-none">
                       ›
                     </span>
@@ -554,6 +572,25 @@ export default function HomeLanding() {
                 </div>
               </div>
             ) : null}
+          </div>
+        </div>
+      </section>
+
+      {/* —— رحلة مختصرة —— */}
+      <section data-section-reveal className="border-b border-slate-200/80 bg-slate-50/70 py-16 sm:py-20" aria-labelledby="live-learning">
+        <div className={container}>
+          <h2 id="live-learning" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">التعلّم المباشر داخل المنصة</h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              "دروس مسجلة داخل المنصة عبر YouTube",
+              "حصص Zoom مباشرة للمشتركين",
+              "إشعارات فورية للتحديثات المهمة",
+              "محادثة مباشرة مع الأستاذ داخل الدورة",
+            ].map((line) => (
+              <div key={line} className={`p-5 ${cardLuxuryFlat}`}>
+                <p className="text-sm font-bold text-slate-800">{line}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -625,7 +662,7 @@ export default function HomeLanding() {
             <div className="pointer-events-none absolute -end-16 bottom-0 h-48 w-48 rounded-full bg-indigo-400/20 blur-3xl" aria-hidden />
             <div className="relative z-10 mx-auto max-w-2xl">
               <h2 id="cta-title" className="text-3xl font-black text-white sm:text-4xl">
-                {homepageContent?.ctaTitle || "جاهز لخطوة أدبية أوضح؟"}
+                {homepageContent?.ctaTitle || "انضم الآن وابدأ رحلتك في الأدب العربي"}
               </h2>
               <p className="mt-4 text-pretty text-slate-200 sm:text-lg">
                 {homepageContent?.ctaSubtitle ||
@@ -636,7 +673,7 @@ export default function HomeLanding() {
                   إنشاء حساب
                 </Link>
                 <Link href="/courses" className={btnHeroGhostWide}>
-                  تصفح الدورات
+                  استكشاف الدورات
                 </Link>
               </div>
             </div>

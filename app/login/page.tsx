@@ -70,7 +70,7 @@ export default function LoginPage() {
   return (
     <AuthPageShell
       title="تسجيل الدخول"
-      subtitle="أدخل بياناتك للوصول إلى حسابك ومتابعة مسارك في yanfa3 Education."
+      subtitle="ادخل إلى حسابك لمتابعة تعلمك."
     >
       <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-[1.375rem]" noValidate>
         <p className={premiumAuthAuxNoteClass}>
@@ -137,7 +137,7 @@ export default function LoginPage() {
         ) : null}
 
         <button type="submit" disabled={loading} className={submitClass}>
-          {loading ? "جاري الدخول…" : "دخول"}
+          {loading ? "جاري الدخول…" : "تسجيل الدخول"}
         </button>
 
         <p className={premiumAuthFormFooterClass}>

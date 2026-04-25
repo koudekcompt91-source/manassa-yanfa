@@ -216,6 +216,12 @@ export default function PackageDetailsPage() {
             <p className="mt-2 text-sm text-slate-600">
               الأستاذ: <span className="font-bold text-slate-800">{teacherName}</span>
             </p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">دروس مسجلة</span>
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">حصص مباشرة</span>
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">اختبارات وواجبات</span>
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">شهادة إتمام</span>
+            </div>
           </div>
           <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:max-w-xs">
             <p className="text-xs font-bold text-slate-500">سعر الدورة</p>
@@ -245,7 +251,16 @@ export default function PackageDetailsPage() {
       <section id="purchase" className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-extrabold text-slate-900">الوصول إلى الدورة</h2>
         {courseState.enrolled ? (
-          <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">أنت مسجّل في هذه الدورة. يمكنك بدء التعلّم الآن.</div>
+          <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            أنت مسجّل في هذه الدورة. يمكنك بدء التعلّم الآن.
+            {continueLesson ? (
+              <div className="mt-2">
+                <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="font-bold text-emerald-800 underline">
+                  الدخول إلى الدورة
+                </Link>
+              </div>
+            ) : null}
+          </div>
         ) : !authedStudent ? (
           <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
             يلزم تسجيل الدخول كطالب للالتحاق بالدورة.
@@ -271,13 +286,13 @@ export default function PackageDetailsPage() {
               </div>
             ) : null}
             <AdminLikeButton disabled={walletBalance < priceMad || purchasing} onClick={handlePurchase}>
-              {purchasing ? "جاري المعالجة..." : "شراء الدورة"}
+              {purchasing ? "جاري المعالجة..." : "اشترك في الدورة"}
             </AdminLikeButton>
           </div>
         ) : (
           <div className="mt-3">
             <AdminLikeButton disabled={purchasing} onClick={handlePurchase}>
-              {purchasing ? "جاري المعالجة..." : "تسجيل مجاني في الدورة"}
+              {purchasing ? "جاري المعالجة..." : "ابدأ الدورة"}
             </AdminLikeButton>
           </div>
         )}

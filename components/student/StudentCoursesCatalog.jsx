@@ -95,7 +95,7 @@ export default function StudentCoursesCatalog() {
       .filter((pkg) => studentSeesPackage(studentLevel || null, pkg, studentLevelCode || null))
       .map((pkg) => {
         const categoryName = (categories || []).find((row) => row.id === pkg.categoryId)?.name || "-";
-        const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "طاقم yanfa3 Education";
+        const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "يوسف مادن";
         const slug = String(pkg.slug || pkg.id || "").trim();
         const detailHref = `/packages/${slug}`;
         const firstLessonHref = detailHref;
@@ -175,7 +175,7 @@ export default function StudentCoursesCatalog() {
           href={firstLessonHref}
           className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 to-indigo-600 px-4 py-3 text-sm font-extrabold text-white shadow-md"
         >
-          متابعة
+          الدخول إلى الدورة
         </Link>
       );
     } else if (!authedStudent) {
@@ -234,7 +234,7 @@ export default function StudentCoursesCatalog() {
           <p className="mt-3 text-lg font-black text-brand-700">{isFree ? "مجانية" : formatDzd(priceMad)}</p>
           <div className="mt-4">{cta}</div>
           <Link href={detailHref} className="mt-3 text-center text-xs font-bold text-brand-800 underline underline-offset-2">
-            تفاصيل الدورة
+            عرض التفاصيل
           </Link>
         </div>
       </article>
@@ -251,10 +251,10 @@ export default function StudentCoursesCatalog() {
   return (
     <section className="container-page space-y-10 py-8 sm:py-10">
       <header className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-bold text-brand-700">كتالوج التعلّم</p>
+        <p className="text-sm font-bold text-brand-700">كتالوج الدورات</p>
         <h1 className="mt-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">الدورات</h1>
         <p className="mt-2 text-slate-600">
-          دورات منشورة من لوحة الإدارة — مجانية ومدفوعة. اشترِ بالمحفظة عند توفر الرصيد، أو ابدأ المجانية مباشرة.
+          تصفح الدورات المنشورة: مجانية ومدفوعة، مع تجربة تعلّم منظمة داخل المنصة.
         </p>
         {authedStudent && studentLevel ? (
           <p className="mt-2 text-sm text-brand-800">المحتوى المعروض لمستواك: {studentLevel}</p>
@@ -287,7 +287,7 @@ export default function StudentCoursesCatalog() {
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600 shadow-sm">
           {loadingCourses ? "جاري تحميل الدورات..." : "لا توجد دورات منشورة تطابق مستواك أو البحث الحالي."}
         </div>
-      ) : (
+      ) : authedStudent ? (
         <>
           <div className="space-y-4">
             <h2 className="text-xl font-extrabold text-slate-900">دوراتي</h2>
@@ -304,6 +304,20 @@ export default function StudentCoursesCatalog() {
           <div className="space-y-4 border-t border-slate-100 pt-10">
             <h2 className="text-xl font-extrabold text-slate-900">دورات مدفوعة</h2>
             <p className="text-sm text-slate-500">الشراء عبر رصيد المحفظة من صفحة الدورة.</p>
+            {renderGrid(paidBrowse, "لا توجد دورات مدفوعة متاحة حاليًا ضمن التصنيف المختار.")}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="space-y-4">
+            <h2 className="text-xl font-extrabold text-slate-900">الدورات المجانية</h2>
+            <p className="text-sm text-slate-500">ابدأ الآن بدون دفع بعد تسجيل الدخول.</p>
+            {renderGrid(freeBrowse, "لا توجد دورات مجانية متاحة حاليًا ضمن التصنيف المختار.")}
+          </div>
+
+          <div className="space-y-4 border-t border-slate-100 pt-10">
+            <h2 className="text-xl font-extrabold text-slate-900">الدورات المدفوعة</h2>
+            <p className="text-sm text-slate-500">اشترك في الدورة للوصول الكامل إلى المحتوى.</p>
             {renderGrid(paidBrowse, "لا توجد دورات مدفوعة متاحة حاليًا ضمن التصنيف المختار.")}
           </div>
         </>
