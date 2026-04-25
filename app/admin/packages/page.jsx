@@ -117,6 +117,9 @@ export default function AdminPackagesPage() {
   const [questionSaving, setQuestionSaving] = useState(false);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [submissions, setSubmissions] = useState([]);
+  const [progressRows, setProgressRows] = useState([]);
+  const [progressLoading, setProgressLoading] = useState(false);
+  const [progressFilter, setProgressFilter] = useState("all");
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -311,14 +314,18 @@ export default function AdminPackagesPage() {
     setSelectedAssessmentId("");
     setQuestions([]);
     setSubmissions([]);
+    setProgressRows([]);
+    setProgressFilter("all");
     setLessonsLoading(true);
     setLiveSessionsLoading(true);
     setAssessmentsLoading(true);
+    setProgressLoading(true);
     try {
-      const [lessonsRes, sessionsRes, assessmentsRes] = await Promise.all([
+      const [lessonsRes, sessionsRes, assessmentsRes, progressRes] = await Promise.all([
         fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/live-sessions`, { credentials: "include" }),
         fetch(`/api/admin/courses/${course.id}/assessments`, { credentials: "include" }),
+        fetch(`/api/admin/courses/${course.id}/progress?filter=all`, { credentials: "include" }),
       ]);
 
       const lessonsData = await lessonsRes.json().catch(() => ({}));
@@ -346,10 +353,33 @@ export default function AdminPackagesPage() {
         setAssessments(nextAssessments);
         if (nextAssessments[0]?.id) setSelectedAssessmentId(nextAssessments[0].id);
       }
+
+      const progressData = await progressRes.json().catch(() => ({}));
+      if (!progressRes.ok || !progressData?.ok) {
+        setProgressRows([]);
+      } else {
+        setProgressRows(Array.isArray(progressData.students) ? progressData.students : []);
+      }
     } finally {
       setLessonsLoading(false);
       setLiveSessionsLoading(false);
       setAssessmentsLoading(false);
+      setProgressLoading(false);
+    }
+  }
+
+  async function loadCourseProgress(courseId, filter) {
+    setProgressLoading(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/progress?filter=${encodeURIComponent(filter)}`, { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setProgressRows([]);
+        return;
+      }
+      setProgressRows(Array.isArray(data.students) ? data.students : []);
+    } finally {
+      setProgressLoading(false);
     }
   }
 
@@ -963,6 +993,15 @@ export default function AdminPackagesPage() {
               >
                 الواجبات والاختبارات
               </AdminActionButton>
+              <AdminActionButton
+                onClick={() => {
+                  setManagerTab("PROGRESS");
+                  if (lessonCourse?.id) loadCourseProgress(lessonCourse.id, progressFilter);
+                }}
+                tone={managerTab === "PROGRESS" ? "primary" : undefined}
+              >
+                تقدم الطلاب
+              </AdminActionButton>
             </div>
 
             {managerTab === "RECORDED" ? (
@@ -1134,6 +1173,69 @@ export default function AdminPackagesPage() {
                   </div>
                 ) : null}
               </>
+            ) : managerTab === "PROGRESS" ? (
+              <div className="mt-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-700">تصفية:</span>
+                  <AdminSelect
+                    value={progressFilter}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setProgressFilter(next);
+                      if (lessonCourse?.id) loadCourseProgress(lessonCourse.id, next);
+                    }}
+                  >
+                    <option value="all">الكل</option>
+                    <option value="completed">مكتمل</option>
+                    <option value="in_progress">قيد التقدم</option>
+                    <option value="not_started">لم يبدأ</option>
+                  </AdminSelect>
+                </div>
+                {progressLoading ? <p className="text-sm text-slate-600">جاري تحميل تقدم الطلاب...</p> : null}
+                {!progressLoading && !progressRows.length ? (
+                  <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                    لا توجد بيانات تقدم ضمن هذا الفلتر.
+                  </p>
+                ) : null}
+                {!progressLoading && progressRows.length ? (
+                  <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-50/70 text-right text-xs font-semibold text-slate-500">
+                          <th className="px-3 py-2">الطالب</th>
+                          <th className="px-3 py-2">البريد</th>
+                          <th className="px-3 py-2">النسبة</th>
+                          <th className="px-3 py-2">الدروس</th>
+                          <th className="px-3 py-2">التقييمات</th>
+                          <th className="px-3 py-2">آخر نشاط</th>
+                          <th className="px-3 py-2">الحالة</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {progressRows.map((row) => (
+                          <tr key={row.studentId} className="border-b border-slate-100 text-slate-700">
+                            <td className="px-3 py-2 font-semibold text-slate-900">{row.studentName || "طالب"}</td>
+                            <td className="px-3 py-2">{row.studentEmail || "-"}</td>
+                            <td className="px-3 py-2 font-bold text-brand-700">{row.progressPercent}%</td>
+                            <td className="px-3 py-2">
+                              {row.completedLessons}/{row.totalLessons}
+                            </td>
+                            <td className="px-3 py-2">
+                              {row.submittedAssessments}/{row.totalAssessments}
+                            </td>
+                            <td className="px-3 py-2 text-xs">{row.lastActivityAt ? new Date(row.lastActivityAt).toLocaleString("ar-DZ") : "-"}</td>
+                            <td className="px-3 py-2">
+                              <AdminBadge tone={row.isCompleted ? "success" : row.progressPercent > 0 ? "brand" : "warning"}>
+                                {row.isCompleted ? "مكتمل" : row.progressPercent > 0 ? "قيد التقدم" : "لم يبدأ"}
+                              </AdminBadge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
             ) : (
               <>
                 <form className="mt-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-2" onSubmit={saveAssessment}>

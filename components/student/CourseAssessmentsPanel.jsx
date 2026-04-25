@@ -19,7 +19,7 @@ function statusLabel(status) {
   return "لم يتم الحل";
 }
 
-export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canAccess }) {
+export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canAccess, onProgressChange }) {
   const [state, setState] = useState({ loading: true, rows: [], error: "" });
   const [activeAssessmentId, setActiveAssessmentId] = useState("");
   const [detail, setDetail] = useState({ loading: false, error: "", assessment: null, questions: [], submission: null, canSubmit: true });
@@ -96,6 +96,7 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
       }
       await loadList();
       await loadDetail();
+      if (typeof onProgressChange === "function") onProgressChange();
     } finally {
       setSubmitting(false);
     }

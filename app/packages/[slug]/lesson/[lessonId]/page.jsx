@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import VideoPlayer from "@/components/VideoPlayer";
-import { addPointsForLessonComplete, getCompletedSet, getPackageProgressStats, markLessonComplete } from "@/lib/student-progress";
+import { addPointsForLessonComplete } from "@/lib/student-progress";
 
 export default function PackageLessonPage() {
   const params = useParams();
@@ -18,7 +18,11 @@ export default function PackageLessonPage() {
     enrolled: false,
     canAccessPaid: false,
   });
-  const [storageTick, setStorageTick] = useState(0);
+  const [progressState, setProgressState] = useState({
+    loading: true,
+    progress: null,
+    marking: false,
+  });
   const [lockOpen, setLockOpen] = useState(false);
 
   const loadPage = useCallback(async () => {
@@ -49,11 +53,28 @@ export default function PackageLessonPage() {
     loadPage();
   }, [loadPage]);
 
+  const loadProgress = useCallback(async () => {
+    if (!slug) return;
+    setProgressState((s) => ({ ...s, loading: true }));
+    try {
+      const res = await fetch(`/api/courses/${encodeURIComponent(slug)}/progress`, {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setProgressState({ loading: false, progress: null, marking: false });
+        return;
+      }
+      setProgressState({ loading: false, progress: data.progress || null, marking: false });
+    } catch {
+      setProgressState({ loading: false, progress: null, marking: false });
+    }
+  }, [slug]);
+
   useEffect(() => {
-    const onStore = () => setStorageTick((t) => t + 1);
-    window.addEventListener("yanfa-student-storage", onStore);
-    return () => window.removeEventListener("yanfa-student-storage", onStore);
-  }, []);
+    loadProgress();
+  }, [loadProgress]);
 
   const pkg = pageState.course;
   const packageLessons = pageState.lessons || [];
@@ -62,28 +83,54 @@ export default function PackageLessonPage() {
     [packageLessons, lessonId]
   );
   const lockedPremium = Boolean(current?.locked);
-  const lessonIdsOrdered = useMemo(() => packageLessons.map((l) => l.id), [packageLessons]);
-  const progressStats = useMemo(
-    () => getPackageProgressStats(pkg?.id, lessonIdsOrdered),
-    [pkg?.id, lessonIdsOrdered, storageTick]
-  );
+  const progressStats = progressState.progress;
 
   const currentIndex = useMemo(() => packageLessons.findIndex((row) => row.id === current?.id), [packageLessons, current]);
   const previousLesson = currentIndex > 0 ? packageLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex >= 0 && currentIndex < packageLessons.length - 1 ? packageLessons[currentIndex + 1] : null;
 
-  const completedHere = pkg?.id && current?.id ? getCompletedSet(pkg.id).has(current.id) : false;
+  const completedLessonIds = new Set(progressStats?.completedLessonIds || []);
+  const completedHere = Boolean(current?.id && completedLessonIds.has(current.id));
+
+  const canTrackProgress = Boolean(pageState.canAccessPaid);
+
+  const markLessonProgress = useCallback(
+    async (action) => {
+      if (!pkg?.slug || !current?.id || lockedPremium || !canTrackProgress) return;
+      setProgressState((s) => ({ ...s, marking: true }));
+      try {
+        const res = await fetch(`/api/courses/${encodeURIComponent(pkg.slug)}/lessons/${encodeURIComponent(current.id)}/progress`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.ok) return;
+        setProgressState((s) => ({ ...s, progress: data.progress || s.progress, marking: false }));
+      } catch {
+        setProgressState((s) => ({ ...s, marking: false }));
+      }
+    },
+    [pkg?.slug, current?.id, lockedPremium, canTrackProgress]
+  );
 
   const handleMarkComplete = () => {
-    if (!pkg?.id || !current?.id) return;
+    if (!pkg?.id || !current?.id || progressState.marking || !canTrackProgress) return;
     if (lockedPremium) {
       setLockOpen(true);
       return;
     }
-    const isNew = markLessonComplete(pkg.id, current.id);
-    if (isNew) addPointsForLessonComplete();
-    setStorageTick((t) => t + 1);
+    const wasDone = completedHere;
+    markLessonProgress("COMPLETED").then(() => {
+      if (!wasDone) addPointsForLessonComplete();
+    });
   };
+
+  useEffect(() => {
+    if (!current?.id || lockedPremium || !canTrackProgress) return;
+    markLessonProgress("STARTED");
+  }, [current?.id, lockedPremium, canTrackProgress, markLessonProgress]);
 
   if (pageState.loading) {
     return <p className="container-page py-8 text-center text-slate-600">جاري تحميل الدرس...</p>;
@@ -154,23 +201,24 @@ export default function PackageLessonPage() {
           </div>
           <div className="mt-4">
             <p className="text-sm text-slate-600">
-              تقدّم الدورة: {progressStats.pct}% — أكملت {progressStats.done} من {progressStats.total}{" "}
-              {progressStats.total === 1 ? "درس" : "دروس"}
+              تقدّم الدورة: {progressStats?.progressPercent || 0}% — أكملت {progressStats?.completedLessons || 0} من {progressStats?.totalLessons || 0}{" "}
+              {progressStats?.totalLessons === 1 ? "درس" : "دروس"}
             </p>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
                 className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-all"
-                style={{ width: `${progressStats.pct}%` }}
+                style={{ width: `${progressStats?.progressPercent || 0}%` }}
               />
             </div>
             <button
               type="button"
               onClick={handleMarkComplete}
-              disabled={lockedPremium || completedHere}
+              disabled={lockedPremium || completedHere || progressState.marking || !canTrackProgress}
               className="mt-3 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {completedHere ? "تم تسجيل إكمال هذا الدرس" : "تسجيل إكمال الدرس"}
+              {completedHere ? "تم إكمال الدرس" : progressState.marking ? "جاري الحفظ..." : "تحديد الدرس كمكتمل"}
             </button>
+            {!canTrackProgress ? <p className="mt-2 text-xs text-slate-600">تتبّع التقدم متاح بعد الاشتراك في الدورة.</p> : null}
             {lockedPremium ? <p className="mt-2 text-xs text-amber-800">اشترك في الدورة لتسجيل الإكمال ومشاهدة الفيديو.</p> : null}
           </div>
         </div>
@@ -179,16 +227,17 @@ export default function PackageLessonPage() {
       <aside className="rounded-2xl border border-slate-200 bg-white p-4 lg:col-span-4 lg:sticky lg:top-6 lg:h-fit">
         <h3 className="mb-1 text-lg font-semibold text-slate-900">محتوى الدورة</h3>
         <p className="mb-1 text-sm text-slate-600">
-          أكملت {progressStats.done} من {progressStats.total} {progressStats.total === 1 ? "درس" : "دروس"} ({progressStats.pct}%)
+          أكملت {progressStats?.completedLessons || 0} من {progressStats?.totalLessons || 0}{" "}
+          {(progressStats?.totalLessons || 0) === 1 ? "درس" : "دروس"} ({progressStats?.progressPercent || 0}%)
         </p>
         <p className="mb-3 text-xs text-slate-500">إجمالي الدروس المنشورة: {packageLessons.length}</p>
         <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" style={{ width: `${progressStats.pct}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" style={{ width: `${progressStats?.progressPercent || 0}%` }} />
         </div>
         <div className="space-y-2">
           {packageLessons.map((lesson) => {
             const blocked = Boolean(lesson.locked);
-            const done = pkg.id ? getCompletedSet(pkg.id).has(lesson.id) : false;
+            const done = completedLessonIds.has(lesson.id);
             const isCurrent = current?.id === lesson.id;
             return (
               <button

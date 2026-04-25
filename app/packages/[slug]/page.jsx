@@ -20,6 +20,7 @@ export default function PackageDetailsPage() {
   const [purchasing, setPurchasing] = useState(false);
   const [activeTab, setActiveTab] = useState("RECORDED");
   const [liveState, setLiveState] = useState({ loading: true, sessions: [], canJoinZoom: false });
+  const [progressState, setProgressState] = useState({ loading: true, progress: null });
 
   const loadMe = useCallback(async () => {
     const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -70,11 +71,30 @@ export default function PackageDetailsPage() {
     }
   }, [slug]);
 
+  const loadProgress = useCallback(async () => {
+    setProgressState((s) => ({ ...s, loading: true }));
+    try {
+      const res = await fetch(`/api/courses/${encodeURIComponent(slug)}/progress`, {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setProgressState({ loading: false, progress: null });
+        return;
+      }
+      setProgressState({ loading: false, progress: data.progress || null });
+    } catch {
+      setProgressState({ loading: false, progress: null });
+    }
+  }, [slug]);
+
   useEffect(() => {
     loadMe();
     loadCourse();
     loadLiveSessions();
-  }, [loadMe, loadCourse, loadLiveSessions]);
+    loadProgress();
+  }, [loadMe, loadCourse, loadLiveSessions, loadProgress]);
 
   useEffect(() => {
     const tab = String(searchParams?.get("tab") || "").toLowerCase();
@@ -107,6 +127,9 @@ export default function PackageDetailsPage() {
   const firstLessonHref = firstLesson ? `/packages/${course?.slug}/lesson/${firstLesson.id}` : null;
   const freePreviewCount = lessons.filter((lesson) => lesson.isFreePreview).length;
   const liveSessions = liveState.sessions || [];
+  const progress = progressState.progress;
+  const completedLessonIds = new Set(progress?.completedLessonIds || []);
+  const continueLesson = lessons.find((lesson) => !completedLessonIds.has(lesson.id) && !lesson.locked) || lessons.find((lesson) => !lesson.locked) || null;
 
   const shortDescription = useMemo(() => {
     const raw = String(course?.description || "").trim();
@@ -220,6 +243,37 @@ export default function PackageDetailsPage() {
         ) : null}
       </section>
 
+      {courseState.canAccessPaid ? (
+        <section className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-xl font-extrabold text-slate-900">تقدمك في الدورة</h2>
+              <p className="mt-2 text-sm text-slate-600">
+                أكملت {progress?.completedLessons || 0} من الدروس ({progress?.totalLessons || 0}) · وأرسلت{" "}
+                {progress?.completedAssessments || 0} من التقييمات ({progress?.totalAssessments || 0})
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                آخر نشاط: {progress?.lastActivityAt ? new Date(progress.lastActivityAt).toLocaleString("ar-DZ") : "لا يوجد نشاط بعد"}
+              </p>
+            </div>
+            <div className="text-start sm:text-end">
+              <p className="text-3xl font-black text-brand-700">{progress?.progressPercent || 0}%</p>
+              {progress?.isCompleted ? <p className="mt-1 text-sm font-bold text-emerald-700">أكملت هذه الدورة بنجاح</p> : null}
+            </div>
+          </div>
+          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div className="h-full rounded-full bg-gradient-to-l from-brand-600 to-indigo-600 transition-all" style={{ width: `${progress?.progressPercent || 0}%` }} />
+          </div>
+          {continueLesson ? (
+            <div className="mt-4">
+              <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="inline-flex rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
+                واصل التعلم
+              </Link>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-xl font-extrabold text-slate-900">محتوى الدورة</h2>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -267,6 +321,9 @@ export default function PackageDetailsPage() {
                       <p className="mt-1 text-sm text-slate-600">{lesson.description || "لا يوجد وصف لهذا الدرس."}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                      {completedLessonIds.has(lesson.id) ? (
+                        <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">تم إكمال الدرس</span>
+                      ) : null}
                       {lesson.locked ? <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">يتطلب اشتراك</span> : null}
                       <Link
                         href={`/packages/${course.slug}/lesson/${lesson.id}`}
@@ -334,6 +391,7 @@ export default function PackageDetailsPage() {
             courseSlug={course.slug}
             authedStudent={authedStudent}
             canAccess={courseState.canAccessPaid}
+            onProgressChange={loadProgress}
           />
         )}
       </section>

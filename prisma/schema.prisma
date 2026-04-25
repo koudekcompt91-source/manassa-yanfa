@@ -65,6 +65,11 @@ enum SubmissionStatus {
   CORRECTED
 }
 
+enum LessonProgressStatus {
+  STARTED
+  COMPLETED
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -87,6 +92,7 @@ model User {
   sentChatMessages   ChatMessage[]       @relation("ChatMessageSender")
   chatConversations  ChatConversation[]  @relation("ChatConversationStudent")
   assessmentSubmissions AssessmentSubmission[]
+  lessonProgresses   LessonProgress[]
 }
 
 model RechargeRequest {
@@ -156,6 +162,7 @@ model Course {
   liveSessions LiveSession[]
   chatConversations ChatConversation[]
   assessments  Assessment[]
+  lessonProgresses LessonProgress[]
 }
 
 model Lesson {
@@ -172,6 +179,8 @@ model Lesson {
   isFreePreview Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  progresses    LessonProgress[]
 
   @@index([courseId, order])
 }
@@ -313,4 +322,22 @@ model AssessmentAnswer {
 
   @@unique([submissionId, questionId])
   @@index([questionId])
+}
+
+model LessonProgress {
+  id          String               @id @default(cuid())
+  studentId   String
+  student     User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status      LessonProgressStatus @default(STARTED)
+  startedAt   DateTime             @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime             @updatedAt
+
+  @@unique([studentId, lessonId])
+  @@index([studentId, courseId, status])
+  @@index([courseId, status, updatedAt])
 }

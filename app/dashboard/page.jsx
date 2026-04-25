@@ -20,6 +20,8 @@ function DashboardPageInner() {
   const [lessons] = useDemoSection("lessons");
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [sessionData, setSessionData] = useState(null);
+  const [dashboardProgress, setDashboardProgress] = useState([]);
+  const [dashboardProgressLoading, setDashboardProgressLoading] = useState(true);
   const [clientStorageTick, setClientStorageTick] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
@@ -29,9 +31,25 @@ function DashboardPageInner() {
       .then(setSessionData);
   }, []);
 
+  const loadDashboardProgress = useCallback(() => {
+    setDashboardProgressLoading(true);
+    fetch("/api/progress/dashboard", { credentials: "include", cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok || !Array.isArray(data?.courses)) {
+          setDashboardProgress([]);
+          return;
+        }
+        setDashboardProgress(data.courses);
+      })
+      .catch(() => setDashboardProgress([]))
+      .finally(() => setDashboardProgressLoading(false));
+  }, []);
+
   useEffect(() => {
     loadMe();
-  }, [loadMe]);
+    loadDashboardProgress();
+  }, [loadMe, loadDashboardProgress]);
 
   const rechargeParam = searchParams.get("recharge");
   useEffect(() => {
@@ -182,10 +200,13 @@ function DashboardPageInner() {
   }, [myEnrollments, publishedPackages, publishedLessons, clientStorageTick, hydrated]);
 
   const overallProgressPct = useMemo(() => {
-    if (!enrollmentProgress.length) return 0;
-    const sum = enrollmentProgress.reduce((acc, r) => acc + (Number(r?.pct) || 0), 0);
-    return Math.min(100, Math.round(sum / enrollmentProgress.length));
-  }, [enrollmentProgress]);
+    const source = dashboardProgress.length
+      ? dashboardProgress.map((r) => Number(r?.progressPercent) || 0)
+      : enrollmentProgress.map((r) => Number(r?.pct) || 0);
+    if (!source.length) return 0;
+    const sum = source.reduce((acc, r) => acc + r, 0);
+    return Math.min(100, Math.round(sum / source.length));
+  }, [dashboardProgress, enrollmentProgress]);
 
   const currentGoalLabel = useMemo(() => {
     if (continueLearning.packageTitle) return continueLearning.packageTitle;
@@ -329,8 +350,10 @@ function DashboardPageInner() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <section id="my-courses" className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دوراتي</h2>
-          <p className="mt-1 text-sm text-slate-400">التقدّم محفوظ على هذا الجهاز لكل دورة.</p>
-          {!enrollmentProgress.length ? (
+          <p className="mt-1 text-sm text-slate-400">متابعة التقدم في كل دورة بشكل مباشر.</p>
+          {dashboardProgressLoading ? (
+            <p className="mt-6 text-sm text-slate-500">جاري تحميل تقدم الدورات...</p>
+          ) : !dashboardProgress.length ? (
             <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
               <p className="text-sm text-slate-600">لم تسجّل في دورة بعد</p>
               <Link
@@ -342,38 +365,38 @@ function DashboardPageInner() {
             </div>
           ) : (
             <ul className="mt-6 flex flex-col gap-4">
-              {enrollmentProgress.map((row) => {
-                const pkgLessons = publishedLessons
-                  .filter((l) => l.packageId === row.pkg.id)
-                  .slice()
-                  .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
-                const firstLesson = pkgLessons[0];
-                const continueHref = firstLesson
-                  ? `/packages/${row.pkg.slug}/lesson/${firstLesson.id}`
-                  : `/packages/${row.pkg.slug}`;
+              {dashboardProgress.map((row) => {
+                const continueHref = row.lastLessonId
+                  ? `/packages/${row.slug}/lesson/${row.lastLessonId}`
+                  : `/packages/${row.slug}`;
                 return (
-                  <li key={row.pkg.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
+                  <li key={row.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="text-base font-bold text-slate-900">{row.pkg.title}</p>
+                        <p className="text-base font-bold text-slate-900">{row.title}</p>
                         <p className="mt-1 text-sm text-slate-500">
-                          {row.total} درس · أكملت {row.done}
+                          {row.totalLessons} درس · أكملت {row.completedLessons}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">آخر درس: {row.lastLessonTitle || "غير محدد بعد"}</p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          آخر نشاط: {row.lastActivityAt ? new Date(row.lastActivityAt).toLocaleString("ar-DZ") : "لا يوجد نشاط بعد"}
                         </p>
                       </div>
-                      <p className="text-lg font-bold text-brand-600">{row.pct}%</p>
+                      <p className="text-lg font-bold text-brand-600">{row.progressPercent}%</p>
                     </div>
                     <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
-                      <div className="h-2.5 rounded-full bg-brand-600" style={{ width: `${row.pct}%` }} />
+                      <div className="h-2.5 rounded-full bg-brand-600" style={{ width: `${row.progressPercent}%` }} />
                     </div>
+                    {row.isCompleted ? <p className="mt-2 text-xs font-bold text-emerald-700">أكملت هذه الدورة بنجاح</p> : null}
                     <div className="mt-4 flex flex-wrap gap-2">
                       <Link
                         href={continueHref}
                         className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
                       >
-                        متابعة التعلّم
+                        واصل التعلم
                       </Link>
                       <Link
-                        href={`/packages/${row.pkg.slug}`}
+                        href={`/packages/${row.slug}`}
                         className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                       >
                         تفاصيل الدورة
