@@ -47,6 +47,11 @@ function DashboardPageInner() {
     pendingAssessments: [],
   });
   const [learningPaths, setLearningPaths] = useState([]);
+  const [interfaceContent, setInterfaceContent] = useState({
+    banners: [],
+    news: [],
+    announcements: [],
+  });
   const [clientStorageTick, setClientStorageTick] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
@@ -101,6 +106,23 @@ function DashboardPageInner() {
       .catch(() => setLearningPaths([]));
   }, []);
 
+  const loadInterfaceContent = useCallback(() => {
+    fetch("/api/homepage/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok || !data?.content) {
+          setInterfaceContent({ banners: [], news: [], announcements: [] });
+          return;
+        }
+        setInterfaceContent({
+          banners: Array.isArray(data.content.banners) ? data.content.banners : [],
+          news: Array.isArray(data.content.news) ? data.content.news : [],
+          announcements: Array.isArray(data.content.announcements) ? data.content.announcements : [],
+        });
+      })
+      .catch(() => setInterfaceContent({ banners: [], news: [], announcements: [] }));
+  }, []);
+
   const openCertificate = useCallback(
     async (row) => {
       if (!row?.slug || issuingCourseId) return;
@@ -133,7 +155,8 @@ function DashboardPageInner() {
     loadDashboardProgress();
     loadOverview();
     loadLearningPaths();
-  }, [loadMe, loadDashboardProgress, loadOverview, loadLearningPaths]);
+    loadInterfaceContent();
+  }, [loadMe, loadDashboardProgress, loadOverview, loadLearningPaths, loadInterfaceContent]);
 
   const rechargeParam = searchParams.get("recharge");
   useEffect(() => {
@@ -284,10 +307,16 @@ function DashboardPageInner() {
   );
 
   const dashboardNews = useMemo(() => {
-    return (announcements || [])
-      .filter((row) => row.placement === "dashboard" || row.placement === "global")
-      .slice(0, 4);
-  }, [announcements]);
+    if (interfaceContent.news.length) return interfaceContent.news.slice(0, 4);
+    return (announcements || []).filter((row) => row.placement === "dashboard" || row.placement === "global").slice(0, 4);
+  }, [announcements, interfaceContent.news]);
+
+  const dashboardAnnouncements = useMemo(() => {
+    if (interfaceContent.announcements.length) return interfaceContent.announcements;
+    return (announcements || []).filter((row) => row.placement === "dashboard" || row.placement === "global");
+  }, [announcements, interfaceContent.announcements]);
+
+  const heroBanner = interfaceContent.banners[0] || null;
 
   const subjectCards = useMemo(() => {
     return (learningPaths || []).slice(0, 6).map((row, index) => ({
@@ -470,11 +499,17 @@ function DashboardPageInner() {
             <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
             <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
             <p className="relative text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
-            <h2 className="relative mt-2 text-2xl font-black sm:text-3xl">رحلة تعليمية منظمة وحديثة</h2>
+            <h2 className="relative mt-2 text-2xl font-black sm:text-3xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
             <p className="relative mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
-              دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام.
+              {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
             </p>
             <div className="relative mt-5 flex flex-wrap gap-2">
+              {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
+                <Link href={heroBanner.buttonUrl} className="touch-button-primary border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
+                  <BookOpen className="h-4 w-4" />
+                  {heroBanner.buttonText}
+                </Link>
+              ) : null}
               <Link href={continueLearning.href} className="touch-button-primary border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                 <BookOpen className="h-4 w-4" />
                 واصل التعلم
@@ -561,7 +596,8 @@ function DashboardPageInner() {
               <ul className="mt-3 space-y-2">
                 {dashboardNews.map((row) => (
                   <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-700">
-                    {row.title}
+                    <p className="font-semibold text-slate-800">{row.title}</p>
+                    {row.summary ? <p className="mt-1 text-xs text-slate-500">{row.summary}</p> : null}
                   </li>
                 ))}
               </ul>
@@ -906,13 +942,23 @@ function DashboardPageInner() {
         )}
       </section>
 
-      {(announcements || [])
-        .filter((row) => row.placement === "dashboard" || row.placement === "global")
-        .map((row) => (
-          <p key={row.id} className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            {row.title}
-          </p>
-        ))}
+      {dashboardAnnouncements.map((row) => (
+        <div key={row.id} className={`rounded-xl border px-4 py-3 text-sm ${
+          row.type === "SUCCESS"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+            : row.type === "WARNING" || row.type === "URGENT"
+            ? "border-amber-200 bg-amber-50 text-amber-900"
+            : "border-sky-200 bg-sky-50 text-sky-900"
+        }`}>
+          <p className="font-semibold">{row.title}</p>
+          {row.message ? <p className="mt-1 text-xs opacity-90">{row.message}</p> : null}
+          {row.link ? (
+            <Link href={row.link} className="mt-2 inline-block text-xs font-bold underline">
+              عرض التفاصيل
+            </Link>
+          ) : null}
+        </div>
+      ))}
 
       <footer className="interactive-card flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-8">
         <div className="flex flex-wrap gap-2">

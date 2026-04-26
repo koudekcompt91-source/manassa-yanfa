@@ -75,6 +75,13 @@ enum CertificateStatus {
   REVOKED
 }
 
+enum AnnouncementType {
+  INFO
+  SUCCESS
+  WARNING
+  URGENT
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -159,6 +166,56 @@ model LearningPath {
   updatedAt   DateTime @updatedAt
 
   @@index([isPublished, order])
+}
+
+model HomepageBanner {
+  id         String   @id @default(cuid())
+  title      String
+  subtitle   String?
+  imageUrl   String?
+  buttonText String?
+  buttonUrl  String?
+  isPublished Boolean @default(true)
+  order      Int      @default(0)
+  startsAt   DateTime?
+  endsAt     DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isPublished, order])
+  @@index([startsAt, endsAt])
+}
+
+model NewsItem {
+  id          String   @id @default(cuid())
+  title       String
+  summary     String
+  icon        String?
+  link        String?
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, order])
+  @@index([publishedAt])
+}
+
+model Announcement {
+  id          String           @id @default(cuid())
+  title       String
+  message     String
+  type        AnnouncementType @default(INFO)
+  link        String?
+  isPublished Boolean          @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([isPublished, createdAt])
+  @@index([startsAt, endsAt])
 }
 
 model Course {

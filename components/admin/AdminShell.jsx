@@ -26,6 +26,7 @@ const adminLinks = [
   { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
   { href: "/admin/categories", label: "التصنيفات", Icon: Shapes },
   { href: "/admin/learning-paths", label: "المسارات التعليمية", Icon: Shapes },
+  { href: "/admin/content", label: "إدارة محتوى الواجهة", Icon: LayoutDashboard },
   { href: "/admin/pages", label: "الصفحات", Icon: LayoutDashboard },
   { href: "/admin/buttons", label: "الأزرار", Icon: LayoutDashboard },
   { href: "/admin/messages", label: "الرسائل", Icon: MessageCircle },

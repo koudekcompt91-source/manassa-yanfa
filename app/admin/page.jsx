@@ -14,6 +14,7 @@ import {
   Users,
   Video,
   Wallet,
+  LayoutTemplate,
 } from "lucide-react";
 
 export default function AdminOverviewPage() {
@@ -92,6 +93,7 @@ export default function AdminOverviewPage() {
     { href: "/admin/dashboard/messages", label: "محادثات الطلاب", Icon: MessageCircle },
     { href: "/admin/packages", label: "إدارة الاختبارات", Icon: ClipboardCheck },
     { href: "/admin/packages", label: "عرض الشهادات", Icon: Award },
+    { href: "/admin/content", label: "إدارة محتوى الواجهة", Icon: LayoutTemplate },
     { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
   ];
 

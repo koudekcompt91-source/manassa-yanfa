@@ -172,6 +172,17 @@ function TeacherPortrait({
 export default function HomeLanding() {
   const router = useRouter();
   const [authGate, setAuthGate] = useState<"checking" | "guest">("checking");
+  const [dynamicContent, setDynamicContent] = useState<{
+    banners: Array<{ id: string; title: string; subtitle?: string; imageUrl?: string; buttonText?: string; buttonUrl?: string }>;
+    news: Array<{ id: string; title: string; summary?: string; link?: string }>;
+    announcements: Array<{ id: string; title: string; message?: string; type?: string; link?: string }>;
+    featuredCourses: Array<{ id: string; slug: string; title: string; description?: string; priceMad?: number; isFree?: boolean }>;
+  }>({
+    banners: [],
+    news: [],
+    announcements: [],
+    featuredCourses: [],
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -200,7 +211,32 @@ export default function HomeLanding() {
   const [packages] = useDemoSection("packages");
   const [settings] = useDemoSection("settings");
   const homeButtons = (ctaButtons || []).filter((row: { placement?: string; visible?: boolean }) => row.placement === "homepage" && row.visible);
-  const featuredCourses = (packages || []).filter((row: { isPublished?: boolean }) => row.isPublished).slice(0, 6);
+  const fallbackFeaturedCourses = (packages || []).filter((row: { isPublished?: boolean }) => row.isPublished).slice(0, 6);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/homepage/content", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok || !data?.ok || !data?.content) {
+          return;
+        }
+        setDynamicContent({
+          banners: Array.isArray(data.content.banners) ? data.content.banners : [],
+          news: Array.isArray(data.content.news) ? data.content.news : [],
+          announcements: Array.isArray(data.content.announcements) ? data.content.announcements : [],
+          featuredCourses: Array.isArray(data.content.featuredCourses) ? data.content.featuredCourses : [],
+        });
+      } catch {
+        if (!cancelled) setDynamicContent({ banners: [], news: [], announcements: [], featuredCourses: [] });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const { nudge, scrollShift, motionOk } = useHeroAmbient("hero", authGate === "guest");
   const sectionIoRef = useRef<IntersectionObserver | null>(null);
@@ -246,8 +282,14 @@ export default function HomeLanding() {
     );
   }
 
-  const heroTitle = homepageContent?.heroTitle;
-  const heroSubtitle = homepageContent?.heroSubtitle;
+  const heroBanner = dynamicContent.banners[0] || null;
+  const heroTitle = heroBanner?.title || homepageContent?.heroTitle;
+  const heroSubtitle = heroBanner?.subtitle || homepageContent?.heroSubtitle;
+  const activeAnnouncements =
+    dynamicContent.announcements.length
+      ? dynamicContent.announcements
+      : (announcements || []).filter((row: { placement?: string }) => row.placement === "homepage" || row.placement === "global");
+  const featuredCourses = dynamicContent.featuredCourses.length ? dynamicContent.featuredCourses : fallbackFeaturedCourses;
 
   const nx = motionOk ? nudge.x : 0;
   const ny = motionOk ? nudge.y : 0;
@@ -301,6 +343,11 @@ export default function HomeLanding() {
                 className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:mt-11 sm:flex-row sm:flex-wrap sm:justify-start sm:gap-x-3 sm:gap-y-3 animate-hero-rise"
                 style={{ animationDelay: "0.4s" }}
               >
+                {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
+                  <Link href={heroBanner.buttonUrl} className={btnHeroPrimary}>
+                    {heroBanner.buttonText}
+                  </Link>
+                ) : null}
                 <Link href="/courses" className={btnHeroPrimary}>
                   ابدأ التعلم الآن
                 </Link>
@@ -322,6 +369,15 @@ export default function HomeLanding() {
                     >
                       {btn.label}
                     </Link>
+                  ))}
+                </div>
+              ) : null}
+              {dynamicContent.banners.length > 1 ? (
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                  {dynamicContent.banners.slice(0, 5).map((banner, idx) => (
+                    <span key={banner.id || idx} className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[11px] font-semibold text-slate-200">
+                      {banner.title}
+                    </span>
                   ))}
                 </div>
               ) : null}
@@ -375,13 +431,41 @@ export default function HomeLanding() {
         </div>
       </section>
 
-      {(announcements || [])
-        .filter((row: { placement?: string }) => row.placement === "homepage" || row.placement === "global")
-        .map((row: { id: string; title: string }) => (
-          <div key={row.id} className={`${container} pt-4`}>
-            <p className="rounded-2xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-sm font-medium text-amber-950 shadow-sm">{row.title}</p>
+      {activeAnnouncements.map((row: { id: string; title?: string; message?: string; type?: string; link?: string }) => (
+        <div key={row.id} className={`${container} pt-4`}>
+          <div className={`rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm ${row.type === "SUCCESS" ? "border-emerald-200/80 bg-emerald-50 text-emerald-900" : row.type === "WARNING" || row.type === "URGENT" ? "border-amber-200/80 bg-amber-50/95 text-amber-950" : "border-sky-200/80 bg-sky-50 text-sky-900"}`}>
+            <p>{row.title || row.message}</p>
+            {row.message && row.title ? <p className="mt-1 text-xs opacity-80">{row.message}</p> : null}
+            {row.link ? (
+              <Link href={row.link} className="mt-2 inline-block text-xs font-bold underline">
+                عرض التفاصيل
+              </Link>
+            ) : null}
           </div>
-        ))}
+        </div>
+      ))}
+
+      <section className="border-b border-slate-200/80 bg-white py-10" aria-labelledby="latest-news">
+        <div className={container}>
+          <div className="flex items-center justify-between gap-3">
+            <h2 id="latest-news" className="text-xl font-black text-slate-900 sm:text-2xl">آخر الأخبار</h2>
+            <Link href="/dashboard/notifications" className={btnMutedOutline}>كل الأخبار</Link>
+          </div>
+          {!dynamicContent.news.length ? (
+            <p className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 px-4 py-3 text-sm text-slate-600">لا توجد أخبار حاليًا</p>
+          ) : (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {dynamicContent.news.slice(0, 3).map((item) => (
+                <article key={item.id} className={`p-4 ${cardLuxuryFlat}`}>
+                  <p className="font-bold text-slate-900">{item.title}</p>
+                  <p className="mt-2 text-sm text-slate-600">{item.summary || "تحديث جديد في المنصة."}</p>
+                  {item.link ? <Link href={item.link} className="mt-2 inline-block text-xs font-bold text-brand-700 underline">عرض الخبر</Link> : null}
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* —— لماذا yanfa3 Education —— */}
       <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
