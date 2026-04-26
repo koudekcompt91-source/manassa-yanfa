@@ -7,8 +7,8 @@ import RechargeWalletModal from "@/components/student/RechargeWalletModal";
 import { logoutSession } from "@/lib/admin-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatDzd, formatDzdOrDash, formatDzdSigned } from "@/lib/format-money";
-import { getCompletedSet, getPackageProgressStats, readEngagement } from "@/lib/student-progress";
-import { studentSeesLesson, studentSeesPackage } from "@/lib/academic-levels";
+import { readEngagement } from "@/lib/student-progress";
+import { studentSeesPackage } from "@/lib/academic-levels";
 import { getPackagePriceMad } from "@/lib/wallet-ops";
 import {
   Activity,
@@ -34,10 +34,9 @@ function DashboardPageInner() {
   const searchParams = useSearchParams();
   const [buttons] = useDemoSection("ctaButtons");
   const [announcements] = useDemoSection("announcements");
-  const [packages] = useDemoSection("packages");
-  const [lessons] = useDemoSection("lessons");
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [sessionData, setSessionData] = useState(null);
+  const [catalogCourses, setCatalogCourses] = useState([]);
   const [dashboardProgress, setDashboardProgress] = useState([]);
   const [dashboardProgressLoading, setDashboardProgressLoading] = useState(true);
   const [issuingCourseId, setIssuingCourseId] = useState("");
@@ -74,6 +73,19 @@ function DashboardPageInner() {
       })
       .catch(() => setDashboardProgress([]))
       .finally(() => setDashboardProgressLoading(false));
+  }, []);
+
+  const loadCatalogCourses = useCallback(() => {
+    fetch("/api/courses", { credentials: "include", cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok || !Array.isArray(data?.courses)) {
+          setCatalogCourses([]);
+          return;
+        }
+        setCatalogCourses(data.courses);
+      })
+      .catch(() => setCatalogCourses([]));
   }, []);
 
   const loadOverview = useCallback(() => {
@@ -152,11 +164,12 @@ function DashboardPageInner() {
 
   useEffect(() => {
     loadMe();
+    loadCatalogCourses();
     loadDashboardProgress();
     loadOverview();
     loadLearningPaths();
     loadInterfaceContent();
-  }, [loadMe, loadDashboardProgress, loadOverview, loadLearningPaths, loadInterfaceContent]);
+  }, [loadMe, loadCatalogCourses, loadDashboardProgress, loadOverview, loadLearningPaths, loadInterfaceContent]);
 
   const rechargeParam = searchParams.get("recharge");
   useEffect(() => {
@@ -192,27 +205,15 @@ function DashboardPageInner() {
   }, [user]);
 
   const publishedPackages = useMemo(() => {
-    const list = (packages || []).filter((row) => row.isPublished);
+    const list = (catalogCourses || []).filter((row) => row.isPublished);
     if (user?.role !== "STUDENT") return list;
     return list.filter((row) => studentSeesPackage(studentLevel || null, row, studentLevelCode || null));
-  }, [packages, studentLevel, studentLevelCode, user?.role]);
-
-  const publishedLessons = useMemo(() => {
-    const list = (lessons || []).filter((row) => row.isPublished);
-    if (user?.role !== "STUDENT") return list;
-    return list.filter((row) => studentSeesLesson(studentLevel || null, row, packages || [], studentLevelCode || null));
-  }, [lessons, packages, studentLevel, studentLevelCode, user?.role]);
+  }, [catalogCourses, studentLevel, studentLevelCode, user?.role]);
 
   const myEnrollments = sessionData?.enrollments || [];
   const enrolledPackageIds = useMemo(() => new Set(myEnrollments.map((e) => e.packageId)), [myEnrollments]);
 
   const enrolledCourses = myEnrollments.length;
-
-  const lessonsInEnrolledPackages = useMemo(() => {
-    return publishedLessons.filter((l) => enrolledPackageIds.has(l.packageId));
-  }, [publishedLessons, enrolledPackageIds]);
-
-  const lessonsAvailableCount = lessonsInEnrolledPackages.length;
 
   const continueLearning = useMemo(() => {
     const recent = (dashboardProgress || [])
@@ -244,24 +245,12 @@ function DashboardPageInner() {
     const firstEnrollment = myEnrollments[0];
     const pkg = publishedPackages.find((p) => p.id === firstEnrollment?.packageId);
     if (!pkg?.slug) return { href: "/courses", lessonTitle: "", packageTitle: "" };
-    const pkgLessons = publishedLessons
-      .filter((l) => l.packageId === pkg.id)
-      .slice()
-      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
-    if (!pkgLessons.length) return { href: `/packages/${pkg.slug}`, lessonTitle: "", packageTitle: pkg.title || "" };
-
-    let target = pkgLessons[0];
-    if (hydrated && pkg.id) {
-      const done = getCompletedSet(pkg.id);
-      const next = pkgLessons.find((l) => !done.has(l.id));
-      if (next) target = next;
-    }
     return {
-      href: `/packages/${pkg.slug}/lesson/${target.id}`,
-      lessonTitle: (target.title || "درس").trim(),
+      href: `/packages/${pkg.slug}`,
+      lessonTitle: "",
       packageTitle: (pkg.title || "").trim(),
     };
-  }, [dashboardProgress, myEnrollments, publishedPackages, publishedLessons, enrolledPackageIds, hydrated]);
+  }, [dashboardProgress, myEnrollments, publishedPackages, enrolledPackageIds]);
 
   const recommendedPackages = useMemo(() => {
     const out = [];
@@ -287,19 +276,6 @@ function DashboardPageInner() {
 
   const myWalletTx = (sessionData?.transactions || []).slice(0, 20);
   const pendingRechargeCount = sessionData?.pendingRechargeCount ?? 0;
-
-  const upcomingFromEnrollments = useMemo(() => {
-    return lessonsInEnrolledPackages
-      .slice()
-      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
-      .slice(0, 4)
-      .map((lesson) => ({
-        id: lesson.id,
-        packageId: lesson.packageId,
-        title: lesson.title || "درس",
-        course: publishedPackages.find((pkg) => pkg.id === lesson.packageId)?.title || "دورة مسجّل بها",
-      }));
-  }, [lessonsInEnrolledPackages, publishedPackages]);
 
   const dashboardCtaButtons = useMemo(
     () => (buttons || []).filter((row) => row.placement === "dashboard" && row.visible),
@@ -380,39 +356,19 @@ function DashboardPageInner() {
     return readEngagement();
   }, [hydrated, clientStorageTick]);
 
-  const enrollmentProgress = useMemo(() => {
-    return myEnrollments
-      .map((e) => {
-        const pkg = publishedPackages.find((p) => p.id === e.packageId);
-        if (!pkg?.id) return null;
-        const ids = publishedLessons
-          .filter((l) => l.packageId === pkg.id)
-          .slice()
-          .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
-          .map((l) => l.id);
-        const st = hydrated
-          ? getPackageProgressStats(pkg.id, ids)
-          : { done: 0, total: ids.length, pct: 0 };
-        return { pkg, ...st };
-      })
-      .filter(Boolean);
-  }, [myEnrollments, publishedPackages, publishedLessons, clientStorageTick, hydrated]);
-
   const overallProgressPct = useMemo(() => {
-    const source = dashboardProgress.length
-      ? dashboardProgress.map((r) => Number(r?.progressPercent) || 0)
-      : enrollmentProgress.map((r) => Number(r?.pct) || 0);
+    const source = dashboardProgress.map((r) => Number(r?.progressPercent) || 0);
     if (!source.length) return 0;
     const sum = source.reduce((acc, r) => acc + r, 0);
     return Math.min(100, Math.round(sum / source.length));
-  }, [dashboardProgress, enrollmentProgress]);
+  }, [dashboardProgress]);
 
   const currentGoalLabel = useMemo(() => {
     if (continueLearning.packageTitle) return continueLearning.packageTitle;
-    const first = enrollmentProgress[0];
-    if (first?.pkg?.title) return first.pkg.title;
+    const first = dashboardProgress[0];
+    if (first?.title) return first.title;
     return "ابدأ من استكشاف الدورات";
-  }, [continueLearning.packageTitle, enrollmentProgress]);
+  }, [continueLearning.packageTitle, dashboardProgress]);
 
   const badgeLabel = (id) => {
     if (id === "streak-3") return "سلسلة 3 أيام";
@@ -683,12 +639,12 @@ function DashboardPageInner() {
             <p className="mt-6 text-sm text-slate-500">جاري تحميل تقدم الدورات...</p>
           ) : !dashboardProgress.length ? (
             <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-              <p className="text-sm text-slate-600">لم تسجّل في دورة بعد</p>
+              <p className="text-sm text-slate-600">لم تشترك في أي دورة بعد</p>
               <Link
                 href="/courses"
                 className="touch-button-primary mt-4"
               >
-                استكشاف الدورات
+                استكشف الدورات
               </Link>
             </div>
           ) : (
@@ -838,10 +794,10 @@ function DashboardPageInner() {
         </section>
       </div>
 
-      {recommendedPackages.length ? (
-        <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دورات موصى بها</h2>
-          <p className="mt-1 text-sm text-slate-400">اختر دورة وابدأ رحلتك.</p>
+      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دورات موصى بها</h2>
+        <p className="mt-1 text-sm text-slate-400">اختر دورة وابدأ رحلتك.</p>
+        {recommendedPackages.length ? (
           <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {recommendedPackages.map((pkg) => {
               const priceMad = getPackagePriceMad(pkg);
@@ -865,8 +821,15 @@ function DashboardPageInner() {
               );
             })}
           </div>
-        </section>
-      ) : null}
+        ) : (
+          <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+            <p className="text-sm text-slate-600">لا توجد دورات موصى بها حاليًا</p>
+            <Link href="/courses" className="touch-button-secondary mt-4">
+              استكشف الدورات
+            </Link>
+          </div>
+        )}
+      </section>
 
       <section id="wallet-details" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">المحفظة</h2>
@@ -897,20 +860,29 @@ function DashboardPageInner() {
       <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دروس دوراتك</h2>
         <p className="mt-1 text-sm text-slate-400">دروس متاحة في الدورات المسجّل بها.</p>
-        {!upcomingFromEnrollments.length ? (
-          <p className="mt-6 text-sm text-slate-500">سجّل في دورة لعرض الدروس هنا.</p>
+        {!dashboardProgress.length ? (
+          <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+            <p className="text-sm text-slate-600">لم تشترك في أي دورة بعد</p>
+            <Link href="/courses" className="touch-button-secondary mt-4">
+              استكشف الدورات
+            </Link>
+          </div>
         ) : (
           <ul className="mt-6 flex flex-col gap-3">
-            {upcomingFromEnrollments.map((lesson) => {
-              const done =
-                hydrated && lesson.packageId ? getCompletedSet(lesson.packageId).has(lesson.id) : false;
+            {dashboardProgress.slice(0, 4).map((row) => {
+              const continueHref = row.lastLessonId
+                ? `/packages/${row.slug}/lesson/${row.lastLessonId}`
+                : `/packages/${row.slug}`;
               return (
-                <li key={lesson.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4">
+                <li key={row.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <p className="min-w-0 flex-1 font-semibold text-slate-900">{lesson.title}</p>
-                    <span className="shrink-0 text-xs font-medium text-slate-400">{done ? "مكتمل" : "قيد التعلم"}</span>
+                    <p className="min-w-0 flex-1 font-semibold text-slate-900">{row.lastLessonTitle || row.title}</p>
+                    <span className="shrink-0 text-xs font-medium text-slate-400">{row.progressPercent || 0}%</span>
                   </div>
-                  <p className="mt-1 text-sm text-slate-400">{lesson.course}</p>
+                  <p className="mt-1 text-sm text-slate-400">{row.title}</p>
+                  <Link href={continueHref} className="mt-2 inline-block text-xs font-bold text-brand-700 underline">
+                    واصل التعلم
+                  </Link>
                 </li>
               );
             })}
