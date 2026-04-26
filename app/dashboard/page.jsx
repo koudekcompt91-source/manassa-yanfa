@@ -16,7 +16,6 @@ function DashboardPageInner() {
   const searchParams = useSearchParams();
   const [buttons] = useDemoSection("ctaButtons");
   const [announcements] = useDemoSection("announcements");
-  const [categories] = useDemoSection("categories");
   const [packages] = useDemoSection("packages");
   const [lessons] = useDemoSection("lessons");
   const [rechargeOpen, setRechargeOpen] = useState(false);
@@ -29,6 +28,7 @@ function DashboardPageInner() {
     upcomingLiveSessions: [],
     pendingAssessments: [],
   });
+  const [learningPaths, setLearningPaths] = useState([]);
   const [clientStorageTick, setClientStorageTick] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
@@ -70,6 +70,19 @@ function DashboardPageInner() {
       .catch(() => setOverview({ summary: null, upcomingLiveSessions: [], pendingAssessments: [] }));
   }, []);
 
+  const loadLearningPaths = useCallback(() => {
+    fetch("/api/learning-paths", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok) {
+          setLearningPaths([]);
+          return;
+        }
+        setLearningPaths(Array.isArray(data.learningPaths) ? data.learningPaths : []);
+      })
+      .catch(() => setLearningPaths([]));
+  }, []);
+
   const openCertificate = useCallback(
     async (row) => {
       if (!row?.slug || issuingCourseId) return;
@@ -101,7 +114,8 @@ function DashboardPageInner() {
     loadMe();
     loadDashboardProgress();
     loadOverview();
-  }, [loadMe, loadDashboardProgress, loadOverview]);
+    loadLearningPaths();
+  }, [loadMe, loadDashboardProgress, loadOverview, loadLearningPaths]);
 
   const rechargeParam = searchParams.get("recharge");
   useEffect(() => {
@@ -258,13 +272,13 @@ function DashboardPageInner() {
   }, [announcements]);
 
   const subjectCards = useMemo(() => {
-    const liveCategories = (categories || [])
-      .filter((row) => row.active)
-      .slice(0, 6)
-      .map((row) => row.name);
-    if (liveCategories.length) return liveCategories;
-    return ["نحو وصرف", "بلاغة", "أدب ونصوص", "عروض", "إنتاج كتابي", "مراجعة نهائية"];
-  }, [categories]);
+    return (learningPaths || []).slice(0, 6).map((row, index) => ({
+      id: row.id || `lp-${index}`,
+      title: row.title || "مسار تعليمي",
+      slug: row.slug || "",
+      color: row.color || "",
+    }));
+  }, [learningPaths]);
 
   const packageMetaById = useMemo(() => {
     const map = new Map();
@@ -445,17 +459,24 @@ function DashboardPageInner() {
                 عرض الدورات
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-              {subjectCards.map((name, idx) => (
-                <Link
-                  key={`${name}-${idx}`}
-                  href="/courses"
-                  className="interactive-card rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 p-3 text-sm font-bold text-slate-800 no-underline"
-                >
-                  {name}
-                </Link>
-              ))}
-            </div>
+            {!subjectCards.length ? (
+              <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-5 text-sm text-slate-500">
+                لا توجد مسارات تعليمية حاليًا
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {subjectCards.map((path, idx) => (
+                  <Link
+                    key={path.id || `${path.title}-${idx}`}
+                    href={path.slug ? `/courses?path=${encodeURIComponent(path.slug)}` : "/courses"}
+                    className="interactive-card rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 p-3 text-sm font-bold text-slate-800 no-underline"
+                    style={path.color ? { boxShadow: `inset 0 0 0 1px ${path.color}33` } : undefined}
+                  >
+                    {path.title}
+                  </Link>
+                ))}
+              </div>
+            )}
           </article>
         </div>
 

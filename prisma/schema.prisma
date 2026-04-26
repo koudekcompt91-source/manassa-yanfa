@@ -146,6 +146,21 @@ model Enrollment {
   @@unique([userId, packageId])
 }
 
+model LearningPath {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, order])
+}
+
 model Course {
   id           String           @id @default(cuid())
   slug         String           @unique

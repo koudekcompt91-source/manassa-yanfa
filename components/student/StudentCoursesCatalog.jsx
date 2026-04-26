@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { studentSeesPackage } from "@/lib/academic-levels";
 import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
@@ -30,9 +30,11 @@ function CourseCover({ title, coverImage }) {
 
 export default function StudentCoursesCatalog() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [packages, setPackages] = useState([]);
   const [categories] = useDemoSection("categories");
   const [teachers] = useDemoSection("teachers");
+  const [learningPaths, setLearningPaths] = useState([]);
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("الكل");
   const [meState, setMeState] = useState(null);
@@ -44,6 +46,27 @@ export default function StudentCoursesCatalog() {
       .then((r) => r.json())
       .then(setMeState)
       .catch(() => setMeState({}));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/learning-paths", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok && data?.ok && Array.isArray(data.learningPaths)) {
+          setLearningPaths(data.learningPaths);
+        } else {
+          setLearningPaths([]);
+        }
+      } catch {
+        if (!cancelled) setLearningPaths([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -81,6 +104,11 @@ export default function StudentCoursesCatalog() {
   const studentLevelCode =
     meState?.user?.role === "STUDENT" ? String(meState.user.level || "").trim() : "";
   const authedStudent = meState?.user?.role === "STUDENT";
+  const activePathSlug = String(searchParams?.get("path") || "").trim().toLowerCase();
+  const activeLearningPath = useMemo(() => {
+    if (!activePathSlug) return null;
+    return (learningPaths || []).find((row) => String(row.slug || "").trim().toLowerCase() === activePathSlug) || null;
+  }, [activePathSlug, learningPaths]);
   const enrollments = meState?.enrollments || [];
   const enrolledIds = useMemo(() => new Set(enrollments.map((e) => e.packageId)), [enrollments]);
 
@@ -95,6 +123,7 @@ export default function StudentCoursesCatalog() {
       .filter((pkg) => studentSeesPackage(studentLevel || null, pkg, studentLevelCode || null))
       .map((pkg) => {
         const categoryName = (categories || []).find((row) => row.id === pkg.categoryId)?.name || "-";
+        const pathName = (learningPaths || []).find((row) => row.id === pkg.categoryId)?.title || "";
         const teacherName = (teachers || []).find((row) => row.id === pkg.teacherId)?.name || "يوسف مادن";
         const slug = String(pkg.slug || pkg.id || "").trim();
         const detailHref = `/packages/${slug}`;
@@ -109,6 +138,7 @@ export default function StudentCoursesCatalog() {
         return {
           pkg,
           categoryName,
+          pathName,
           teacherName,
           slug,
           detailHref,
@@ -121,16 +151,24 @@ export default function StudentCoursesCatalog() {
       })
       .filter((row) => {
         const byCategory = activeCategory === "الكل" || row.categoryName === activeCategory;
+        const byPath = !activePathSlug
+          ? true
+          : activeLearningPath
+            ? row.pkg.categoryId === activeLearningPath.id || row.pkg.categoryId === activeLearningPath.slug
+            : String(row.pkg.categoryId || "").toLowerCase() === activePathSlug;
         const target = `${row.pkg.title} ${row.pkg.description} ${row.teacherName}`.toLowerCase();
-        return byCategory && target.includes(query.trim().toLowerCase());
+        return byCategory && byPath && target.includes(query.trim().toLowerCase());
       })
       .sort((a, b) => (a.pkg.order || 0) - (b.pkg.order || 0));
   }, [
     packages,
     categories,
     teachers,
+    learningPaths,
     query,
     activeCategory,
+    activePathSlug,
+    activeLearningPath,
     studentLevel,
     studentLevelCode,
     enrolledIds,
@@ -165,7 +203,7 @@ export default function StudentCoursesCatalog() {
   );
 
   const renderCard = (row) => {
-    const { pkg, detailHref, firstLessonHref, priceMad, owned, shortDesc, isFree, teacherName, categoryName } = row;
+    const { pkg, detailHref, firstLessonHref, priceMad, owned, shortDesc, isFree, teacherName, categoryName, pathName } = row;
     const purchasing = busyId === pkg.id;
 
     let cta;
@@ -217,7 +255,7 @@ export default function StudentCoursesCatalog() {
         <CourseCover title={pkg.title} coverImage={pkg.coverImage} />
         <div className="flex flex-1 flex-col p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">{categoryName}</span>
+            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">{pathName || categoryName}</span>
             <span
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
                 isFree ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"
@@ -258,6 +296,11 @@ export default function StudentCoursesCatalog() {
         </p>
         {authedStudent && studentLevel ? (
           <p className="mt-2 text-sm text-brand-800">المحتوى المعروض لمستواك: {studentLevel}</p>
+        ) : null}
+        {activeLearningPath ? (
+          <p className="mt-2 text-sm font-bold text-indigo-700">
+            المسار المحدد: {activeLearningPath.title}
+          </p>
         ) : null}
         <input
           type="search"

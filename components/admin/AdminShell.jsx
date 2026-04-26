@@ -13,6 +13,7 @@ const adminLinks = [
   { href: "/admin/students", label: "الطلاب" },
   { href: "/admin/recharge-requests", label: "طلبات الشحن" },
   { href: "/admin/categories", label: "التصنيفات" },
+  { href: "/admin/learning-paths", label: "المسارات التعليمية" },
   { href: "/admin/pages", label: "الصفحات" },
   { href: "/admin/buttons", label: "الأزرار" },
   { href: "/admin/messages", label: "الرسائل" },
