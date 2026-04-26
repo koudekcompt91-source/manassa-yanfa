@@ -4,10 +4,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   Award,
+  BookOpenText,
+  ClipboardCheck,
   MessageCircle,
-  PlayCircle,
   Video,
-  Wallet,
+  TrendingUp,
 } from "lucide-react";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
@@ -25,6 +26,8 @@ type AuthPageShellProps = {
   brandHeadline?: string;
   brandSubtitle?: string;
   brandFeatures?: string[];
+  authNavHref?: string;
+  authNavLabel?: string;
 };
 
 export default function AuthPageShell({
@@ -35,6 +38,8 @@ export default function AuthPageShell({
   brandHeadline = "مرحبًا بك في منصة ينفع",
   brandSubtitle = "تابع الدروس، الحصص المباشرة، الاختبارات، التقدم، والشهادات من مكان واحد.",
   brandFeatures = ["الدروس المسجلة", "الحصص المباشرة", "الواجبات والاختبارات", "متابعة التقدم", "شهادات الإتمام"],
+  authNavHref = "/register",
+  authNavLabel = "إنشاء حساب",
 }: AuthPageShellProps) {
   const { nudge, scrollShift, motionOk } = useHeroAmbient("auth-atmosphere", true);
 
@@ -67,8 +72,8 @@ export default function AuthPageShell({
               <Link href="/courses" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:bg-slate-100 hover:text-slate-900">
                 الدورات
               </Link>
-              <Link href="/register" className="rounded-lg bg-gradient-to-l from-brand-600 to-indigo-600 px-3 py-2 text-sm font-bold text-white no-underline shadow-sm transition-[transform,filter] hover:-translate-y-px hover:brightness-105">
-                إنشاء حساب
+              <Link href={authNavHref} className="rounded-lg bg-gradient-to-l from-brand-600 to-indigo-600 px-3 py-2 text-sm font-bold text-white no-underline shadow-sm transition-[transform,filter] hover:-translate-y-px hover:brightness-105">
+                {authNavLabel}
               </Link>
             </nav>
           </div>
@@ -93,19 +98,19 @@ export default function AuthPageShell({
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">محفظة آمنة</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-sm font-black text-slate-900"><Wallet className="h-4 w-4 text-brand-600" />اشحن رصيدك وتابع عملياتك بسهولة</p>
-                </article>
-                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">تقدم واضح</p>
-                  <p className="mt-2 text-sm font-black text-slate-900">تابع إنجازك داخل الدورات خطوة بخطوة</p>
-                  <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-2.5 w-2/3 rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
-                  </div>
+                  <p className="text-xs font-semibold text-slate-500">دروس منظمة</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-black text-slate-900"><BookOpenText className="h-4 w-4 text-brand-600" />تعلّم عبر دروس مسجلة مرتبة داخل الدورات.</p>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
                   <p className="text-xs font-semibold text-slate-500">حصص مباشرة</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Video className="h-4 w-4 text-emerald-600" />انضم إلى حصص Zoom عند توفرها للمشتركين</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-black text-slate-900"><Video className="h-4 w-4 text-emerald-600" />انضم إلى حصص مباشرة عند توفرها للمشتركين.</p>
+                  <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-2.5 w-3/5 rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
+                  </div>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
+                  <p className="text-xs font-semibold text-slate-500">اختبارات وتقدم</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><ClipboardCheck className="h-4 w-4 text-violet-600" />تابع إنجازك واختبر فهمك خطوة بخطوة.</p>
                   <span className="mt-2 inline-flex rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-bold text-sky-700">ميزة تعليمية</span>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
@@ -120,7 +125,7 @@ export default function AuthPageShell({
                     key={feature}
                     className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)] transition-colors hover:border-brand-200 hover:bg-brand-50/60"
                   >
-                    <PlayCircle className="h-3.5 w-3.5 text-brand-600" />
+                    <TrendingUp className="h-3.5 w-3.5 text-brand-600" />
                     {feature}
                   </span>
                 ))}
@@ -129,7 +134,7 @@ export default function AuthPageShell({
                   محادثة مع الأستاذ
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)]">
-                  <PlayCircle className="h-3.5 w-3.5 text-brand-600" />
+                  <ClipboardCheck className="h-3.5 w-3.5 text-brand-600" />
                   واجبات واختبارات
                 </span>
               </div>
