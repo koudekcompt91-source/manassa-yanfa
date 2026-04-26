@@ -89,6 +89,10 @@ export default function Navbar() {
     return null;
   }
 
+  if (pathname === "/login") {
+    return null;
+  }
+
   /** Logged-in students use the in-app sidebar; hide marketing links to reduce noise. */
   const hideMarketingNav =
     Boolean(student) &&

@@ -14,10 +14,74 @@ type AuthPageShellProps = {
   children: ReactNode;
   title: string;
   subtitle?: string;
+  mode?: "default" | "split";
+  brandHeadline?: string;
+  brandSubtitle?: string;
+  brandFeatures?: string[];
 };
 
-export default function AuthPageShell({ children, title, subtitle }: AuthPageShellProps) {
+export default function AuthPageShell({
+  children,
+  title,
+  subtitle,
+  mode = "default",
+  brandHeadline = "مرحبًا بك في منصة ينفع",
+  brandSubtitle = "تابع الدروس، الحصص المباشرة، الاختبارات، التقدم، والشهادات من مكان واحد.",
+  brandFeatures = ["الدروس المسجلة", "الحصص المباشرة", "الواجبات والاختبارات", "متابعة التقدم", "شهادات الإتمام"],
+}: AuthPageShellProps) {
   const { nudge, scrollShift, motionOk } = useHeroAmbient("auth-atmosphere", true);
+
+  if (mode === "split") {
+    return (
+      <div
+        id="auth-atmosphere"
+        className="landing-hero-cinematic relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950 bg-hero-mesh bg-[length:120%_120%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none"
+      >
+        <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-1 items-stretch px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="grid w-full overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/95 shadow-[0_30px_80px_-32px_rgba(2,6,23,0.65)] lg:grid-cols-2">
+            <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-[#0b1b3d] to-[#153a84] p-6 text-white sm:p-8 lg:p-10">
+              <div className="pointer-events-none absolute -start-14 -top-10 h-48 w-48 rounded-full bg-brand-400/30 blur-3xl" aria-hidden />
+              <div className="pointer-events-none absolute -bottom-12 -end-10 h-52 w-52 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
+              <div className="relative z-10">
+                <Link href="/" aria-label={BRAND_NAME} className="inline-flex rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-[1px] transition-colors hover:bg-white/15">
+                  <BrandLogoMark variant="authFocal" showWordmark priority />
+                </Link>
+                <p className="mt-6 text-sm font-semibold text-sky-100">Yanfa / yanfa3 Education / منصة ينفع</p>
+                <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{brandHeadline}</h2>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-slate-200 sm:text-base">{brandSubtitle}</p>
+                <div className="mt-8 grid gap-2 sm:grid-cols-2">
+                  {brandFeatures.map((feature) => (
+                    <div key={feature} className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-slate-100">
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="flex items-center bg-gradient-to-b from-slate-50 to-white p-5 sm:p-8 lg:p-10">
+              <div className="mx-auto w-full max-w-md">
+                <Link
+                  href="/"
+                  className={`mb-5 inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 no-underline transition-colors ${easePremium} hover:bg-slate-100 hover:text-slate-700`}
+                >
+                  ← العودة للرئيسية
+                </Link>
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_16px_34px_-20px_rgba(15,23,42,0.28)] sm:p-7">
+                  <header className="text-start">
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+                    {subtitle ? <p className="mt-2 text-sm leading-7 text-slate-600">{subtitle}</p> : null}
+                  </header>
+                  <div className="mt-6">{children}</div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
