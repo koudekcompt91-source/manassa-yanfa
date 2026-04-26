@@ -85,6 +85,14 @@
     @apply bg-[radial-gradient(1200px_480px_at_90%_-10%,rgba(59,130,246,0.10),transparent_62%),radial-gradient(900px_360px_at_10%_0%,rgba(99,102,241,0.08),transparent_58%),linear-gradient(to_bottom,#f8fafc,#f1f5f9)];
   }
 
+  .soft-grid-bg {
+    background-color: #f8fafc;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
   .pressable {
     @apply transition-transform duration-200 ease-out motion-safe:active:scale-[0.97] motion-reduce:active:scale-100;
   }

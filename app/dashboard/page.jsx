@@ -16,6 +16,7 @@ function DashboardPageInner() {
   const searchParams = useSearchParams();
   const [buttons] = useDemoSection("ctaButtons");
   const [announcements] = useDemoSection("announcements");
+  const [categories] = useDemoSection("categories");
   const [packages] = useDemoSection("packages");
   const [lessons] = useDemoSection("lessons");
   const [rechargeOpen, setRechargeOpen] = useState(false);
@@ -250,6 +251,69 @@ function DashboardPageInner() {
     [buttons]
   );
 
+  const dashboardNews = useMemo(() => {
+    return (announcements || [])
+      .filter((row) => row.placement === "dashboard" || row.placement === "global")
+      .slice(0, 4);
+  }, [announcements]);
+
+  const subjectCards = useMemo(() => {
+    const liveCategories = (categories || [])
+      .filter((row) => row.active)
+      .slice(0, 6)
+      .map((row) => row.name);
+    if (liveCategories.length) return liveCategories;
+    return ["نحو وصرف", "بلاغة", "أدب ونصوص", "عروض", "إنتاج كتابي", "مراجعة نهائية"];
+  }, [categories]);
+
+  const packageMetaById = useMemo(() => {
+    const map = new Map();
+    (publishedPackages || []).forEach((pkg) => {
+      map.set(pkg.id, {
+        accessType: pkg.accessType,
+        priceMad: getPackagePriceMad(pkg),
+      });
+    });
+    return map;
+  }, [publishedPackages]);
+
+  const recentActivityRows = useMemo(() => {
+    const rows = [];
+    const recentCourse = (dashboardProgress || [])
+      .filter((row) => row?.title)
+      .slice()
+      .sort((a, b) => {
+        const at = a?.lastActivityAt ? new Date(a.lastActivityAt).getTime() : 0;
+        const bt = b?.lastActivityAt ? new Date(b.lastActivityAt).getTime() : 0;
+        return bt - at;
+      })[0];
+    if (recentCourse) {
+      rows.push({
+        label: "آخر دورة",
+        value: recentCourse.title,
+      });
+    }
+    if (continueLearning.lessonTitle) {
+      rows.push({
+        label: "آخر درس",
+        value: continueLearning.lessonTitle,
+      });
+    }
+    if (overview.pendingAssessments?.[0]?.title) {
+      rows.push({
+        label: "آخر تقييم",
+        value: overview.pendingAssessments[0].title,
+      });
+    }
+    if ((overview.summary?.certificatesAvailable ?? 0) > 0) {
+      rows.push({
+        label: "الشهادات",
+        value: `${overview.summary?.certificatesAvailable ?? 0} شهادة`,
+      });
+    }
+    return rows.slice(0, 4);
+  }, [continueLearning.lessonTitle, dashboardProgress, overview.pendingAssessments, overview.summary?.certificatesAvailable]);
+
   const engagement = useMemo(() => {
     if (!hydrated) return { points: 0, streak: 0, lastLogin: null, badges: [] };
     return readEngagement();
@@ -309,7 +373,7 @@ function DashboardPageInner() {
   ];
 
   return (
-    <div className="premium-app-bg flex w-full flex-col gap-8">
+    <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-8">
       <header className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-medium text-slate-400">منصة ينفع</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا، {displayName}</h1>
@@ -354,49 +418,120 @@ function DashboardPageInner() {
         ))}
       </section>
 
-      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">إجراءات سريعة</h2>
-        <p className="mt-1 text-sm text-slate-400">اختصارات للمهام الأكثر استخدامًا.</p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button
-            type="button"
-            onClick={() => setRechargeOpen(true)}
-            className="touch-button-primary px-5"
-          >
-            شحن الرصيد
-          </button>
-          <Link
-            href="/courses"
-            className="touch-button-secondary px-5 text-center"
-          >
-            استكشاف الدورات
-          </Link>
-          <Link
-            href={continueLearning.href}
-            className="touch-button-secondary px-5 text-center"
-          >
-            متابعة آخر درس
-          </Link>
-          <Link
-            href="/profile"
-            className="touch-button-secondary px-5 text-center"
-          >
-            الملف الشخصي
-          </Link>
-        </div>
-        {dashboardCtaButtons.length ? (
-          <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-100 pt-6">
-            {dashboardCtaButtons.slice(0, 4).map((row) => (
-              <Link
-                key={row.id}
-                href={row.route}
-                className="touch-button-secondary px-4 py-2 text-xs"
-              >
-                {row.label}
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.55fr_1fr]">
+        <div className="space-y-6">
+          <article className="interactive-card relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-l from-slate-950 via-brand-900 to-indigo-900 p-6 text-white shadow-sm sm:p-8">
+            <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
+            <p className="relative text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
+            <h2 className="relative mt-2 text-2xl font-black sm:text-3xl">رحلة تعليمية منظمة وحديثة</h2>
+            <p className="relative mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
+              دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام.
+            </p>
+            <div className="relative mt-5 flex flex-wrap gap-2">
+              <Link href={continueLearning.href} className="touch-button-primary border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
+                واصل التعلم
               </Link>
-            ))}
-          </div>
-        ) : null}
+              <Link href="/courses" className="touch-button-secondary border-white/25 bg-white/10 text-white hover:bg-white/15 no-underline">
+                استكشف الدورات
+              </Link>
+            </div>
+          </article>
+
+          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">المسارات التعليمية</h3>
+              <Link href="/courses" className="text-xs font-bold text-brand-700 underline">
+                عرض الدورات
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {subjectCards.map((name, idx) => (
+                <Link
+                  key={`${name}-${idx}`}
+                  href="/courses"
+                  className="interactive-card rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 p-3 text-sm font-bold text-slate-800 no-underline"
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </article>
+        </div>
+
+        <div className="space-y-4">
+          <article id="wallet" className="interactive-card rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-700 p-5 text-white shadow-sm">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-xs font-semibold text-brand-100">رصيد المحفظة</p>
+                <p className="mt-2 text-3xl font-black">{formatDzd(walletBalance)}</p>
+                <p className="mt-1 text-xs text-brand-100">
+                  {pendingRechargeCount > 0 ? `طلبات قيد المراجعة: ${pendingRechargeCount}` : "لا توجد طلبات شحن معلقة"}
+                </p>
+              </div>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white" aria-hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </span>
+            </div>
+            <button type="button" onClick={() => setRechargeOpen(true)} className="touch-button mt-4 w-full bg-white text-brand-700 hover:bg-slate-100">
+              شحن المحفظة
+            </button>
+          </article>
+
+          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-extrabold text-slate-900">أحدث الأخبار</h3>
+            {!dashboardNews.length ? (
+              <p className="mt-3 text-sm text-slate-500">لا توجد أخبار حاليًا</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {dashboardNews.map((row) => (
+                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-700">
+                    {row.title}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+
+          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-extrabold text-slate-900">النشاط الأخير</h3>
+            {!recentActivityRows.length ? (
+              <p className="mt-3 text-sm text-slate-500">لا يوجد نشاط حديث حتى الآن</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {recentActivityRows.map((item, idx) => (
+                  <li key={`${item.label}-${idx}`} className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2">
+                    <p className="text-[11px] font-semibold text-slate-500">{item.label}</p>
+                    <p className="text-sm font-bold text-slate-800">{item.value}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+
+          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-extrabold text-slate-900">إجراءات سريعة</h3>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link href="/courses" className="touch-button-secondary justify-center text-center">استكشف الدورات</Link>
+              <Link href="/dashboard#wallet" className="touch-button-secondary justify-center text-center">المحفظة</Link>
+              <Link href="/dashboard/certificates" className="touch-button-secondary justify-center text-center">شهاداتي</Link>
+              <Link href="/dashboard/notifications" className="touch-button-secondary justify-center text-center">الإشعارات</Link>
+            </div>
+            {dashboardCtaButtons.length ? (
+              <div className="mt-3 border-t border-slate-100 pt-3">
+                <div className="flex flex-wrap gap-2">
+                  {dashboardCtaButtons.slice(0, 2).map((row) => (
+                    <Link key={row.id} href={row.route} className="touch-button-secondary px-3 py-2 text-xs">
+                      {row.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </article>
+        </div>
       </section>
 
       <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
@@ -447,6 +582,8 @@ function DashboardPageInner() {
                 const continueHref = row.lastLessonId
                   ? `/packages/${row.slug}/lesson/${row.lastLessonId}`
                   : `/packages/${row.slug}`;
+                const packageMeta = packageMetaById.get(row.id);
+                const isPaidCourse = (packageMeta?.accessType === "PAID") || Number(packageMeta?.priceMad || 0) > 0;
                 return (
                   <li key={row.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -462,6 +599,9 @@ function DashboardPageInner() {
                         <p className="text-base font-bold text-slate-900">{row.title}</p>
                         {row.isCompleted ? <p className="mt-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">مكتملة</p> : null}
                         {!row.isCompleted && row.progressPercent > 0 ? <p className="mt-1 inline-flex rounded-full bg-brand-100 px-2 py-0.5 text-[11px] font-bold text-brand-800">قيد التقدم</p> : null}
+                        <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold ${isPaidCourse ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-800"}`}>
+                          {isPaidCourse ? "مدفوعة" : "مجانية"}
+                        </p>
                         <p className="mt-1 text-xs text-slate-500">الأستاذ: يوسف مادن</p>
                         <p className="mt-1 text-sm text-slate-500">
                           {row.totalLessons} درس · أكملت {row.completedLessons}
@@ -488,7 +628,7 @@ function DashboardPageInner() {
                         href={`/packages/${row.slug}`}
                         className="touch-button-secondary"
                       >
-                        تفاصيل الدورة
+                        عرض الدورة
                       </Link>
                       {row.isCompleted ? (
                         <button
@@ -611,7 +751,7 @@ function DashboardPageInner() {
         </section>
       ) : null}
 
-      <section id="wallet" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section id="wallet-details" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">المحفظة</h2>
         <p className="mt-3 text-3xl font-bold tracking-tight text-brand-600">{formatDzd(walletBalance)}</p>
         {pendingRechargeCount > 0 ? (

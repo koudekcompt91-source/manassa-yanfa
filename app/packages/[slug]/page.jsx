@@ -207,28 +207,30 @@ export default function PackageDetailsPage() {
 
   return (
     <section className="container-page premium-app-bg space-y-8 py-8 text-start sm:space-y-10 sm:py-10">
-      <header className="interactive-card rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+      <header className="interactive-card relative overflow-hidden rounded-2xl border border-slate-800/40 bg-gradient-to-l from-slate-950 via-brand-900 to-indigo-900 p-6 text-white shadow-sm sm:p-8">
+        <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{categoryName}</span>
-            <h1 className="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">{course.title}</h1>
-            <p className="mt-3 text-base text-slate-600">{shortDescription}</p>
-            <p className="mt-2 text-sm text-slate-600">
-              الأستاذ: <span className="font-bold text-slate-800">{teacherName}</span>
+            <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-slate-100">{categoryName}</span>
+            <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">{course.title}</h1>
+            <p className="mt-3 text-base text-slate-200">{shortDescription}</p>
+            <p className="mt-2 text-sm text-slate-200">
+              الأستاذ: <span className="font-bold text-white">{teacherName}</span>
             </p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">دروس مسجلة</span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">حصص مباشرة</span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">اختبارات وواجبات</span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700">شهادة إتمام</span>
+              <span className="rounded-full bg-white/15 px-2.5 py-1 font-bold text-slate-100">دروس مسجلة</span>
+              <span className="rounded-full bg-white/15 px-2.5 py-1 font-bold text-slate-100">حصص مباشرة</span>
+              <span className="rounded-full bg-white/15 px-2.5 py-1 font-bold text-slate-100">اختبارات وواجبات</span>
+              <span className="rounded-full bg-white/15 px-2.5 py-1 font-bold text-slate-100">شهادة إتمام</span>
             </div>
           </div>
-          <div className="interactive-card w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:max-w-xs">
-            <p className="text-xs font-bold text-slate-500">سعر الدورة</p>
-            <p className="mt-1 text-2xl font-black text-brand-700">{isPaid ? formatDzd(priceMad) : "مجانية"}</p>
-            <p className="mt-2 text-xs text-slate-500">دروس الدورة: {lessons.length}</p>
-            <p className="mt-1 text-xs text-slate-500">معاينة مجانية: {freePreviewCount}</p>
-            <p className="mt-1 text-xs text-slate-500">{courseState.canAccessPaid ? "مشترك في الدورة" : "الوصول مقيد"}</p>
+          <div className="interactive-card w-full rounded-2xl border border-white/20 bg-white/10 p-4 sm:max-w-xs">
+            <p className="text-xs font-bold text-slate-200">سعر الدورة</p>
+            <p className="mt-1 text-2xl font-black text-white">{isPaid ? formatDzd(priceMad) : "مجانية"}</p>
+            <p className="mt-2 text-xs text-slate-200">دروس الدورة: {lessons.length}</p>
+            <p className="mt-1 text-xs text-slate-200">معاينة مجانية: {freePreviewCount}</p>
+            <p className="mt-1 text-xs text-slate-200">{courseState.canAccessPaid ? "مشترك في الدورة" : "الوصول مقيد"}</p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
