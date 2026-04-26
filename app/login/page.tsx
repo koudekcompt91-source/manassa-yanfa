@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import AuthPageShell from "@/components/auth/AuthPageShell";
-import { SEEDED_STUDENT } from "@/lib/admin-auth";
 import { authStore } from "@/lib/auth";
 
 export default function LoginPage() {
@@ -69,15 +68,6 @@ export default function LoginPage() {
       brandFeatures={["دروس مسجلة", "حصص مباشرة", "اختبارات", "شهادات"]}
     >
       <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-6" noValidate>
-        <p className="rounded-xl border border-sky-100/90 bg-sky-50/85 px-3.5 py-2.5 text-xs text-slate-700 shadow-[0_10px_20px_-18px_rgba(14,116,144,0.45)]">
-          <span className="font-semibold text-slate-800">حساب تجريبي:</span>{" "}
-          <span className="font-mono text-slate-700" dir="ltr">
-            {SEEDED_STUDENT.email}
-          </span>
-          <span className="text-slate-500"> / </span>
-          <span className="font-mono text-slate-700">{SEEDED_STUDENT.passwordHint}</span>
-        </p>
-
         <div className="group space-y-2">
           <label htmlFor="login-email" className="block text-sm font-black text-slate-700">
             البريد الإلكتروني
@@ -159,6 +149,9 @@ export default function LoginPage() {
           <Link href="/register" className="font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
             إنشاء حساب
           </Link>
+        </p>
+        <p className="text-center text-xs text-slate-500">
+          بياناتك التعليمية والمالية تظهر فقط بعد تسجيل الدخول.
         </p>
       </form>
     </AuthPageShell>

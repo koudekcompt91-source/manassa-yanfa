@@ -93,28 +93,24 @@ export default function AuthPageShell({
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">الرصيد الحالي</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-xl font-black text-slate-900"><Wallet className="h-4 w-4 text-brand-600" />4,000 دج</p>
-                  <p className="mt-1 text-[11px] font-medium text-slate-500">جاهز للاشتراك في الدورات</p>
+                  <p className="text-xs font-semibold text-slate-500">محفظة آمنة</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-black text-slate-900"><Wallet className="h-4 w-4 text-brand-600" />اشحن رصيدك وتابع عملياتك بسهولة</p>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">تقدمك في الدورة</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <p className="text-lg font-black text-slate-900">68%</p>
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">جيد جدًا</span>
-                  </div>
+                  <p className="text-xs font-semibold text-slate-500">تقدم واضح</p>
+                  <p className="mt-2 text-sm font-black text-slate-900">تابع إنجازك داخل الدورات خطوة بخطوة</p>
                   <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-2.5 w-[68%] rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
+                    <div className="h-2.5 w-2/3 rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
                   </div>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">حصة مباشرة اليوم</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Video className="h-4 w-4 text-emerald-600" />أدب عربي - الساعة 18:00</p>
-                  <span className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">مباشر</span>
+                  <p className="text-xs font-semibold text-slate-500">حصص مباشرة</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Video className="h-4 w-4 text-emerald-600" />انضم إلى حصص Zoom عند توفرها للمشتركين</p>
+                  <span className="mt-2 inline-flex rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[11px] font-bold text-sky-700">ميزة تعليمية</span>
                 </article>
                 <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
-                  <p className="text-xs font-semibold text-slate-500">شهادة إتمام</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Award className="h-4 w-4 text-amber-500" />جاهزة للعرض بعد الإكمال</p>
+                  <p className="text-xs font-semibold text-slate-500">شهادات إتمام</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Award className="h-4 w-4 text-amber-500" />احصل على شهادة بعد إكمال الدورة</p>
                 </article>
               </div>
 
@@ -131,6 +127,10 @@ export default function AuthPageShell({
                 <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)]">
                   <MessageCircle className="h-3.5 w-3.5 text-brand-600" />
                   محادثة مع الأستاذ
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)]">
+                  <PlayCircle className="h-3.5 w-3.5 text-brand-600" />
+                  واجبات واختبارات
                 </span>
               </div>
             </section>
