@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import {
+  Award,
+  MessageCircle,
+  PlayCircle,
+  Video,
+  Wallet,
+} from "lucide-react";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
 import { useHeroAmbient } from "@/components/home/useHeroAmbient";
@@ -14,7 +21,7 @@ type AuthPageShellProps = {
   children: ReactNode;
   title: string;
   subtitle?: string;
-  mode?: "default" | "split";
+  mode?: "default" | "split" | "light-edu";
   brandHeadline?: string;
   brandSubtitle?: string;
   brandFeatures?: string[];
@@ -30,6 +37,104 @@ export default function AuthPageShell({
   brandFeatures = ["الدروس المسجلة", "الحصص المباشرة", "الواجبات والاختبارات", "متابعة التقدم", "شهادات الإتمام"],
 }: AuthPageShellProps) {
   const { nudge, scrollShift, motionOk } = useHeroAmbient("auth-atmosphere", true);
+
+  if (mode === "light-edu") {
+    return (
+      <div id="auth-atmosphere" className="relative min-h-screen overflow-hidden bg-[#f8fafc] text-slate-900">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(59,130,246,0.14),transparent_35%),radial-gradient(circle_at_85%_24%,rgba(14,165,233,0.12),transparent_34%),radial-gradient(circle_at_62%_88%,rgba(139,92,246,0.1),transparent_32%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.32]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(148,163,184,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.14) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+          aria-hidden
+        />
+
+        <header className="relative z-10 border-b border-slate-200/80 bg-white/82 backdrop-blur-sm">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <Link href="/" aria-label={BRAND_NAME} className="inline-flex rounded-xl px-1 py-1 no-underline hover:bg-slate-50">
+              <BrandLogoMark variant="navPrimary" showWordmark priority />
+            </Link>
+            <nav className="flex items-center gap-1 sm:gap-2">
+              <Link href="/" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:bg-slate-100 hover:text-slate-900">
+                الرئيسية
+              </Link>
+              <Link href="/courses" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:bg-slate-100 hover:text-slate-900">
+                الدورات
+              </Link>
+              <Link href="/register" className="rounded-lg bg-gradient-to-l from-brand-600 to-indigo-600 px-3 py-2 text-sm font-bold text-white no-underline shadow-sm transition-[transform,filter] hover:-translate-y-px hover:brightness-105">
+                إنشاء حساب
+              </Link>
+            </nav>
+          </div>
+        </header>
+
+        <main className="relative z-10 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+          <div className="grid gap-5 lg:grid-cols-[1fr_1fr] lg:gap-6">
+            <section className="order-1 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_24px_60px_-34px_rgba(15,23,42,0.25)] sm:p-7 lg:p-9">
+              <header>
+                <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
+                {subtitle ? <p className="mt-2 text-sm leading-7 text-slate-600 sm:text-base">{subtitle}</p> : null}
+              </header>
+              <div className="mt-7">{children}</div>
+            </section>
+
+            <section className="order-2 rounded-[2rem] border border-slate-200/90 bg-gradient-to-b from-white via-sky-50/45 to-indigo-50/55 p-5 shadow-[0_24px_60px_-34px_rgba(59,130,246,0.22)] sm:p-7 lg:p-8">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+                <p className="text-sm font-semibold text-brand-700">Yanfa / منصة ينفع</p>
+                <h2 className="mt-2 text-2xl font-black leading-tight text-slate-900 sm:text-[2rem]">{brandHeadline}</h2>
+                <p className="mt-2 text-sm leading-7 text-slate-600">{brandSubtitle}</p>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-semibold text-slate-500">الرصيد الحالي</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-xl font-black text-slate-900"><Wallet className="h-4 w-4 text-brand-600" />4,000 دج</p>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-semibold text-slate-500">تقدمك في الدورة</p>
+                  <p className="mt-2 text-lg font-black text-slate-900">68%</p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-2 w-[68%] rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
+                  </div>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-semibold text-slate-500">حصة مباشرة اليوم</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Video className="h-4 w-4 text-emerald-600" />أدب عربي - الساعة 18:00</p>
+                  <span className="mt-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700">مباشر</span>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-semibold text-slate-500">شهادة إتمام</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Award className="h-4 w-4 text-amber-500" />جاهزة للعرض بعد الإكمال</p>
+                </article>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {brandFeatures.map((feature) => (
+                  <span
+                    key={feature}
+                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-brand-200 hover:bg-brand-50/60"
+                  >
+                    <PlayCircle className="h-3.5 w-3.5 text-brand-600" />
+                    {feature}
+                  </span>
+                ))}
+                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                  <MessageCircle className="h-3.5 w-3.5 text-brand-600" />
+                  محادثة مع الأستاذ
+                </span>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (mode === "split") {
     return (

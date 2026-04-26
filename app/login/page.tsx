@@ -5,10 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import AuthPageShell from "@/components/auth/AuthPageShell";
-import {
-  premiumAuthAlertSecondaryRowClass,
-  premiumAuthFooterLinkClass as footerLinkClass,
-} from "@/components/auth/premiumAuthFormClasses";
 import { SEEDED_STUDENT } from "@/lib/admin-auth";
 import { authStore } from "@/lib/auth";
 
@@ -67,10 +63,10 @@ export default function LoginPage() {
     <AuthPageShell
       title="تسجيل الدخول"
       subtitle="ادخل إلى حسابك لمتابعة تعلمك."
-      mode="split"
+      mode="light-edu"
       brandHeadline="سجّل الدخول وواصل رحلتك التعليمية"
       brandSubtitle="منصة ينفع تجمع لك تجربة تعليمية حديثة: دروس مسجلة، حصص مباشرة، اختبارات، متابعة تقدم، وشهادات إتمام."
-      brandFeatures={["الدروس المسجلة", "الحصص المباشرة", "الواجبات والاختبارات", "متابعة التقدم", "شهادات الإتمام"]}
+      brandFeatures={["دروس مسجلة", "حصص مباشرة", "اختبارات", "شهادات"]}
     >
       <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-6" noValidate>
         <p className="rounded-xl border border-sky-100/90 bg-sky-50/80 px-3.5 py-2.5 text-xs text-slate-700">
@@ -95,7 +91,7 @@ export default function LoginPage() {
               autoComplete="email"
               inputMode="email"
               dir="ltr"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pe-10 text-[0.94rem] font-mono text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
+              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/65 px-4 pe-10 text-[0.94rem] font-mono text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
               placeholder="name@example.com"
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
@@ -117,7 +113,7 @@ export default function LoginPage() {
               name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pe-[4.5rem] text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
+              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/65 px-4 pe-[4.5rem] text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
               placeholder="••••••••"
               value={form.password}
               onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
@@ -141,8 +137,8 @@ export default function LoginPage() {
           <div id="login-error" role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm leading-relaxed text-red-700 shadow-[0_8px_20px_-18px_rgba(185,28,28,0.45)]">
             <p>{error}</p>
             {showAdminPortalLink ? (
-              <p className={premiumAuthAlertSecondaryRowClass}>
-                <Link href="/admin/login" className={footerLinkClass}>
+              <p className="mt-3 border-t border-red-200 pt-3 text-center">
+                <Link href="/admin/login" className="text-xs font-bold text-red-700 underline">
                   الانتقال إلى تسجيل دخول الإدارة
                 </Link>
               </p>
@@ -160,7 +156,7 @@ export default function LoginPage() {
 
         <p className="pt-1.5 text-center text-sm text-slate-600">
           ليس لديك حساب؟{" "}
-          <Link href="/register" className={`${footerLinkClass} text-brand-700 hover:text-brand-800`}>
+          <Link href="/register" className="font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
             إنشاء حساب
           </Link>
         </p>
