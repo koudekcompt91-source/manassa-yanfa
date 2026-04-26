@@ -7,6 +7,17 @@ import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
 import CourseChatPanel from "@/components/student/CourseChatPanel";
 import CourseAssessmentsPanel from "@/components/student/CourseAssessmentsPanel";
+import {
+  Award,
+  BookText,
+  CheckCircle2,
+  ClipboardCheck,
+  ExternalLink,
+  Lock,
+  MessageCircle,
+  PlayCircle,
+  Video,
+} from "lucide-react";
 
 export default function PackageDetailsPage() {
   const params = useParams();
@@ -236,14 +247,17 @@ export default function PackageDetailsPage() {
         <div className="mt-4 flex flex-wrap gap-2">
           {continueLesson ? (
             <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="touch-button-primary no-underline">
+              <PlayCircle className="h-4 w-4" />
               واصل التعلم
             </Link>
           ) : null}
           <button type="button" onClick={() => setActiveTab("CHAT")} className="touch-button-secondary">
+            <MessageCircle className="h-4 w-4" />
             راسل الأستاذ
           </button>
           {progress?.isCompleted && certificateState.certificate?.certificateCode ? (
             <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-secondary border-emerald-200 bg-emerald-50 text-emerald-800 no-underline">
+              <Award className="h-4 w-4" />
               عرض الشهادة
             </Link>
           ) : null}
@@ -336,12 +350,14 @@ export default function PackageDetailsPage() {
                       href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
                       className="touch-button-primary from-emerald-600 to-emerald-500 no-underline"
                     >
+                      <Award className="h-4 w-4" />
                       عرض الشهادة
                     </Link>
                     <Link
                       href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`}
                       className="touch-button-secondary border-emerald-300 bg-white text-emerald-800 no-underline"
                     >
+                      <ExternalLink className="h-4 w-4" />
                       تحميل الشهادة
                     </Link>
                   </>
@@ -352,6 +368,7 @@ export default function PackageDetailsPage() {
                     disabled={certificateState.loading}
                     className="touch-button-primary from-emerald-600 to-emerald-500"
                   >
+                    <Award className="h-4 w-4" />
                     {certificateState.loading ? "جاري تجهيز الشهادة..." : "عرض الشهادة"}
                   </button>
                 )}
@@ -364,6 +381,7 @@ export default function PackageDetailsPage() {
           {continueLesson ? (
             <div className="mt-4">
               <Link href={`/packages/${course.slug}/lesson/${continueLesson.id}`} className="touch-button-primary no-underline">
+                <PlayCircle className="h-4 w-4" />
                 واصل التعلم
               </Link>
             </div>
@@ -379,6 +397,7 @@ export default function PackageDetailsPage() {
             onClick={() => setActiveTab("RECORDED")}
             className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "RECORDED" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
+            <BookText className="me-1 inline h-4 w-4" />
             الدروس المسجلة
           </button>
           <button
@@ -386,6 +405,7 @@ export default function PackageDetailsPage() {
             onClick={() => setActiveTab("LIVE")}
             className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "LIVE" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
+            <Video className="me-1 inline h-4 w-4" />
             الحصص المباشرة
           </button>
           <button
@@ -393,6 +413,7 @@ export default function PackageDetailsPage() {
             onClick={() => setActiveTab("CHAT")}
             className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CHAT" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
+            <MessageCircle className="me-1 inline h-4 w-4" />
             المحادثة مع الأستاذ
           </button>
           <button
@@ -400,6 +421,7 @@ export default function PackageDetailsPage() {
             onClick={() => setActiveTab("ASSESSMENTS")}
             className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "ASSESSMENTS" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
+            <ClipboardCheck className="me-1 inline h-4 w-4" />
             الواجبات والاختبارات
           </button>
           <button
@@ -407,6 +429,7 @@ export default function PackageDetailsPage() {
             onClick={() => setActiveTab("CERTIFICATE")}
             className={`interactive-tab shrink-0 rounded-xl px-4 py-2 text-sm font-bold ${activeTab === "CERTIFICATE" ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm" : "border border-slate-200 text-slate-700"}`}
           >
+            <Award className="me-1 inline h-4 w-4" />
             الشهادة
           </button>
         </div>
@@ -427,13 +450,14 @@ export default function PackageDetailsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {completedLessonIds.has(lesson.id) ? (
-                        <span className="motion-safe:animate-[softPulse_1.8s_ease-in-out_2] rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">تم إكمال الدرس</span>
+                        <span className="motion-safe:animate-[softPulse_1.8s_ease-in-out_2] inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800"><CheckCircle2 className="h-3.5 w-3.5" />تم إكمال الدرس</span>
                       ) : null}
-                      {lesson.locked ? <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">يتطلب اشتراك</span> : null}
+                      {lesson.locked ? <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800"><Lock className="h-3.5 w-3.5" />يتطلب اشتراك</span> : null}
                       <Link
                         href={`/packages/${course.slug}/lesson/${lesson.id}`}
                         className="touch-button-primary no-underline"
                       >
+                        <PlayCircle className="h-4 w-4" />
                         تشغيل الدرس
                       </Link>
                     </div>
@@ -468,6 +492,7 @@ export default function PackageDetailsPage() {
                             rel="noreferrer"
                             className="touch-button-primary no-underline"
                           >
+                            <ExternalLink className="h-4 w-4" />
                             انضم إلى الحصة
                           </a>
                         ) : (
@@ -508,14 +533,17 @@ export default function PackageDetailsPage() {
                   {certificateState.certificate?.certificateCode ? (
                     <>
                       <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-primary from-emerald-600 to-emerald-500 no-underline">
+                        <Award className="h-4 w-4" />
                         عرض الشهادة
                       </Link>
                       <Link href={`/dashboard/certificates/${encodeURIComponent(certificateState.certificate.certificateCode)}`} className="touch-button-secondary border-emerald-300 bg-white text-emerald-800 no-underline">
+                        <ExternalLink className="h-4 w-4" />
                         تحميل الشهادة
                       </Link>
                     </>
                   ) : (
                     <button type="button" onClick={loadCertificate} className="touch-button-primary from-emerald-600 to-emerald-500">
+                      <Award className="h-4 w-4" />
                       عرض الشهادة
                     </button>
                   )}
@@ -534,6 +562,7 @@ export default function PackageDetailsPage() {
       {firstLessonHref ? (
         <div className="flex flex-wrap justify-center gap-3 border-t border-slate-200 pt-6">
           <Link href={firstLessonHref} className="touch-button-primary px-6 no-underline">
+            <PlayCircle className="h-4 w-4" />
             ابدأ التعلّم
           </Link>
         </div>

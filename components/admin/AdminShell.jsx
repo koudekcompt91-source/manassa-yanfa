@@ -5,21 +5,33 @@ import { usePathname, useRouter } from "next/navigation";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { logoutSession } from "@/lib/admin-auth";
 import { BRAND_NAME } from "@/lib/brand";
+import {
+  Bell,
+  BookOpen,
+  CreditCard,
+  LayoutDashboard,
+  LogOut,
+  MessageCircle,
+  Settings,
+  Shapes,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 const adminLinks = [
-  { href: "/admin/dashboard", label: "لوحة التحكم" },
-  { href: "/admin/courses", label: "الدورات" },
-  { href: "/admin/teachers", label: "الأساتذة" },
-  { href: "/admin/students", label: "الطلاب" },
-  { href: "/admin/recharge-requests", label: "طلبات الشحن" },
-  { href: "/admin/categories", label: "التصنيفات" },
-  { href: "/admin/learning-paths", label: "المسارات التعليمية" },
-  { href: "/admin/pages", label: "الصفحات" },
-  { href: "/admin/buttons", label: "الأزرار" },
-  { href: "/admin/messages", label: "الرسائل" },
-  { href: "/admin/dashboard/messages", label: "محادثات الطلاب" },
-  { href: "/admin/notifications", label: "الإشعارات" },
-  { href: "/admin/settings", label: "الإعدادات" },
+  { href: "/admin/dashboard", label: "لوحة التحكم", Icon: LayoutDashboard },
+  { href: "/admin/courses", label: "الدورات", Icon: BookOpen },
+  { href: "/admin/teachers", label: "الأساتذة", Icon: UserRound },
+  { href: "/admin/students", label: "الطلاب", Icon: Users },
+  { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
+  { href: "/admin/categories", label: "التصنيفات", Icon: Shapes },
+  { href: "/admin/learning-paths", label: "المسارات التعليمية", Icon: Shapes },
+  { href: "/admin/pages", label: "الصفحات", Icon: LayoutDashboard },
+  { href: "/admin/buttons", label: "الأزرار", Icon: LayoutDashboard },
+  { href: "/admin/messages", label: "الرسائل", Icon: MessageCircle },
+  { href: "/admin/dashboard/messages", label: "محادثات الطلاب", Icon: MessageCircle },
+  { href: "/admin/notifications", label: "الإشعارات", Icon: Bell },
+  { href: "/admin/settings", label: "الإعدادات", Icon: Settings },
 ];
 
 function isActiveLink(pathname, href) {
@@ -59,16 +71,18 @@ export default function AdminShell({ title, subtitle, children }) {
         <nav className="space-y-1">
           {adminLinks.map((link) => {
             const active = isActiveLink(pathname, link.href);
+            const Icon = link.Icon;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`interactive-tab touch-target block rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                className={`interactive-tab touch-target flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${
                   active
                     ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-sm"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
+                <Icon className="h-4 w-4 shrink-0" />
                 {link.label}
               </Link>
             );
@@ -77,9 +91,10 @@ export default function AdminShell({ title, subtitle, children }) {
         <button
           type="button"
           onClick={handleLogout}
-          className="touch-button-secondary mt-4 w-full justify-center border-slate-300 bg-slate-900 px-3 text-white hover:bg-slate-800"
+          className="touch-button-secondary mt-4 w-full justify-center gap-2 border-slate-300 bg-slate-900 px-3 text-white hover:bg-slate-800"
         >
-          تسجيل الخروج
+          <LogOut className="h-4 w-4" />
+          <span>تسجيل الخروج</span>
         </button>
       </aside>
 

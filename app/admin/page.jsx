@@ -3,6 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
+import {
+  Award,
+  Bell,
+  BookOpen,
+  BookText,
+  ClipboardCheck,
+  CreditCard,
+  MessageCircle,
+  Users,
+  Video,
+  Wallet,
+} from "lucide-react";
 
 export default function AdminOverviewPage() {
   const [state, setState] = useState({
@@ -52,35 +64,35 @@ export default function AdminOverviewPage() {
   const statCards = useMemo(() => {
     const s = state.stats || {};
     return [
-      { label: "إجمالي الطلاب", value: s.totalStudents ?? 0 },
-      { label: "إجمالي الدورات", value: s.totalCourses ?? 0 },
-      { label: "الدورات المنشورة", value: s.publishedCourses ?? 0 },
-      { label: "الدورات المدفوعة", value: s.paidCourses ?? 0 },
-      { label: "الدورات المجانية", value: s.freeCourses ?? 0 },
-      { label: "إجمالي الدروس", value: s.totalLessons ?? 0 },
-      { label: "الحصص المباشرة", value: s.totalLiveSessions ?? 0 },
-      { label: "الحصص القادمة", value: s.upcomingLiveSessions ?? 0 },
-      { label: "الواجبات والاختبارات", value: s.totalAssessments ?? 0 },
-      { label: "إجابات الطلاب", value: s.totalSubmissions ?? 0 },
-      { label: "الشهادات", value: s.totalCertificates ?? 0 },
-      { label: "الشهادات الصالحة", value: s.activeCertificates ?? 0 },
-      { label: "المحادثات", value: s.totalChatConversations ?? 0 },
-      { label: "رسائل غير مقروءة", value: s.unreadStudentMessages ?? 0 },
-      { label: "الإشعارات", value: s.totalNotificationsSent ?? 0 },
-      { label: "طلبات الشحن", value: s.totalRechargeRequests ?? 0 },
-      { label: "الإيرادات", value: `${Number(s.totalRevenue ?? 0)} دج` },
+      { label: "إجمالي الطلاب", value: s.totalStudents ?? 0, Icon: Users },
+      { label: "إجمالي الدورات", value: s.totalCourses ?? 0, Icon: BookOpen },
+      { label: "الدورات المنشورة", value: s.publishedCourses ?? 0, Icon: BookOpen },
+      { label: "الدورات المدفوعة", value: s.paidCourses ?? 0, Icon: Wallet },
+      { label: "الدورات المجانية", value: s.freeCourses ?? 0, Icon: BookOpen },
+      { label: "إجمالي الدروس", value: s.totalLessons ?? 0, Icon: BookText },
+      { label: "الحصص المباشرة", value: s.totalLiveSessions ?? 0, Icon: Video },
+      { label: "الحصص القادمة", value: s.upcomingLiveSessions ?? 0, Icon: Video },
+      { label: "الواجبات والاختبارات", value: s.totalAssessments ?? 0, Icon: ClipboardCheck },
+      { label: "إجابات الطلاب", value: s.totalSubmissions ?? 0, Icon: ClipboardCheck },
+      { label: "الشهادات", value: s.totalCertificates ?? 0, Icon: Award },
+      { label: "الشهادات الصالحة", value: s.activeCertificates ?? 0, Icon: Award },
+      { label: "المحادثات", value: s.totalChatConversations ?? 0, Icon: MessageCircle },
+      { label: "رسائل غير مقروءة", value: s.unreadStudentMessages ?? 0, Icon: MessageCircle },
+      { label: "الإشعارات", value: s.totalNotificationsSent ?? 0, Icon: Bell },
+      { label: "طلبات الشحن", value: s.totalRechargeRequests ?? 0, Icon: CreditCard },
+      { label: "الإيرادات", value: `${Number(s.totalRevenue ?? 0)} دج`, Icon: Wallet },
     ];
   }, [state.stats]);
 
   const quickActions = [
-    { href: "/admin/packages", label: "إضافة دورة" },
-    { href: "/admin/lessons", label: "إضافة درس" },
-    { href: "/admin/packages", label: "إضافة حصة مباشرة" },
-    { href: "/admin/notifications", label: "إرسال إشعار" },
-    { href: "/admin/dashboard/messages", label: "محادثات الطلاب" },
-    { href: "/admin/packages", label: "إدارة الاختبارات" },
-    { href: "/admin/packages", label: "عرض الشهادات" },
-    { href: "/admin/recharge-requests", label: "طلبات الشحن" },
+    { href: "/admin/packages", label: "إضافة دورة", Icon: BookOpen },
+    { href: "/admin/lessons", label: "إضافة درس", Icon: BookText },
+    { href: "/admin/packages", label: "إضافة حصة مباشرة", Icon: Video },
+    { href: "/admin/notifications", label: "إرسال إشعار", Icon: Bell },
+    { href: "/admin/dashboard/messages", label: "محادثات الطلاب", Icon: MessageCircle },
+    { href: "/admin/packages", label: "إدارة الاختبارات", Icon: ClipboardCheck },
+    { href: "/admin/packages", label: "عرض الشهادات", Icon: Award },
+    { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
   ];
 
   return (
@@ -99,7 +111,10 @@ export default function AdminOverviewPage() {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="مؤشرات لوحة الإدارة">
         {statCards.map((card) => (
           <article key={card.label} className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-400">{card.label}</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium text-slate-400">{card.label}</p>
+              <card.Icon className="h-4 w-4 text-brand-600" />
+            </div>
             <p className="mt-2 text-2xl font-extrabold text-slate-900">{card.value}</p>
           </article>
         ))}
@@ -114,6 +129,7 @@ export default function AdminOverviewPage() {
               href={item.href}
               className="touch-button-secondary no-underline"
             >
+              <item.Icon className="h-4 w-4" />
               {item.label}
             </Link>
           ))}
