@@ -38,39 +38,49 @@ export default function AuthPageShell({
         className="landing-hero-cinematic relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950 bg-hero-mesh bg-[length:120%_120%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none"
       >
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-1 items-stretch px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-          <div className="grid w-full overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/95 shadow-[0_30px_80px_-32px_rgba(2,6,23,0.65)] lg:grid-cols-2">
-            <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-[#0b1b3d] to-[#153a84] p-6 text-white sm:p-8 lg:p-10">
-              <div className="pointer-events-none absolute -start-14 -top-10 h-48 w-48 rounded-full bg-brand-400/30 blur-3xl" aria-hidden />
-              <div className="pointer-events-none absolute -bottom-12 -end-10 h-52 w-52 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(56,189,248,0.2),transparent_34%),radial-gradient(circle_at_82%_82%,rgba(99,102,241,0.2),transparent_36%)]" aria-hidden />
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-1 items-center px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
+          <div className="relative grid w-full overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#030714]/95 via-[#07142d]/96 to-[#0d2452]/95 shadow-[0_45px_120px_-44px_rgba(2,6,23,0.92),0_0_0_1px_rgba(148,163,184,0.1)] lg:min-h-[min(88vh,46rem)] lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] opacity-[0.2]" aria-hidden />
+            <section className="relative flex flex-col justify-between p-6 text-white sm:p-8 lg:p-11">
+              <div className="pointer-events-none absolute -start-20 -top-16 h-56 w-56 rounded-full bg-brand-500/26 blur-3xl" aria-hidden />
+              <div className="pointer-events-none absolute -bottom-20 end-10 h-56 w-56 rounded-full bg-indigo-400/20 blur-3xl" aria-hidden />
               <div className="relative z-10">
-                <Link href="/" aria-label={BRAND_NAME} className="inline-flex rounded-2xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-[1px] transition-colors hover:bg-white/15">
+                <Link
+                  href="/"
+                  aria-label={BRAND_NAME}
+                  className="inline-flex rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.65)] backdrop-blur-[1px] transition-colors hover:bg-white/15"
+                >
                   <BrandLogoMark variant="authFocal" showWordmark priority />
                 </Link>
                 <p className="mt-6 text-sm font-semibold text-sky-100">Yanfa / yanfa3 Education / منصة ينفع</p>
-                <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{brandHeadline}</h2>
+                <h2 className="mt-3 max-w-xl text-3xl font-black leading-tight sm:text-4xl lg:text-[2.6rem]">{brandHeadline}</h2>
                 <p className="mt-4 max-w-xl text-sm leading-7 text-slate-200 sm:text-base">{brandSubtitle}</p>
-                <div className="mt-8 grid gap-2 sm:grid-cols-2">
-                  {brandFeatures.map((feature) => (
-                    <div key={feature} className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-slate-100">
-                      {feature}
-                    </div>
-                  ))}
-                </div>
+              </div>
+              <div className="relative z-10 mt-8 grid gap-3 sm:grid-cols-2">
+                {brandFeatures.map((feature) => (
+                  <div
+                    key={feature}
+                    className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/16 to-white/[0.06] px-3.5 py-3 text-sm font-semibold text-slate-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16)]"
+                  >
+                    {feature}
+                  </div>
+                ))}
               </div>
             </section>
 
-            <section className="flex items-center bg-gradient-to-b from-slate-50 to-white p-5 sm:p-8 lg:p-10">
-              <div className="mx-auto w-full max-w-md">
+            <section className="relative flex items-center border-t border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-5 sm:p-8 lg:border-t-0 lg:border-s lg:border-white/10 lg:p-10">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_34%)]" aria-hidden />
+              <div className="relative z-10 mx-auto w-full max-w-[28rem]">
                 <Link
                   href="/"
-                  className={`mb-5 inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 no-underline transition-colors ${easePremium} hover:bg-slate-100 hover:text-slate-700`}
+                  className={`mb-5 inline-flex items-center rounded-lg border border-white/15 bg-white/10 px-2.5 py-1.5 text-xs font-semibold text-slate-200 no-underline transition-colors ${easePremium} hover:bg-white/15 hover:text-white`}
                 >
                   ← العودة للرئيسية
                 </Link>
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_16px_34px_-20px_rgba(15,23,42,0.28)] sm:p-7">
+                <div className="rounded-[1.55rem] border border-white/20 bg-white px-5 py-6 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.45)] sm:px-7 sm:py-8">
                   <header className="text-start">
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-[2rem]">{title}</h1>
                     {subtitle ? <p className="mt-2 text-sm leading-7 text-slate-600">{subtitle}</p> : null}
                   </header>
                   <div className="mt-6">{children}</div>
