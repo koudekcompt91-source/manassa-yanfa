@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SEEDED_ADMIN } from "@/lib/admin-auth";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
 
@@ -81,7 +80,7 @@ export default function AdminLoginPage() {
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
               className="mt-1 w-full rounded-md border border-slate-500 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-              placeholder={SEEDED_ADMIN.email}
+              placeholder="admin@example.com"
               required
             />
           </div>

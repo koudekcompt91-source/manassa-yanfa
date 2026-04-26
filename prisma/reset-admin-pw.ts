@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = "admin@yanfa.app";
-  const plainPassword = "Admin2026"
+  const plainPassword = "Admin2026";
   const passwordHash = await bcrypt.hash(plainPassword, 10);
 
   const admin = await prisma.user.upsert({
@@ -30,7 +30,7 @@ async function main() {
 
   console.log("SUCCESS");
   console.log("EMAIL:", admin.email);
-  console.log("PASSWORD:", plainPassword);
+  console.log("PASSWORD_RESET:", "done");
 }
 
 main()
