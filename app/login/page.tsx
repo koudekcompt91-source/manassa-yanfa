@@ -69,7 +69,7 @@ export default function LoginPage() {
       brandFeatures={["دروس مسجلة", "حصص مباشرة", "اختبارات", "شهادات"]}
     >
       <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-6" noValidate>
-        <p className="rounded-xl border border-sky-100/90 bg-sky-50/80 px-3.5 py-2.5 text-xs text-slate-700">
+        <p className="rounded-xl border border-sky-100/90 bg-sky-50/85 px-3.5 py-2.5 text-xs text-slate-700 shadow-[0_10px_20px_-18px_rgba(14,116,144,0.45)]">
           <span className="font-semibold text-slate-800">حساب تجريبي:</span>{" "}
           <span className="font-mono text-slate-700" dir="ltr">
             {SEEDED_STUDENT.email}
@@ -79,7 +79,7 @@ export default function LoginPage() {
         </p>
 
         <div className="group space-y-2">
-          <label htmlFor="login-email" className="block text-sm font-extrabold text-slate-700">
+          <label htmlFor="login-email" className="block text-sm font-black text-slate-700">
             البريد الإلكتروني
           </label>
           <div className="relative">
@@ -91,7 +91,7 @@ export default function LoginPage() {
               autoComplete="email"
               inputMode="email"
               dir="ltr"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/65 px-4 pe-10 text-[0.94rem] font-mono text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
+              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] font-mono text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
               placeholder="name@example.com"
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
@@ -103,7 +103,7 @@ export default function LoginPage() {
         </div>
 
         <div className="group space-y-2">
-          <label htmlFor="login-password" className="block text-sm font-extrabold text-slate-700">
+          <label htmlFor="login-password" className="block text-sm font-black text-slate-700">
             كلمة المرور
           </label>
           <div className="relative">
@@ -113,7 +113,7 @@ export default function LoginPage() {
               name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/65 px-4 pe-[4.5rem] text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
+              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-[4.5rem] text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
               placeholder="••••••••"
               value={form.password}
               onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
@@ -149,7 +149,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_14px_28px_-12px_rgba(24,117,245,0.48)] ring-1 ring-white/20 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_18px_36px_-12px_rgba(24,117,245,0.56)] active:translate-y-0 active:scale-[0.995] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_16px_32px_-12px_rgba(24,117,245,0.5)] ring-1 ring-white/25 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_20px_38px_-12px_rgba(24,117,245,0.58)] active:translate-y-0 active:scale-[0.992] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "جاري الدخول…" : "تسجيل الدخول"}
         </button>

@@ -55,12 +55,12 @@ export default function AuthPageShell({
           aria-hidden
         />
 
-        <header className="relative z-10 border-b border-slate-200/80 bg-white/82 backdrop-blur-sm">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <header className="relative z-10 border-b border-slate-200/80 bg-white/88 backdrop-blur-sm">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
             <Link href="/" aria-label={BRAND_NAME} className="inline-flex rounded-xl px-1 py-1 no-underline hover:bg-slate-50">
               <BrandLogoMark variant="navPrimary" showWordmark priority />
             </Link>
-            <nav className="flex items-center gap-1 sm:gap-2">
+            <nav className="flex items-center gap-1.5 sm:gap-2">
               <Link href="/" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:bg-slate-100 hover:text-slate-900">
                 الرئيسية
               </Link>
@@ -74,9 +74,9 @@ export default function AuthPageShell({
           </div>
         </header>
 
-        <main className="relative z-10 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-          <div className="grid gap-5 lg:grid-cols-[1fr_1fr] lg:gap-6">
-            <section className="order-1 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_24px_60px_-34px_rgba(15,23,42,0.25)] sm:p-7 lg:p-9">
+        <main className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-7 min-h-[calc(100dvh-4.6rem)]">
+          <div className="grid w-full gap-5 lg:grid-cols-[1.02fr_0.98fr] lg:gap-6">
+            <section className="order-1 rounded-[2rem] border border-slate-200/95 bg-white p-5 shadow-[0_30px_70px_-36px_rgba(15,23,42,0.3)] sm:p-7 lg:p-9">
               <header>
                 <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
                 {subtitle ? <p className="mt-2 text-sm leading-7 text-slate-600 sm:text-base">{subtitle}</p> : null}
@@ -84,31 +84,35 @@ export default function AuthPageShell({
               <div className="mt-7">{children}</div>
             </section>
 
-            <section className="order-2 rounded-[2rem] border border-slate-200/90 bg-gradient-to-b from-white via-sky-50/45 to-indigo-50/55 p-5 shadow-[0_24px_60px_-34px_rgba(59,130,246,0.22)] sm:p-7 lg:p-8">
-              <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 sm:p-5">
+            <section className="order-2 rounded-[2rem] border border-slate-200/90 bg-gradient-to-b from-white via-sky-50/45 to-indigo-50/55 p-5 shadow-[0_30px_70px_-34px_rgba(59,130,246,0.26)] sm:p-7 lg:p-8">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_12px_32px_-24px_rgba(15,23,42,0.28)] sm:p-5">
                 <p className="text-sm font-semibold text-brand-700">Yanfa / منصة ينفع</p>
                 <h2 className="mt-2 text-2xl font-black leading-tight text-slate-900 sm:text-[2rem]">{brandHeadline}</h2>
                 <p className="mt-2 text-sm leading-7 text-slate-600">{brandSubtitle}</p>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
                   <p className="text-xs font-semibold text-slate-500">الرصيد الحالي</p>
                   <p className="mt-2 flex items-center gap-1.5 text-xl font-black text-slate-900"><Wallet className="h-4 w-4 text-brand-600" />4,000 دج</p>
+                  <p className="mt-1 text-[11px] font-medium text-slate-500">جاهز للاشتراك في الدورات</p>
                 </article>
-                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
                   <p className="text-xs font-semibold text-slate-500">تقدمك في الدورة</p>
-                  <p className="mt-2 text-lg font-black text-slate-900">68%</p>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-2 w-[68%] rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="text-lg font-black text-slate-900">68%</p>
+                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">جيد جدًا</span>
+                  </div>
+                  <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-2.5 w-[68%] rounded-full bg-gradient-to-l from-brand-600 to-indigo-600" />
                   </div>
                 </article>
-                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
                   <p className="text-xs font-semibold text-slate-500">حصة مباشرة اليوم</p>
                   <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Video className="h-4 w-4 text-emerald-600" />أدب عربي - الساعة 18:00</p>
-                  <span className="mt-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700">مباشر</span>
+                  <span className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">مباشر</span>
                 </article>
-                <article className="rounded-2xl border border-slate-200 bg-white p-4">
+                <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.22)]">
                   <p className="text-xs font-semibold text-slate-500">شهادة إتمام</p>
                   <p className="mt-2 flex items-center gap-1.5 text-sm font-bold text-slate-900"><Award className="h-4 w-4 text-amber-500" />جاهزة للعرض بعد الإكمال</p>
                 </article>
@@ -118,13 +122,13 @@ export default function AuthPageShell({
                 {brandFeatures.map((feature) => (
                   <span
                     key={feature}
-                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-brand-200 hover:bg-brand-50/60"
+                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)] transition-colors hover:border-brand-200 hover:bg-brand-50/60"
                   >
                     <PlayCircle className="h-3.5 w-3.5 text-brand-600" />
                     {feature}
                   </span>
                 ))}
-                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_8px_16px_-14px_rgba(15,23,42,0.3)]">
                   <MessageCircle className="h-3.5 w-3.5 text-brand-600" />
                   محادثة مع الأستاذ
                 </span>
