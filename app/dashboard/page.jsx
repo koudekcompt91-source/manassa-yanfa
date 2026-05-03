@@ -370,6 +370,67 @@ function DashboardPageInner() {
     return "ابدأ من استكشاف الدورات";
   }, [continueLearning.packageTitle, dashboardProgress]);
 
+  /** Hero strip: real progress / activity only, or enrolled “واصل” hint—no fabricated stats. */
+  const heroActivitySnapshot = useMemo(() => {
+    if (continueLearning.lessonTitle?.trim()) {
+      return {
+        heading: "واصل من حيث توقفت",
+        meta: (continueLearning.packageTitle || currentGoalLabel || "").trim() || null,
+        line: continueLearning.lessonTitle.trim(),
+        href: continueLearning.href,
+        linkLabel: "واصل التعلم",
+      };
+    }
+    const firstRow = recentActivityRows[0];
+    if (firstRow) {
+      return {
+        heading: "آخر نشاط",
+        meta: firstRow.label,
+        line: firstRow.value,
+        href: continueLearning.href,
+        linkLabel: "عرض الملخص",
+      };
+    }
+    const recentCourse = (dashboardProgress || [])
+      .filter((row) => row?.lastActivityAt)
+      .slice()
+      .sort((a, b) => {
+        const at = a.lastActivityAt ? new Date(a.lastActivityAt).getTime() : 0;
+        const bt = b.lastActivityAt ? new Date(b.lastActivityAt).getTime() : 0;
+        return bt - at;
+      })[0];
+    if (recentCourse?.lastActivityAt) {
+      return {
+        heading: "آخر نشاط",
+        meta: (recentCourse.title || "").trim() || null,
+        line: new Date(recentCourse.lastActivityAt).toLocaleString("ar-DZ"),
+        href: continueLearning.href,
+        linkLabel: "متابعة التعلم",
+      };
+    }
+    if (enrolledCourses > 0) {
+      const title = (continueLearning.packageTitle || dashboardProgress[0]?.title || "").trim();
+      if (title) {
+        return {
+          heading: "واصل من حيث توقفت",
+          meta: title,
+          line: null,
+          href: continueLearning.href,
+          linkLabel: "واصل التعلم",
+        };
+      }
+    }
+    return null;
+  }, [
+    continueLearning.href,
+    continueLearning.lessonTitle,
+    continueLearning.packageTitle,
+    currentGoalLabel,
+    dashboardProgress,
+    enrolledCourses,
+    recentActivityRows,
+  ]);
+
   const badgeLabel = (id) => {
     if (id === "streak-3") return "سلسلة 3 أيام";
     if (id === "streak-7") return "أسبوع متواصل";
@@ -411,13 +472,13 @@ function DashboardPageInner() {
     "bg-indigo-50 text-indigo-700 ring-indigo-100",
   ];
 
-  const panelClass = "dashboard-panel p-6 sm:p-8";
-  const panelCompactClass = "dashboard-panel p-5";
+  const panelClass = "dashboard-panel p-5 sm:p-7";
+  const panelCompactClass = "dashboard-panel p-4 sm:p-5";
   const softItemClass = "dashboard-soft-list-item p-3";
 
   return (
-    <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-6 sm:gap-8">
-      <header className="dashboard-welcome interactive-card p-5 sm:p-6">
+    <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-5 sm:gap-6">
+      <header className="dashboard-welcome interactive-card p-4 sm:p-5">
         <div className="dashboard-welcome-blob-1" aria-hidden />
         <div className="dashboard-welcome-blob-2" aria-hidden />
         <div className="dashboard-welcome-mesh" aria-hidden />
@@ -426,21 +487,38 @@ function DashboardPageInner() {
           strokeWidth={1}
           aria-hidden
         />
-        <div className="relative z-[1] flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
+        <div className="relative z-[1] flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-start lg:gap-5 xl:gap-6">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-brand-200/80 bg-brand-50/95 px-3 py-1 text-xs font-extrabold text-brand-800 ring-1 ring-brand-100/70">
                 منصة ينفع
               </span>
             </div>
-            <h1 className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-[2rem] md:leading-tight">مرحبًا، {displayName}</h1>
+            <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-[2rem] md:leading-tight">مرحبًا، {displayName}</h1>
             {displayEmail ? (
-              <p className="mt-2 text-sm text-slate-500" dir="ltr">
+              <p className="mt-1.5 text-sm text-slate-500" dir="ltr">
                 {displayEmail}
               </p>
             ) : null}
-            <p className="mt-3 max-w-xl text-base leading-relaxed text-slate-600">واصل تعلمك وتابع تقدمك في الدورات.</p>
-            <div className="dashboard-welcome-actions mt-4">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">واصل تعلمك وتابع تقدمك في الدورات.</p>
+            {heroActivitySnapshot ? (
+              <div className="dashboard-welcome-snapshot mt-3">
+                <p className="text-[11px] font-extrabold uppercase tracking-wide text-slate-400">{heroActivitySnapshot.heading}</p>
+                {heroActivitySnapshot.meta ? (
+                  <p className="mt-1 line-clamp-2 text-sm font-bold text-slate-800">{heroActivitySnapshot.meta}</p>
+                ) : null}
+                {heroActivitySnapshot.line ? (
+                  <p className="mt-0.5 line-clamp-2 text-sm text-slate-600">{heroActivitySnapshot.line}</p>
+                ) : null}
+                <Link
+                  href={heroActivitySnapshot.href}
+                  className="mt-2 inline-flex text-xs font-extrabold text-brand-700 underline decoration-brand-300 underline-offset-2 transition-colors hover:text-brand-800"
+                >
+                  {heroActivitySnapshot.linkLabel}
+                </Link>
+              </div>
+            ) : null}
+            <div className="dashboard-welcome-actions mt-3 sm:mt-3.5">
               <Link href={continueLearning.href} className="touch-button-primary magnetic-button no-underline">
                 <BookOpen className="h-4 w-4" />
                 واصل التعلم
@@ -451,7 +529,7 @@ function DashboardPageInner() {
               </Link>
             </div>
             {pendingRechargeCount > 0 ? (
-              <p className="mt-6 rounded-xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-sm text-amber-950">
+              <p className="mt-4 rounded-xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-sm text-amber-950">
                 لديك {pendingRechargeCount} طلب شحن قيد المراجعة.
               </p>
             ) : null}
@@ -461,17 +539,17 @@ function DashboardPageInner() {
               </p>
             ) : null}
           </div>
-          <div className="dashboard-welcome-progress flex w-full flex-col justify-center p-4 sm:p-5 lg:max-w-[min(100%,22rem)] lg:flex-none">
+          <div className="dashboard-welcome-progress dashboard-welcome-progress-compact flex w-full flex-col justify-center p-3.5 sm:p-4 lg:max-w-[min(100%,20rem)] lg:flex-none">
             <div className="relative z-[1]">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">الدورة الحالية</p>
-              <p className="mt-2 text-base font-extrabold leading-snug text-slate-900 sm:text-lg">{currentGoalLabel}</p>
-              <div className="mt-4">
-                <p className="text-xs font-semibold text-slate-500">التقدّم الإجمالي</p>
-                <p className="mt-1 text-3xl font-black tabular-nums text-brand-600 sm:text-[2rem] sm:leading-none">{overallProgressPct}%</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">الدورة الحالية</p>
+              <p className="mt-1 line-clamp-2 text-sm font-extrabold leading-snug text-slate-900 sm:text-[0.95rem]">{currentGoalLabel}</p>
+              <div className="mt-2.5 flex items-end justify-between gap-2">
+                <p className="text-[11px] font-semibold text-slate-500">التقدّم الإجمالي</p>
+                <p className="text-2xl font-black tabular-nums leading-none text-brand-600 sm:text-[1.75rem]">{overallProgressPct}%</p>
               </div>
-              <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-slate-200/90 shadow-inner ring-1 ring-slate-200/70">
+              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-200/90 shadow-inner ring-1 ring-slate-200/70">
                 <div
-                  className="h-3 rounded-full bg-gradient-to-l from-brand-500 via-indigo-500 to-violet-500 shadow-[0_0_12px_rgba(59,130,246,0.35)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                  className="h-2.5 rounded-full bg-gradient-to-l from-brand-500 via-indigo-500 to-violet-500 shadow-[0_0_10px_rgba(59,130,246,0.32)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
                   style={{ width: `${overallProgressPct}%` }}
                 />
               </div>
@@ -487,12 +565,12 @@ function DashboardPageInner() {
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-500">{card.label}</p>
                 <span
-                  className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white via-white to-slate-50/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_14px_-4px_rgba(15,23,42,0.14)] ring-2 ring-white ${kpiIconWrapClasses[idx % kpiIconWrapClasses.length]}`}
+                  className={`dashboard-kpi-icon-wrap relative z-0 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white via-white to-slate-50/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_14px_-4px_rgba(15,23,42,0.14),0_0_22px_-6px_rgba(59,130,246,0.28)] ring-2 ring-white ${kpiIconWrapClasses[idx % kpiIconWrapClasses.length]}`}
                 >
-                  <card.Icon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
+                  <card.Icon className="relative z-[1] h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
                 </span>
               </div>
-              <p className="dashboard-kpi-value mt-auto pt-4 text-[1.625rem] font-black tracking-tight text-slate-950 sm:text-3xl tabular-nums">
+              <p className="dashboard-kpi-value mt-auto pt-3 text-[1.6875rem] font-black tracking-tight text-slate-950 sm:text-[1.875rem] tabular-nums">
                 {card.value}
               </p>
               <p className="mt-1 text-sm text-slate-400">{card.sub}</p>
@@ -501,17 +579,17 @@ function DashboardPageInner() {
         ))}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.42fr_1fr] xl:gap-7">
-        <div className="space-y-6 xl:flex xl:min-h-0 xl:flex-col">
-          <article className="dashboard-cta interactive-card flex flex-col p-6 sm:p-8 xl:min-h-[13.5rem] xl:flex-1">
-            <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
-            <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
-            <p className="relative z-[1] text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
-            <h2 className="relative z-[1] mt-2 text-2xl font-black sm:text-3xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
-            <p className="relative z-[1] mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.42fr_1fr] xl:gap-6">
+        <div className="space-y-5 xl:flex xl:min-h-0 xl:flex-col">
+          <article className="dashboard-cta interactive-card flex min-h-0 flex-col p-5 sm:p-6 xl:min-h-[11rem] xl:flex-1">
+            <div className="pointer-events-none absolute -start-16 top-0 h-36 w-36 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -end-10 bottom-0 h-40 w-40 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
+            <p className="relative z-[1] text-xs font-semibold text-slate-200 sm:text-sm">منصة ينفع لتعلّم الأدب العربي</p>
+            <h2 className="relative z-[1] mt-1.5 text-xl font-black sm:text-2xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
+            <p className="relative z-[1] mt-2 max-w-2xl text-xs text-slate-200 sm:text-sm">
               {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
             </p>
-            <div className="dashboard-cta-actions relative z-[1] mt-auto flex flex-wrap gap-2 pt-5 sm:gap-3">
+            <div className="dashboard-cta-actions relative z-[1] mt-auto flex flex-wrap gap-2 pt-4 sm:gap-2.5">
               {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
                 <Link href={heroBanner.buttonUrl} className="touch-button-primary magnetic-button border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                   <BookOpen className="h-4 w-4" />
@@ -568,8 +646,8 @@ function DashboardPageInner() {
           </article>
         </div>
 
-        <div className="flex flex-col gap-4 sm:gap-5 xl:min-h-0">
-          <article id="wallet" className="dashboard-wallet pressable flex flex-col p-5 sm:p-6 xl:min-h-[13.5rem] xl:justify-between">
+        <div className="flex flex-col gap-4 sm:gap-4 xl:min-h-0">
+          <article id="wallet" className="dashboard-wallet pressable flex min-h-0 flex-col p-4 sm:p-5 xl:min-h-[11rem] xl:justify-between">
             <div className="relative z-[1] flex items-start justify-between gap-2">
               <div>
                 <p className="flex items-center gap-1 text-xs font-semibold text-white/85">
@@ -687,7 +765,7 @@ function DashboardPageInner() {
         )}
       </section>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-6">
         <section id="my-courses" className={panelClass}>
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دوراتي</h2>
           <p className="mt-1 text-sm text-slate-400">متابعة التقدم في كل دورة بشكل مباشر.</p>

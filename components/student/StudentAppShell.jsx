@@ -135,7 +135,7 @@ export default function StudentAppShell({ children }) {
               className={`group dashboard-sidebar-link ${active ? "dashboard-sidebar-link-active" : "dashboard-sidebar-link-idle"}`}
             >
               <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-[transform,background-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100 ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-[transform,background-color,box-shadow,color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100 ${
                   active ? "bg-white/18 text-white shadow-inner ring-1 ring-white/20" : "bg-slate-100 text-slate-500 shadow-sm"
                 }`}
                 aria-hidden

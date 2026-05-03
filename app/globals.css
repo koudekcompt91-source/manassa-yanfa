@@ -257,7 +257,7 @@
   }
 
   .dashboard-kpi {
-    @apply dashboard-panel relative overflow-hidden p-6;
+    @apply dashboard-panel relative overflow-hidden border-slate-200/95 p-5;
     transition:
       transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 280ms ease,
@@ -291,12 +291,13 @@
   }
 
   .dashboard-kpi:hover {
-    transform: translate3d(0, -6px, 0);
-    border-color: rgba(59, 130, 246, 0.32);
+    transform: translate3d(0, -8px, 0);
+    border-color: rgba(59, 130, 246, 0.38);
     box-shadow:
       0 1px 0 0 rgba(255, 255, 255, 0.95) inset,
-      0 22px 48px -18px rgba(15, 23, 42, 0.2),
-      0 0 0 1px rgba(59, 130, 246, 0.12);
+      0 26px 56px -16px rgba(15, 23, 42, 0.24),
+      0 0 0 1px rgba(59, 130, 246, 0.16),
+      0 12px 40px -22px rgba(59, 130, 246, 0.14);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -338,7 +339,7 @@
 
   .dashboard-sidebar-link {
     position: relative;
-    @apply interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition-[transform,background-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition-[transform,background-color,box-shadow,color,filter] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .dashboard-sidebar-link-active {
@@ -348,19 +349,18 @@
   .dashboard-sidebar-link-active::before {
     content: "";
     position: absolute;
-    inset-inline-start: 0.5rem;
+    inset-inline-start: 0.65rem;
     top: 50%;
-    width: 3px;
-    height: 56%;
+    width: 2px;
+    height: 44%;
     border-radius: 999px;
     transform: translateY(-50%);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 100%);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.78);
     pointer-events: none;
   }
 
   .dashboard-sidebar-link-idle {
-    @apply text-slate-600 hover:bg-slate-100/95 hover:text-slate-900 hover:shadow-sm;
+    @apply text-slate-600 hover:bg-slate-100/90 hover:text-slate-900 hover:shadow-[0_6px_18px_-12px_rgba(15,23,42,0.12)];
   }
 
   /* Student dashboard: light glass welcome (top hero) */
@@ -452,6 +452,24 @@
     pointer-events: none;
   }
 
+  .dashboard-welcome-snapshot {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.98);
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.92) inset,
+      0 8px 22px -16px rgba(15, 23, 42, 0.14);
+    padding: 0.55rem 0.7rem;
+  }
+
+  .dashboard-welcome-progress-compact {
+    border-radius: 0.875rem;
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.98) inset,
+      0 12px 36px -20px rgba(37, 99, 235, 0.22),
+      0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+  }
+
   .dashboard-welcome-actions {
     @apply flex flex-wrap items-stretch gap-2 sm:items-center sm:gap-3;
   }
@@ -540,15 +558,17 @@
 
   .dashboard-cta-actions .touch-button-primary,
   .dashboard-cta-actions .touch-button-secondary {
-    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-0.5 motion-reduce:hover:translate-y-0;
+    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-1 motion-reduce:hover:translate-y-0 motion-safe:hover:brightness-[1.04] motion-safe:active:translate-y-0 motion-safe:active:brightness-100;
   }
 
   .dashboard-wallet-btn {
-    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)];
+    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-1 motion-reduce:hover:translate-y-0 motion-safe:hover:brightness-[1.03] motion-safe:active:translate-y-0;
   }
 
   .dashboard-wallet-btn:hover {
-    box-shadow: 0 16px 36px -14px rgba(15, 23, 42, 0.35);
+    box-shadow:
+      0 18px 40px -14px rgba(15, 23, 42, 0.42),
+      0 0 0 1px rgba(255, 255, 255, 0.35) inset;
   }
 
   /* Wallet: premium emphasis + subtle sweep */
@@ -629,14 +649,27 @@
     position: relative;
     z-index: 1;
     display: flex;
-    min-height: 7.75rem;
+    min-height: 7.1rem;
     flex-direction: column;
   }
 
   .dashboard-kpi-value {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: rgb(15 23 42);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.92);
+  }
+
+  .dashboard-kpi-icon-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(circle at 32% 28%, rgba(99, 102, 241, 0.22), transparent 62%);
+    opacity: 0.88;
   }
 
   .interactive-tab {
