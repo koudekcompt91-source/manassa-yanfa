@@ -417,24 +417,30 @@ function DashboardPageInner() {
 
   return (
     <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-6 sm:gap-8">
-      <header className="dashboard-welcome interactive-card p-6 sm:p-8">
+      <header className="dashboard-welcome interactive-card p-5 sm:p-6">
         <div className="dashboard-welcome-blob-1" aria-hidden />
         <div className="dashboard-welcome-blob-2" aria-hidden />
-        <div className="relative z-[1] flex flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-10">
+        <div className="dashboard-welcome-mesh" aria-hidden />
+        <BookOpen
+          className="dashboard-welcome-deco-icon absolute end-2 top-8 hidden h-24 w-24 sm:block lg:end-6 lg:top-10 lg:h-28 lg:w-28"
+          strokeWidth={1}
+          aria-hidden
+        />
+        <div className="relative z-[1] flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-brand-200/80 bg-brand-50/95 px-3 py-1 text-xs font-extrabold text-brand-800 ring-1 ring-brand-100/70">
                 منصة ينفع
               </span>
             </div>
-            <h1 className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-[2rem] md:leading-tight">مرحبًا، {displayName}</h1>
+            <h1 className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-[2rem] md:leading-tight">مرحبًا، {displayName}</h1>
             {displayEmail ? (
               <p className="mt-2 text-sm text-slate-500" dir="ltr">
                 {displayEmail}
               </p>
             ) : null}
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">واصل تعلمك وتابع تقدمك في الدورات.</p>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <p className="mt-3 max-w-xl text-base leading-relaxed text-slate-600">واصل تعلمك وتابع تقدمك في الدورات.</p>
+            <div className="dashboard-welcome-actions mt-4">
               <Link href={continueLearning.href} className="touch-button-primary magnetic-button no-underline">
                 <BookOpen className="h-4 w-4" />
                 واصل التعلم
@@ -455,18 +461,20 @@ function DashboardPageInner() {
               </p>
             ) : null}
           </div>
-          <div className="flex w-full flex-col justify-center rounded-2xl border border-slate-200/85 bg-white/75 p-5 shadow-[0_16px_44px_-26px_rgba(15,23,42,0.28)] backdrop-blur-md lg:max-w-md lg:flex-none">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">الدورة الحالية</p>
-            <p className="mt-2 text-lg font-extrabold leading-snug text-slate-900">{currentGoalLabel}</p>
-            <div className="mt-5">
-              <p className="text-xs font-semibold text-slate-500">التقدّم الإجمالي</p>
-              <p className="mt-1 text-3xl font-black tabular-nums text-brand-600">{overallProgressPct}%</p>
-            </div>
-            <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-slate-200/85 ring-1 ring-slate-200/60">
-              <div
-                className="h-3 rounded-full bg-gradient-to-l from-brand-500 via-indigo-500 to-violet-500 transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${overallProgressPct}%` }}
-              />
+          <div className="dashboard-welcome-progress flex w-full flex-col justify-center p-4 sm:p-5 lg:max-w-[min(100%,22rem)] lg:flex-none">
+            <div className="relative z-[1]">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">الدورة الحالية</p>
+              <p className="mt-2 text-base font-extrabold leading-snug text-slate-900 sm:text-lg">{currentGoalLabel}</p>
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-slate-500">التقدّم الإجمالي</p>
+                <p className="mt-1 text-3xl font-black tabular-nums text-brand-600 sm:text-[2rem] sm:leading-none">{overallProgressPct}%</p>
+              </div>
+              <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-slate-200/90 shadow-inner ring-1 ring-slate-200/70">
+                <div
+                  className="h-3 rounded-full bg-gradient-to-l from-brand-500 via-indigo-500 to-violet-500 shadow-[0_0_12px_rgba(59,130,246,0.35)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                  style={{ width: `${overallProgressPct}%` }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -479,21 +487,23 @@ function DashboardPageInner() {
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-500">{card.label}</p>
                 <span
-                  className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ${kpiIconWrapClasses[idx % kpiIconWrapClasses.length]}`}
+                  className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white via-white to-slate-50/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_4px_14px_-4px_rgba(15,23,42,0.14)] ring-2 ring-white ${kpiIconWrapClasses[idx % kpiIconWrapClasses.length]}`}
                 >
-                  <card.Icon className="h-4 w-4" />
+                  <card.Icon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
                 </span>
               </div>
-              <p className="mt-auto pt-4 text-2xl font-black tracking-tight text-slate-900 tabular-nums">{card.value}</p>
+              <p className="dashboard-kpi-value mt-auto pt-4 text-[1.625rem] font-black tracking-tight text-slate-950 sm:text-3xl tabular-nums">
+                {card.value}
+              </p>
               <p className="mt-1 text-sm text-slate-400">{card.sub}</p>
             </div>
           </div>
         ))}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.45fr_1fr]">
-        <div className="space-y-6">
-          <article className="dashboard-cta interactive-card p-6 sm:p-8">
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.42fr_1fr] xl:gap-7">
+        <div className="space-y-6 xl:flex xl:min-h-0 xl:flex-col">
+          <article className="dashboard-cta interactive-card flex flex-col p-6 sm:p-8 xl:min-h-[13.5rem] xl:flex-1">
             <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
             <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
             <p className="relative z-[1] text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
@@ -501,7 +511,7 @@ function DashboardPageInner() {
             <p className="relative z-[1] mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
               {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
             </p>
-            <div className="relative z-[1] mt-5 flex flex-wrap gap-2">
+            <div className="dashboard-cta-actions relative z-[1] mt-auto flex flex-wrap gap-2 pt-5 sm:gap-3">
               {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
                 <Link href={heroBanner.buttonUrl} className="touch-button-primary magnetic-button border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                   <BookOpen className="h-4 w-4" />
@@ -558,8 +568,8 @@ function DashboardPageInner() {
           </article>
         </div>
 
-        <div className="space-y-4">
-          <article id="wallet" className="dashboard-wallet pressable p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:gap-5 xl:min-h-0">
+          <article id="wallet" className="dashboard-wallet pressable flex flex-col p-5 sm:p-6 xl:min-h-[13.5rem] xl:justify-between">
             <div className="relative z-[1] flex items-start justify-between gap-2">
               <div>
                 <p className="flex items-center gap-1 text-xs font-semibold text-white/85">
@@ -577,7 +587,11 @@ function DashboardPageInner() {
                 </svg>
               </span>
             </div>
-            <button type="button" onClick={() => setRechargeOpen(true)} className="relative z-[1] touch-button magnetic-button mt-4 w-full bg-white text-brand-700 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.35)] hover:bg-slate-50">
+            <button
+              type="button"
+              onClick={() => setRechargeOpen(true)}
+              className="dashboard-wallet-btn relative z-[1] touch-button magnetic-button mt-5 w-full rounded-xl bg-white font-bold text-brand-700 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.35)] ring-2 ring-white/25 hover:bg-slate-50 xl:mt-0"
+            >
               <Wallet className="h-4 w-4" />
               شحن المحفظة
             </button>

@@ -258,6 +258,10 @@
 
   .dashboard-kpi {
     @apply dashboard-panel relative overflow-hidden p-6;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 280ms ease,
+      border-color 280ms ease;
   }
 
   .dashboard-kpi::before {
@@ -269,6 +273,39 @@
     height: 110%;
     pointer-events: none;
     background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.11), transparent 72%);
+  }
+
+  .dashboard-kpi::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.22) 0%, transparent 42%, transparent 58%, rgba(99, 102, 241, 0.06) 100%);
+    transition: opacity 240ms ease;
+  }
+
+  .dashboard-kpi:hover::after {
+    opacity: 1;
+  }
+
+  .dashboard-kpi:hover {
+    transform: translate3d(0, -6px, 0);
+    border-color: rgba(59, 130, 246, 0.32);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.95) inset,
+      0 22px 48px -18px rgba(15, 23, 42, 0.2),
+      0 0 0 1px rgba(59, 130, 246, 0.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dashboard-kpi:hover {
+      transform: none;
+    }
+    .dashboard-kpi:hover::after {
+      opacity: 0;
+    }
   }
 
   .dashboard-soft-list-item {
@@ -300,15 +337,30 @@
   }
 
   .dashboard-sidebar-link {
-    @apply interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)];
+    position: relative;
+    @apply interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition-[transform,background-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)];
   }
 
   .dashboard-sidebar-link-active {
     @apply bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-600 text-white shadow-[0_12px_28px_-14px_rgba(24,117,245,0.5)];
   }
 
+  .dashboard-sidebar-link-active::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.5rem;
+    top: 50%;
+    width: 3px;
+    height: 56%;
+    border-radius: 999px;
+    transform: translateY(-50%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 100%);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+  }
+
   .dashboard-sidebar-link-idle {
-    @apply text-slate-600 hover:bg-slate-100/90 hover:text-slate-900;
+    @apply text-slate-600 hover:bg-slate-100/95 hover:text-slate-900 hover:shadow-sm;
   }
 
   /* Student dashboard: light glass welcome (top hero) */
@@ -366,6 +418,64 @@
     pointer-events: none;
   }
 
+  .dashboard-welcome-mesh {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath fill='none' stroke='%23334155' stroke-width='0.6' d='M0 24h48M24 0v48'/%3E%3C/svg%3E");
+    background-size: 48px 48px;
+  }
+
+  .dashboard-welcome-progress {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(191, 219, 254, 0.65);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.92) 45%, rgba(239, 246, 255, 0.88) 100%);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.98) inset,
+      0 14px 40px -22px rgba(37, 99, 235, 0.22),
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  }
+
+  .dashboard-welcome-progress::before {
+    content: "";
+    position: absolute;
+    inset-inline-end: -20%;
+    top: -50%;
+    width: 70%;
+    height: 120%;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.12), transparent 68%);
+    pointer-events: none;
+  }
+
+  .dashboard-welcome-actions {
+    @apply flex flex-wrap items-stretch gap-2 sm:items-center sm:gap-3;
+  }
+
+  .dashboard-welcome-actions .touch-button-primary,
+  .dashboard-welcome-actions .touch-button-secondary {
+    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-0.5 motion-reduce:hover:translate-y-0;
+  }
+
+  .dashboard-welcome-actions .touch-button-primary:hover {
+    box-shadow: 0 14px 32px -12px rgba(37, 99, 235, 0.45);
+  }
+
+  .dashboard-welcome-actions .touch-button-secondary:hover {
+    box-shadow: 0 10px 26px -14px rgba(15, 23, 42, 0.18);
+  }
+
+  .dashboard-welcome-deco-icon {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.06;
+    color: rgb(37 99 235);
+  }
+
   /* CTA banner: distinct indigo/purple emphasis */
   .dashboard-cta {
     @apply dashboard-panel relative overflow-hidden text-white;
@@ -385,6 +495,60 @@
       radial-gradient(280px 180px at 92% 88%, rgba(196, 181, 253, 0.2), transparent 72%),
       linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.04) 50%, transparent 60%);
     opacity: 1;
+  }
+
+  .dashboard-cta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.14) 50%,
+      transparent 62%,
+      transparent 100%
+    );
+    background-size: 220% 100%;
+    background-position: 100% 0;
+    transition: opacity 380ms ease;
+  }
+
+  .dashboard-cta:hover::after {
+    opacity: 1;
+    animation: dashboard-cta-shine 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes dashboard-cta-shine {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dashboard-cta:hover::after {
+      opacity: 0.12;
+      animation: none;
+      background-position: 50% 0;
+    }
+  }
+
+  .dashboard-cta-actions .touch-button-primary,
+  .dashboard-cta-actions .touch-button-secondary {
+    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-0.5 motion-reduce:hover:translate-y-0;
+  }
+
+  .dashboard-wallet-btn {
+    @apply motion-safe:transition-[transform,box-shadow,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)];
+  }
+
+  .dashboard-wallet-btn:hover {
+    box-shadow: 0 16px 36px -14px rgba(15, 23, 42, 0.35);
   }
 
   /* Wallet: premium emphasis + subtle sweep */
@@ -420,11 +584,17 @@
     inset: 0;
     pointer-events: none;
     opacity: 0;
-    background: linear-gradient(110deg, transparent 28%, rgba(255, 255, 255, 0.18) 48%, transparent 66%);
-    transform: translateX(-100%);
-    transition:
-      opacity 320ms ease,
-      transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    background: linear-gradient(
+      108deg,
+      transparent 0%,
+      transparent 34%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 66%,
+      transparent 100%
+    );
+    background-size: 220% 100%;
+    background-position: 100% 0;
+    transition: opacity 320ms ease;
   }
 
   .dashboard-wallet:hover {
@@ -435,7 +605,24 @@
 
   .dashboard-wallet:hover::after {
     opacity: 0.85;
-    transform: translateX(100%);
+    animation: dashboard-wallet-shine 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes dashboard-wallet-shine {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dashboard-wallet:hover::after {
+      opacity: 0.2;
+      animation: none;
+      background-position: 50% 0;
+    }
   }
 
   .dashboard-kpi-content {
@@ -444,6 +631,12 @@
     display: flex;
     min-height: 7.75rem;
     flex-direction: column;
+  }
+
+  .dashboard-kpi-value {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .interactive-tab {
