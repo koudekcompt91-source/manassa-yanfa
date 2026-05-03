@@ -169,6 +169,35 @@
     will-change: transform;
   }
 
+  .flagship-section {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .flagship-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(760px 300px at 12% -2%, rgba(59, 130, 246, 0.07), transparent 64%),
+      radial-gradient(680px 260px at 88% 102%, rgba(99, 102, 241, 0.06), transparent 68%);
+    opacity: 0.95;
+  }
+
+  .flagship-section::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.38), transparent);
+    opacity: 0.8;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .magnetic-button,
     .magnetic-button:hover,
@@ -213,6 +242,208 @@
   .hero-image-shell:hover::after {
     opacity: 1;
     transform: translateX(72%);
+  }
+
+  .dashboard-shell {
+    @apply premium-app-bg;
+    background-image:
+      radial-gradient(980px 420px at 94% -8%, rgba(59, 130, 246, 0.11), transparent 64%),
+      radial-gradient(860px 360px at 8% 0%, rgba(99, 102, 241, 0.08), transparent 62%),
+      linear-gradient(to bottom, #f8fafc, #f1f5f9);
+  }
+
+  .dashboard-panel {
+    @apply interactive-card rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_16px_40px_-22px_rgba(15,23,42,0.26),0_0_0_1px_rgba(148,163,184,0.08)];
+  }
+
+  .dashboard-kpi {
+    @apply dashboard-panel relative overflow-hidden p-6;
+  }
+
+  .dashboard-kpi::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -30%;
+    top: -38%;
+    width: 72%;
+    height: 110%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.11), transparent 72%);
+  }
+
+  .dashboard-soft-list-item {
+    @apply interactive-card rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.22)];
+  }
+
+  .dashboard-hero {
+    @apply dashboard-panel relative overflow-hidden bg-gradient-to-l from-slate-950 via-brand-900 to-indigo-900 text-white;
+    box-shadow:
+      0 24px 58px -26px rgba(15, 23, 42, 0.62),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  .dashboard-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(340px 180px at 6% 8%, rgba(103, 232, 249, 0.2), transparent 72%),
+      radial-gradient(300px 200px at 96% 92%, rgba(165, 180, 252, 0.2), transparent 72%);
+  }
+
+  .dashboard-sidebar {
+    @apply border-slate-200/80 bg-white/90 backdrop-blur-sm;
+    box-shadow:
+      0 22px 44px -32px rgba(15, 23, 42, 0.2),
+      1px 0 0 0 rgba(148, 163, 184, 0.18) inset;
+  }
+
+  .dashboard-sidebar-link {
+    @apply interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)];
+  }
+
+  .dashboard-sidebar-link-active {
+    @apply bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-600 text-white shadow-[0_12px_28px_-14px_rgba(24,117,245,0.5)];
+  }
+
+  .dashboard-sidebar-link-idle {
+    @apply text-slate-600 hover:bg-slate-100/90 hover:text-slate-900;
+  }
+
+  /* Student dashboard: light glass welcome (top hero) */
+  .dashboard-welcome {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.88) 45%, rgba(241, 245, 249, 0.92) 100%);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.95) inset,
+      0 20px 50px -28px rgba(15, 23, 42, 0.28),
+      0 0 0 1px rgba(148, 163, 184, 0.06);
+    backdrop-filter: blur(10px);
+    transition:
+      border-color 240ms ease,
+      box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @supports not (backdrop-filter: blur(10px)) {
+    .dashboard-welcome {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+    }
+  }
+
+  .dashboard-welcome:hover {
+    border-color: rgba(191, 219, 254, 0.85);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.98) inset,
+      0 26px 56px -26px rgba(30, 64, 175, 0.2),
+      0 0 0 1px rgba(59, 130, 246, 0.12);
+  }
+
+  .dashboard-welcome-blob-1 {
+    position: absolute;
+    inset-inline-end: -18%;
+    top: -40%;
+    width: min(52vw, 28rem);
+    height: min(52vw, 28rem);
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.16), transparent 68%);
+    pointer-events: none;
+  }
+
+  .dashboard-welcome-blob-2 {
+    position: absolute;
+    inset-inline-start: -12%;
+    bottom: -35%;
+    width: min(44vw, 22rem);
+    height: min(44vw, 22rem);
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* CTA banner: distinct indigo/purple emphasis */
+  .dashboard-cta {
+    @apply dashboard-panel relative overflow-hidden text-white;
+    background: linear-gradient(115deg, #0f172a 0%, #1e3a8a 38%, #4338ca 72%, #5b21b6 100%);
+    box-shadow:
+      0 24px 56px -26px rgba(30, 27, 75, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  .dashboard-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(380px 200px at 10% 12%, rgba(125, 211, 252, 0.22), transparent 70%),
+      radial-gradient(280px 180px at 92% 88%, rgba(196, 181, 253, 0.2), transparent 72%),
+      linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.04) 50%, transparent 60%);
+    opacity: 1;
+  }
+
+  /* Wallet: premium emphasis + subtle sweep */
+  .dashboard-wallet {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(125deg, #2563eb 0%, #4f46e5 45%, #6d28d9 100%);
+    box-shadow:
+      0 22px 48px -20px rgba(37, 99, 235, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+    color: #fff;
+    transition:
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dashboard-wallet::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(320px 160px at 8% 8%, rgba(255, 255, 255, 0.22), transparent 65%),
+      radial-gradient(260px 140px at 96% 96%, rgba(167, 139, 250, 0.25), transparent 70%);
+  }
+
+  .dashboard-wallet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(110deg, transparent 28%, rgba(255, 255, 255, 0.18) 48%, transparent 66%);
+    transform: translateX(-100%);
+    transition:
+      opacity 320ms ease,
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dashboard-wallet:hover {
+    box-shadow:
+      0 28px 58px -22px rgba(79, 70, 229, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  }
+
+  .dashboard-wallet:hover::after {
+    opacity: 0.85;
+    transform: translateX(100%);
+  }
+
+  .dashboard-kpi-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 7.75rem;
+    flex-direction: column;
   }
 
   .interactive-tab {

@@ -124,17 +124,22 @@ export default function Navbar() {
 
   const isMarketingHome = pathname === "/";
   const isPublicAuth = pathname === "/login" || pathname === "/register";
+  const isStudentDashboard = pathname === "/dashboard";
 
   return (
     <header
       className={`sticky top-0 z-10 shrink-0 border-b ${
-        isMarketingHome
-          ? "border-slate-200/80 bg-white/[0.98] shadow-[0_1px_0_0_rgba(15,23,42,0.035)] supports-[backdrop-filter]:backdrop-blur-sm"
-          : "border-slate-200 bg-white"
+        isStudentDashboard
+          ? "border-slate-200/70 bg-white/82 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.12)] supports-[backdrop-filter]:backdrop-blur-md"
+          : isMarketingHome
+            ? "border-slate-200/80 bg-white/[0.98] shadow-[0_1px_0_0_rgba(15,23,42,0.035)] supports-[backdrop-filter]:backdrop-blur-sm"
+            : "border-slate-200 bg-white"
       }`}
     >
       <nav
-        className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:gap-7 lg:px-8 xl:px-10 ${
+        className={`mx-auto flex w-full items-center justify-between gap-3 px-4 sm:px-6 lg:gap-7 lg:px-8 xl:px-10 ${
+          isStudentDashboard ? "max-w-[86rem]" : "max-w-7xl"
+        } ${
           isMarketingHome
             ? "min-h-[6.05rem] py-2.5 sm:min-h-[6.55rem] sm:py-3 md:min-h-[6.75rem] md:py-3.5 lg:min-h-[7.05rem] lg:py-4"
             : "h-16"

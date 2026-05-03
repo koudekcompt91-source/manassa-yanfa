@@ -132,15 +132,11 @@ export default function StudentAppShell({ children }) {
               key={n.href}
               href={n.href}
               onClick={() => onPick?.()}
-              className={`interactive-tab touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-start text-sm font-semibold no-underline transition ${
-                active
-                  ? "bg-gradient-to-l from-brand-600 to-indigo-600 text-white shadow-md"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              }`}
+              className={`dashboard-sidebar-link ${active ? "dashboard-sidebar-link-active" : "dashboard-sidebar-link-idle"}`}
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                  active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                  active ? "bg-white/18 text-white" : "bg-slate-100 text-slate-500"
                 }`}
                 aria-hidden
               >
@@ -161,7 +157,8 @@ export default function StudentAppShell({ children }) {
   );
 
   const sidebarBrand = (
-    <div className="shrink-0 border-b border-slate-100 bg-white px-4 py-5">
+    <div className="relative shrink-0 border-b border-slate-200/70 bg-gradient-to-b from-white to-slate-50/70 px-4 py-5">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-l from-transparent via-brand-200/70 to-transparent" aria-hidden />
       <Link
         href="/"
         aria-label={BRAND_NAME}
@@ -174,7 +171,7 @@ export default function StudentAppShell({ children }) {
 
   const sidebarStudentCard =
     user && isStudent ? (
-      <div className="mx-4 mb-3 rounded-xl border border-slate-100 bg-slate-50 p-4 shadow-sm">
+      <div className="mx-4 mb-3 rounded-xl border border-slate-200/70 bg-gradient-to-b from-white to-slate-50 p-4 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.28)]">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-sm font-extrabold text-white">
             {avatarLetter(user.fullName, user.email)}
@@ -209,12 +206,12 @@ export default function StudentAppShell({ children }) {
   }
 
   return (
-    <div className="premium-app-bg relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2.5 md:hidden">
+    <div className="dashboard-shell relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
+      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-3 py-2.5 backdrop-blur-sm md:hidden">
         <span className="text-sm font-extrabold text-slate-900">القائمة</span>
         <button
           type="button"
-          className="touch-button-secondary px-3 py-2 text-sm font-bold text-slate-800"
+          className="touch-button-secondary magnetic-button px-3 py-2 text-sm font-bold text-slate-800"
           aria-label={mobileNavOpen ? "إخفاء القائمة" : "فتح القائمة"}
           aria-expanded={mobileNavOpen}
           onClick={() => setMobileNavOpen((o) => !o)}
@@ -231,14 +228,14 @@ export default function StudentAppShell({ children }) {
 
       <div className="flex min-h-0 w-full flex-1 flex-col md:flex-row">
         <aside
-          className={`relative z-0 w-full shrink-0 border-slate-200 bg-white md:w-[260px] md:border-e ${mobileNavOpen ? "block border-b" : "hidden border-b md:block"}`}
+          className={`dashboard-sidebar relative z-0 w-full shrink-0 md:w-[272px] md:border-e ${mobileNavOpen ? "block border-b" : "hidden border-b md:block"}`}
           aria-label="القائمة الجانبية"
         >
           {sidebarInner}
         </aside>
 
         <main className="relative z-10 min-h-0 min-w-0 flex-1">
-          <div className="relative z-10 mx-auto min-h-0 w-full min-w-0 max-w-6xl py-6">{children}</div>
+          <div className="relative z-10 mx-auto min-h-0 w-full min-w-0 max-w-[86rem] px-3 py-5 sm:px-4 sm:py-6 lg:px-6">{children}</div>
         </main>
       </div>
     </div>

@@ -390,94 +390,136 @@ function DashboardPageInner() {
   };
 
   const statCards = [
-    { label: "دوراتي", value: overview.summary?.myCourses ?? enrolledCourses, sub: "دورة", Icon: BookOpen },
-    { label: "دورات مكتملة", value: overview.summary?.completedCourses ?? 0, sub: "مكتملة", Icon: CheckCircle2 },
-    { label: "قيد التقدم", value: overview.summary?.inProgressCourses ?? 0, sub: "دورة", Icon: Activity },
     { label: "شهاداتي", value: overview.summary?.certificatesAvailable ?? 0, sub: "شهادة", Icon: Award },
-    { label: "الحصص القادمة", value: overview.summary?.upcomingLiveSessions ?? 0, sub: "حصة", Icon: Video },
-    { label: "إشعارات غير مقروءة", value: overview.summary?.unreadNotifications ?? 0, sub: "إشعار", Icon: Bell },
-    { label: "واجبات قيد الانتظار", value: overview.summary?.pendingAssessments ?? 0, sub: "تقييم", Icon: ClipboardCheck },
+    { label: "قيد التقدم", value: overview.summary?.inProgressCourses ?? 0, sub: "دورة", Icon: Activity },
+    { label: "دورات مكتملة", value: overview.summary?.completedCourses ?? 0, sub: "مكتملة", Icon: CheckCircle2 },
+    { label: "دوراتي", value: overview.summary?.myCourses ?? enrolledCourses, sub: "دورة", Icon: BookOpen },
     { label: "الرصيد", value: formatDzd(walletBalance), sub: "دج", Icon: Wallet },
+    { label: "واجبات قيد الانتظار", value: overview.summary?.pendingAssessments ?? 0, sub: "تقييم", Icon: ClipboardCheck },
+    { label: "إشعارات غير مقروءة", value: overview.summary?.unreadNotifications ?? 0, sub: "إشعار", Icon: Bell },
+    { label: "الحصص القادمة", value: overview.summary?.upcomingLiveSessions ?? 0, sub: "حصة", Icon: Video },
   ];
 
+  const kpiIconWrapClasses = [
+    "bg-violet-50 text-violet-700 ring-violet-100",
+    "bg-sky-50 text-sky-700 ring-sky-100",
+    "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    "bg-brand-50 text-brand-700 ring-brand-100",
+    "bg-amber-50 text-amber-800 ring-amber-100",
+    "bg-orange-50 text-orange-800 ring-orange-100",
+    "bg-rose-50 text-rose-700 ring-rose-100",
+    "bg-indigo-50 text-indigo-700 ring-indigo-100",
+  ];
+
+  const panelClass = "dashboard-panel p-6 sm:p-8";
+  const panelCompactClass = "dashboard-panel p-5";
+  const softItemClass = "dashboard-soft-list-item p-3";
+
   return (
-    <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-8">
-      <header className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-medium text-slate-400">منصة ينفع</p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">مرحبًا، {displayName}</h1>
-        <p className="mt-2 text-base text-slate-500">واصل تعلمك وتابع تقدمك في الدورات.</p>
-        {displayEmail ? (
-          <p className="mt-2 text-sm text-slate-400" dir="ltr">
-            {displayEmail}
-          </p>
-        ) : null}
-        <div className="mt-6 flex flex-col gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-slate-400">الدورة الحالية</p>
-            <p className="mt-1 text-base font-semibold text-slate-900">{currentGoalLabel}</p>
+    <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-6 sm:gap-8">
+      <header className="dashboard-welcome interactive-card p-6 sm:p-8">
+        <div className="dashboard-welcome-blob-1" aria-hidden />
+        <div className="dashboard-welcome-blob-2" aria-hidden />
+        <div className="relative z-[1] flex flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-10">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-brand-200/80 bg-brand-50/95 px-3 py-1 text-xs font-extrabold text-brand-800 ring-1 ring-brand-100/70">
+                منصة ينفع
+              </span>
+            </div>
+            <h1 className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl md:text-[2rem] md:leading-tight">مرحبًا، {displayName}</h1>
+            {displayEmail ? (
+              <p className="mt-2 text-sm text-slate-500" dir="ltr">
+                {displayEmail}
+              </p>
+            ) : null}
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">واصل تعلمك وتابع تقدمك في الدورات.</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link href={continueLearning.href} className="touch-button-primary magnetic-button no-underline">
+                <BookOpen className="h-4 w-4" />
+                واصل التعلم
+              </Link>
+              <Link href="/courses" className="touch-button-secondary magnetic-button no-underline">
+                <BookOpen className="h-4 w-4" />
+                تصفح الدورات
+              </Link>
+            </div>
+            {pendingRechargeCount > 0 ? (
+              <p className="mt-6 rounded-xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-sm text-amber-950">
+                لديك {pendingRechargeCount} طلب شحن قيد المراجعة.
+              </p>
+            ) : null}
+            {user?.role === "STUDENT" && !String(user?.academicLevel || "").trim() ? (
+              <p className="mt-4 rounded-xl border border-sky-200/80 bg-sky-50/95 px-4 py-3 text-sm text-sky-950">
+                لم يُسجَّل مستواك الدراسي على حسابك بعد. يُرجى التواصل مع الإدارة لتحديث الملف حتى تظهر لك الدورات والدروس المناسبة لمستواك فقط.
+              </p>
+            ) : null}
           </div>
-          <div className="text-start sm:text-end">
-            <p className="text-sm text-slate-400">التقدّم الإجمالي</p>
-            <p className="mt-1 text-2xl font-bold text-brand-600">{overallProgressPct}%</p>
-            <div className="mt-2 h-2.5 w-full max-w-xs overflow-hidden rounded-full bg-slate-100 sm:ms-auto sm:me-0">
-              <div className="h-2.5 rounded-full bg-brand-600 transition-[width] duration-500" style={{ width: `${overallProgressPct}%` }} />
+          <div className="flex w-full flex-col justify-center rounded-2xl border border-slate-200/85 bg-white/75 p-5 shadow-[0_16px_44px_-26px_rgba(15,23,42,0.28)] backdrop-blur-md lg:max-w-md lg:flex-none">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">الدورة الحالية</p>
+            <p className="mt-2 text-lg font-extrabold leading-snug text-slate-900">{currentGoalLabel}</p>
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-slate-500">التقدّم الإجمالي</p>
+              <p className="mt-1 text-3xl font-black tabular-nums text-brand-600">{overallProgressPct}%</p>
+            </div>
+            <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-slate-200/85 ring-1 ring-slate-200/60">
+              <div
+                className="h-3 rounded-full bg-gradient-to-l from-brand-500 via-indigo-500 to-violet-500 transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                style={{ width: `${overallProgressPct}%` }}
+              />
             </div>
           </div>
         </div>
-        {pendingRechargeCount > 0 ? (
-          <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            لديك {pendingRechargeCount} طلب شحن قيد المراجعة.
-          </p>
-        ) : null}
-        {user?.role === "STUDENT" && !String(user?.academicLevel || "").trim() ? (
-          <p className="mt-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
-            لم يُسجَّل مستواك الدراسي على حسابك بعد. يُرجى التواصل مع الإدارة لتحديث الملف حتى تظهر لك الدورات والدروس المناسبة لمستواك فقط.
-          </p>
-        ) : null}
       </header>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6" aria-label="مؤشرات لوحة التحكم">
-        {statCards.map((card) => (
-          <div key={card.label} className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium text-slate-400">{card.label}</p>
-              <card.Icon className="h-4 w-4 text-brand-600" />
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4 xl:gap-6" aria-label="مؤشرات لوحة التحكم">
+        {statCards.map((card, idx) => (
+          <div key={card.label} className="dashboard-kpi">
+            <div className="dashboard-kpi-content">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold text-slate-500">{card.label}</p>
+                <span
+                  className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ${kpiIconWrapClasses[idx % kpiIconWrapClasses.length]}`}
+                >
+                  <card.Icon className="h-4 w-4" />
+                </span>
+              </div>
+              <p className="mt-auto pt-4 text-2xl font-black tracking-tight text-slate-900 tabular-nums">{card.value}</p>
+              <p className="mt-1 text-sm text-slate-400">{card.sub}</p>
             </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{card.value}</p>
-            <p className="mt-2 text-sm text-slate-400">{card.sub}</p>
           </div>
         ))}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.55fr_1fr]">
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.45fr_1fr]">
         <div className="space-y-6">
-          <article className="interactive-card relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-l from-slate-950 via-brand-900 to-indigo-900 p-6 text-white shadow-sm sm:p-8">
+          <article className="dashboard-cta interactive-card p-6 sm:p-8">
             <div className="pointer-events-none absolute -start-16 top-0 h-40 w-40 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
             <div className="pointer-events-none absolute -end-10 bottom-0 h-44 w-44 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
-            <p className="relative text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
-            <h2 className="relative mt-2 text-2xl font-black sm:text-3xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
-            <p className="relative mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
+            <p className="relative z-[1] text-sm font-semibold text-slate-200">منصة ينفع لتعلّم الأدب العربي</p>
+            <h2 className="relative z-[1] mt-2 text-2xl font-black sm:text-3xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
+            <p className="relative z-[1] mt-3 max-w-2xl text-sm text-slate-200 sm:text-base">
               {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
             </p>
-            <div className="relative mt-5 flex flex-wrap gap-2">
+            <div className="relative z-[1] mt-5 flex flex-wrap gap-2">
               {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
-                <Link href={heroBanner.buttonUrl} className="touch-button-primary border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
+                <Link href={heroBanner.buttonUrl} className="touch-button-primary magnetic-button border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                   <BookOpen className="h-4 w-4" />
                   {heroBanner.buttonText}
                 </Link>
               ) : null}
-              <Link href={continueLearning.href} className="touch-button-primary border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
+              <Link href={continueLearning.href} className="touch-button-primary magnetic-button border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                 <BookOpen className="h-4 w-4" />
                 واصل التعلم
               </Link>
-              <Link href="/courses" className="touch-button-secondary border-white/25 bg-white/10 text-white hover:bg-white/15 no-underline">
+              <Link href="/courses" className="touch-button-secondary magnetic-button border-white/25 bg-white/10 text-white hover:bg-white/15 no-underline">
                 <BookOpen className="h-4 w-4" />
                 استكشف الدورات
               </Link>
             </div>
           </article>
 
-          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <article className={panelClass}>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
                 <BookMarked className="h-5 w-5 text-brand-600" />
@@ -497,7 +539,7 @@ function DashboardPageInner() {
                   <Link
                     key={path.id || `${path.title}-${idx}`}
                     href={path.slug ? `/courses?path=${encodeURIComponent(path.slug)}` : "/courses"}
-                    className="interactive-card rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 p-3 text-sm font-bold text-slate-800 no-underline"
+                    className="dashboard-soft-list-item p-3 text-sm font-bold text-slate-800 no-underline"
                     style={path.color ? { boxShadow: `inset 0 0 0 1px ${path.color}33` } : undefined}
                   >
                     {(() => {
@@ -517,31 +559,31 @@ function DashboardPageInner() {
         </div>
 
         <div className="space-y-4">
-          <article id="wallet" className="interactive-card rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-700 p-5 text-white shadow-sm">
-            <div className="flex items-start justify-between gap-2">
+          <article id="wallet" className="dashboard-wallet pressable p-5 sm:p-6">
+            <div className="relative z-[1] flex items-start justify-between gap-2">
               <div>
-                <p className="flex items-center gap-1 text-xs font-semibold text-brand-100">
+                <p className="flex items-center gap-1 text-xs font-semibold text-white/85">
                   <Wallet className="h-3.5 w-3.5" />
                   <span>رصيد المحفظة</span>
                 </p>
-                <p className="mt-2 text-3xl font-black">{formatDzd(walletBalance)}</p>
-                <p className="mt-1 text-xs text-brand-100">
+                <p className="mt-2 text-3xl font-black tabular-nums tracking-tight sm:text-[2rem]">{formatDzd(walletBalance)}</p>
+                <p className="mt-1 text-xs text-white/80">
                   {pendingRechargeCount > 0 ? `طلبات قيد المراجعة: ${pendingRechargeCount}` : "لا توجد طلبات شحن معلقة"}
                 </p>
               </div>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white" aria-hidden>
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/18 text-white shadow-inner ring-1 ring-white/25" aria-hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
               </span>
             </div>
-            <button type="button" onClick={() => setRechargeOpen(true)} className="touch-button mt-4 w-full bg-white text-brand-700 hover:bg-slate-100">
+            <button type="button" onClick={() => setRechargeOpen(true)} className="relative z-[1] touch-button magnetic-button mt-4 w-full bg-white text-brand-700 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.35)] hover:bg-slate-50">
               <Wallet className="h-4 w-4" />
               شحن المحفظة
             </button>
           </article>
 
-          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <article className={panelCompactClass}>
             <h3 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
               <Megaphone className="h-4.5 w-4.5 text-brand-600" />
               <span>أحدث الأخبار</span>
@@ -551,7 +593,7 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-3 space-y-2">
                 {dashboardNews.map((row) => (
-                  <li key={row.id} className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-700">
+                  <li key={row.id} className="dashboard-soft-list-item px-3 py-2 text-sm text-slate-700">
                     <p className="font-semibold text-slate-800">{row.title}</p>
                     {row.summary ? <p className="mt-1 text-xs text-slate-500">{row.summary}</p> : null}
                   </li>
@@ -560,7 +602,7 @@ function DashboardPageInner() {
             )}
           </article>
 
-          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <article className={panelCompactClass}>
             <h3 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
               <Clock3 className="h-4.5 w-4.5 text-brand-600" />
               <span>النشاط الأخير</span>
@@ -570,7 +612,7 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-3 space-y-2">
                 {recentActivityRows.map((item, idx) => (
-                  <li key={`${item.label}-${idx}`} className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2">
+                  <li key={`${item.label}-${idx}`} className="dashboard-soft-list-item px-3 py-2">
                     <p className="text-[11px] font-semibold text-slate-500">{item.label}</p>
                     <p className="text-sm font-bold text-slate-800">{item.value}</p>
                   </li>
@@ -579,7 +621,7 @@ function DashboardPageInner() {
             )}
           </article>
 
-          <article className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <article className={panelCompactClass}>
             <h3 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
               <Activity className="h-4.5 w-4.5 text-brand-600" />
               <span>إجراءات سريعة</span>
@@ -605,7 +647,7 @@ function DashboardPageInner() {
         </div>
       </section>
 
-      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className={panelClass}>
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">واصل من حيث توقفت</h2>
         {continueLearning.lessonTitle ? (
           <>
@@ -632,7 +674,7 @@ function DashboardPageInner() {
       </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <section id="my-courses" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section id="my-courses" className={panelClass}>
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دوراتي</h2>
           <p className="mt-1 text-sm text-slate-400">متابعة التقدم في كل دورة بشكل مباشر.</p>
           {dashboardProgressLoading ? (
@@ -656,9 +698,9 @@ function DashboardPageInner() {
                 const packageMeta = packageMetaById.get(row.id);
                 const isPaidCourse = (packageMeta?.accessType === "PAID") || Number(packageMeta?.priceMad || 0) > 0;
                 return (
-                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 shadow-sm">
+                  <li key={row.id} className="dashboard-soft-list-item p-5">
                     <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="interactive-card h-14 w-20 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-indigo-100">
+                      <div className="dashboard-soft-list-item h-14 w-20 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-indigo-100">
                         {row.coverImage ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={row.coverImage} alt={row.title} className="h-full w-full object-cover" />
@@ -720,7 +762,7 @@ function DashboardPageInner() {
           )}
         </section>
 
-        <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className={panelClass}>
           <h2 className="text-lg font-bold text-slate-900 sm:text-xl">الحصص القادمة والواجبات</h2>
           <div className="mt-4">
             <p className="text-sm font-semibold text-slate-700">الحصص المباشرة القادمة</p>
@@ -729,7 +771,7 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-2 space-y-2">
                 {overview.upcomingLiveSessions.slice(0, 4).map((row) => (
-                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                  <li key={row.id} className={`${softItemClass} text-sm`}>
                     <p className="font-semibold text-slate-900">{row.title}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
                     <p className="mt-1 text-xs text-slate-500">{new Date(row.startsAt).toLocaleString("ar-DZ")}</p>
@@ -754,7 +796,7 @@ function DashboardPageInner() {
             ) : (
               <ul className="mt-2 space-y-2">
                 {overview.pendingAssessments.slice(0, 4).map((row) => (
-                  <li key={row.id} className="interactive-card rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm">
+                  <li key={row.id} className={`${softItemClass} text-sm`}>
                     <p className="font-semibold text-slate-900">{row.title}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.courseTitle}</p>
                     <p className="mt-1 text-xs text-slate-500">{row.dueDate ? `الموعد: ${new Date(row.dueDate).toLocaleString("ar-DZ")}` : "بدون موعد محدد"}</p>
@@ -794,7 +836,7 @@ function DashboardPageInner() {
         </section>
       </div>
 
-      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className={panelClass}>
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دورات موصى بها</h2>
         <p className="mt-1 text-sm text-slate-400">اختر دورة وابدأ رحلتك.</p>
         {recommendedPackages.length ? (
@@ -806,7 +848,7 @@ function DashboardPageInner() {
               return (
                 <article
                   key={pkg.id}
-                  className="interactive-card flex flex-col rounded-2xl border border-slate-200/80 bg-slate-50/30 p-6 shadow-sm"
+                  className="dashboard-panel flex flex-col p-6"
                 >
                   <h3 className="text-base font-bold text-slate-900">{pkg.title}</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-500">{shortDesc}</p>
@@ -831,7 +873,7 @@ function DashboardPageInner() {
         )}
       </section>
 
-      <section id="wallet-details" className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section id="wallet-details" className={panelClass}>
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">المحفظة</h2>
         <p className="mt-3 text-3xl font-bold tracking-tight text-brand-600">{formatDzd(walletBalance)}</p>
         {pendingRechargeCount > 0 ? (
@@ -857,7 +899,7 @@ function DashboardPageInner() {
         </div>
       </section>
 
-      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className={panelClass}>
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">دروس دوراتك</h2>
         <p className="mt-1 text-sm text-slate-400">دروس متاحة في الدورات المسجّل بها.</p>
         {!dashboardProgress.length ? (
@@ -874,7 +916,7 @@ function DashboardPageInner() {
                 ? `/packages/${row.slug}/lesson/${row.lastLessonId}`
                 : `/packages/${row.slug}`;
               return (
-                <li key={row.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4">
+                <li key={row.id} className="dashboard-soft-list-item p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <p className="min-w-0 flex-1 font-semibold text-slate-900">{row.lastLessonTitle || row.title}</p>
                     <span className="shrink-0 text-xs font-medium text-slate-400">{row.progressPercent || 0}%</span>
@@ -890,7 +932,7 @@ function DashboardPageInner() {
         )}
       </section>
 
-      <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+      <section className={panelClass}>
         <h2 className="text-lg font-bold text-slate-900 sm:text-xl">سجل المحفظة</h2>
         <p className="mt-1 text-sm text-slate-400">آخر العمليات المرتبطة برصيدك.</p>
         {!myWalletTx.length ? (
@@ -898,7 +940,7 @@ function DashboardPageInner() {
         ) : (
           <ul className="mt-6 flex flex-col gap-3">
             {myWalletTx.map((tx) => (
-              <li key={tx.id} className="interactive-card rounded-xl border border-slate-200/80 bg-slate-50/40 p-4 text-sm">
+              <li key={tx.id} className="dashboard-soft-list-item p-4 text-sm">
                 <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                   <span className="font-semibold text-slate-900">{tx.labelAr || tx.type}</span>
                   <span className="font-mono text-xs text-slate-500 sm:text-end">
@@ -932,7 +974,7 @@ function DashboardPageInner() {
         </div>
       ))}
 
-      <footer className="interactive-card flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-8">
+      <footer className="dashboard-panel flex flex-col gap-4 p-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-8">
         <div className="flex flex-wrap gap-2">
           <Link
             href="/courses"

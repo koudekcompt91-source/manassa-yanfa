@@ -32,19 +32,23 @@ const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
 
 /** Light sections */
 const btnLightSolid =
-  "inline-flex touch-manipulation items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white shadow-tactile ring-1 ring-white/10 transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-slate-800 active:scale-[0.992] motion-reduce:active:scale-100";
+  "magnetic-button inline-flex touch-manipulation items-center justify-center rounded-2xl bg-gradient-to-l from-slate-900 to-slate-800 px-6 py-3 text-sm font-extrabold text-white shadow-[0_14px_34px_-16px_rgba(2,6,23,0.6)] ring-1 ring-white/16 transition-[transform,box-shadow,filter,background-color] duration-[300ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[0_20px_42px_-18px_rgba(2,6,23,0.68)] hover:brightness-[1.03] active:scale-[0.988] motion-reduce:active:scale-100";
 
 const btnLightGhost =
-  "inline-flex touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-white/5 px-6 py-3 text-sm font-bold text-white shadow-tactile-ghost backdrop-blur-sm transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-white/10 active:scale-[0.992] motion-reduce:active:scale-100";
+  "magnetic-button inline-flex touch-manipulation items-center justify-center rounded-2xl border border-white/28 bg-white/[0.06] px-6 py-3 text-sm font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_12px_30px_-14px_rgba(2,6,23,0.55)] backdrop-blur-sm transition-[transform,border-color,background-color,box-shadow] duration-[300ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/42 hover:bg-white/[0.11] hover:shadow-[0_18px_40px_-18px_rgba(2,6,23,0.6)] active:scale-[0.988] motion-reduce:active:scale-100";
 
 const btnMutedOutline =
-  "inline-flex touch-manipulation items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-sm ring-1 ring-slate-900/[0.04] transition duration-[320ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-card-luxury active:scale-[0.992] motion-reduce:active:scale-100";
+  "magnetic-button inline-flex touch-manipulation items-center justify-center rounded-2xl border border-slate-200/95 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-[0_10px_24px_-16px_rgba(15,23,42,0.2)] ring-1 ring-slate-900/[0.04] transition duration-[300ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-brand-200/90 hover:bg-gradient-to-b hover:from-brand-50/80 hover:to-white hover:shadow-[0_16px_34px_-18px_rgba(24,117,245,0.35)] active:scale-[0.988] motion-reduce:active:scale-100";
 
 const cardLuxury =
-  "touch-manipulation rounded-3xl border border-slate-200/70 bg-gradient-to-b from-white via-white to-slate-50/80 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/60 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100";
+  "interactive-card touch-manipulation rounded-3xl border border-slate-200/70 bg-gradient-to-b from-white via-white to-slate-50/90 shadow-[0_1px_0_0_rgba(255,255,255,0.95)_inset,0_20px_46px_-28px_rgba(15,23,42,0.3),0_0_0_1px_rgba(148,163,184,0.09)] transition duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-brand-200/65 hover:shadow-[0_26px_56px_-26px_rgba(15,23,42,0.34),0_0_0_1px_rgba(59,130,246,0.14)] active:scale-[0.996] motion-reduce:active:scale-100";
 
 const cardLuxuryFlat =
-  "touch-manipulation rounded-2xl border border-slate-200/75 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.92)_inset,0_8px_28px_-10px_rgba(15,23,42,0.07),0_0_0_1px_rgba(148,163,184,0.09)] transition duration-[380ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/55 hover:shadow-card-luxury active:scale-[0.997] motion-reduce:active:scale-100";
+  "interactive-card touch-manipulation rounded-2xl border border-slate-200/75 bg-white/95 shadow-[0_1px_0_0_rgba(255,255,255,0.92)_inset,0_12px_30px_-14px_rgba(15,23,42,0.13),0_0_0_1px_rgba(148,163,184,0.09)] transition duration-[340ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-brand-200/60 hover:shadow-[0_18px_40px_-18px_rgba(24,117,245,0.26)] active:scale-[0.996] motion-reduce:active:scale-100";
+
+const sectionKicker = "text-sm font-bold tracking-wide text-brand-700";
+const sectionTitle = "mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl";
+const sectionSubtitle = "mt-4 text-pretty text-slate-600 sm:text-lg";
 
 const TEACHER_NAME = "يوسف مادن";
 /** Studio portrait (682×1024); served from /public */
@@ -331,7 +335,7 @@ export default function HomeLanding() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
+    <div className="premium-app-bg bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
       {/* —— Hero —— */}
       <section
         id="hero"
@@ -506,7 +510,7 @@ export default function HomeLanding() {
         </div>
       ))}
 
-      <section className="border-b border-slate-200/80 bg-white py-10" aria-labelledby="latest-news">
+      <section className="flagship-section border-b border-slate-200/80 bg-white py-10" aria-labelledby="latest-news">
         <div className={container}>
           <div className="flex items-center justify-between gap-3">
             <h2 id="latest-news" className="text-xl font-black text-slate-900 sm:text-2xl">آخر الأخبار</h2>
@@ -529,14 +533,14 @@ export default function HomeLanding() {
       </section>
 
       {/* —— لماذا yanfa3 Education —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="why-yanfa">
         <div className={container}>
           <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-bold text-brand-700">مزايا منصة ينفع</p>
-            <h2 id="why-yanfa" className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+              <p className={sectionKicker}>مزايا منصة ينفع</p>
+            <h2 id="why-yanfa" className={sectionTitle}>
                 تجربة تعلّم موثوقة ومتكاملة
             </h2>
-            <p className="mt-4 text-pretty text-slate-600 sm:text-lg">
+            <p className={sectionSubtitle}>
                 الدرس المسجّل، الحصة المباشرة، الاختبار، التقدم، الشهادة، والتواصل المباشر — كلها داخل منصة واحدة.
             </p>
           </div>
@@ -583,15 +587,15 @@ export default function HomeLanding() {
       </section>
 
       {/* —— ماذا ستتعلم —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-gradient-to-b from-[#f4f6fb] to-white py-16 sm:py-20" aria-labelledby="what-learn">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-gradient-to-b from-[#f4f6fb] to-white py-16 sm:py-20" aria-labelledby="what-learn">
         <div className={container}>
           <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-5">
-              <p className="text-sm font-bold text-brand-700">ماذا ستتعلّم؟</p>
-              <h2 id="what-learn" className="mt-2 text-3xl font-black text-slate-900 sm:text-4xl">
+              <p className={sectionKicker}>ماذا ستتعلّم؟</p>
+              <h2 id="what-learn" className={sectionTitle}>
                 مهارات أدبية تتراكم مع كل درس
               </h2>
-              <p className="mt-4 text-pretty text-slate-600 sm:text-lg">
+              <p className={sectionSubtitle}>
                 ليست مجرد معلومات: بل أدوات قراءة وكتابة نقدية تخدمك في المنهج، في الامتحان، وفي ذائقتك الأدبية.
               </p>
             </div>
@@ -664,12 +668,12 @@ export default function HomeLanding() {
       </section>
 
       {/* —— الدورات المتاحة —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="courses-block">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="courses-block">
         <div className={container}>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-bold text-brand-700">الدورات المتاحة</p>
-              <h2 id="courses-block" className="mt-2 text-3xl font-black text-slate-900 sm:text-4xl">
+              <p className={sectionKicker}>الدورات المتاحة</p>
+              <h2 id="courses-block" className={sectionTitle}>
                 دورات جاهزة للبدء الآن
               </h2>
               <p className="mt-3 max-w-2xl text-slate-600 sm:text-lg">دورات منشورة تجمع بين الدروس المسجلة والحصص المباشرة والمتابعة الأكاديمية.</p>
@@ -722,7 +726,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— رحلة مختصرة —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-slate-50/70 py-16 sm:py-20" aria-labelledby="live-learning">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-slate-50/70 py-16 sm:py-20" aria-labelledby="live-learning">
         <div className={container}>
           <h2 id="live-learning" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">التعلّم المباشر داخل المنصة</h2>
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -741,7 +745,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— رحلة مختصرة —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-[#f4f6fb] py-16 sm:py-20" aria-labelledby="journey">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-[#f4f6fb] py-16 sm:py-20" aria-labelledby="journey">
         <div className={container}>
           <h2 id="journey" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">
             ثلاث خطوات… ثم أنت في قلب النص
@@ -766,7 +770,7 @@ export default function HomeLanding() {
       </section>
 
       {/* —— آراء مختصرة —— */}
-      <section data-section-reveal className="border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="voices">
+      <section data-section-reveal className="flagship-section border-b border-slate-200/80 bg-white py-16 sm:py-20" aria-labelledby="voices">
         <div className={container}>
           <h2 id="voices" className="text-center text-3xl font-black text-slate-900 sm:text-4xl">
             صوت الدارسين
@@ -789,7 +793,7 @@ export default function HomeLanding() {
             ].map((v) => (
               <figure
                 key={v.who}
-                className="flex h-full touch-manipulation flex-col rounded-3xl border border-slate-200/70 bg-gradient-to-b from-slate-50/95 to-white/90 p-6 shadow-card-luxury transition duration-[480ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:border-brand-200/55 hover:shadow-card-luxury-hover active:scale-[0.997] motion-reduce:active:scale-100"
+                className={`flex h-full touch-manipulation flex-col p-6 ${cardLuxury}`}
               >
                 <blockquote className="flex-1 text-sm leading-relaxed text-slate-800 sm:text-base">«{v.q}»</blockquote>
                 <figcaption className="mt-4 text-xs font-bold text-slate-500">{v.who}</figcaption>
