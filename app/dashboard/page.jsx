@@ -579,17 +579,23 @@ function DashboardPageInner() {
         ))}
       </section>
 
-      <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.42fr_1fr] xl:gap-6">
-        <div className="space-y-5 xl:flex xl:min-h-0 xl:flex-col">
-          <article className="dashboard-cta interactive-card flex min-h-0 flex-col p-5 sm:p-6 xl:min-h-[11rem] xl:flex-1">
-            <div className="pointer-events-none absolute -start-16 top-0 h-36 w-36 rounded-full bg-cyan-300/20 blur-3xl" aria-hidden />
-            <div className="pointer-events-none absolute -end-10 bottom-0 h-40 w-40 rounded-full bg-indigo-300/20 blur-3xl" aria-hidden />
-            <p className="relative z-[1] text-xs font-semibold text-slate-200 sm:text-sm">منصة ينفع لتعلّم الأدب العربي</p>
-            <h2 className="relative z-[1] mt-1.5 text-xl font-black sm:text-2xl">{heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}</h2>
-            <p className="relative z-[1] mt-2 max-w-2xl text-xs text-slate-200 sm:text-sm">
-              {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
-            </p>
-            <div className="dashboard-cta-actions relative z-[1] mt-auto flex flex-wrap gap-2 pt-4 sm:gap-2.5">
+      <section className="dashboard-two-col grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.34fr)_minmax(0,1fr)] xl:items-start xl:gap-5">
+        <div className="order-2 flex flex-col gap-4 xl:order-1">
+          <article className="dashboard-cta dashboard-cta-compact interactive-card flex flex-col overflow-hidden p-4 sm:p-5 xl:max-h-[18.75rem]">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+              <span className="absolute -start-8 top-1/2 h-24 w-40 -translate-y-1/2 rounded-full bg-cyan-400/15 blur-2xl" />
+              <span className="absolute -end-6 top-1/3 h-20 w-32 rounded-full bg-violet-400/15 blur-2xl" />
+            </div>
+            <div className="relative z-[1] flex flex-col gap-1.5 sm:gap-2">
+              <p className="text-[11px] font-semibold leading-tight text-slate-200/95 sm:text-xs">منصة ينفع لتعلّم الأدب العربي</p>
+              <h2 className="line-clamp-2 text-lg font-black leading-snug text-white sm:text-xl">
+                {heroBanner?.title || "رحلة تعليمية منظمة وحديثة"}
+              </h2>
+              <p className="line-clamp-2 max-w-2xl text-xs leading-relaxed text-slate-200/90 sm:text-[0.8125rem]">
+                {heroBanner?.subtitle || "دروس مسجلة، حصص مباشرة، اختبارات، متابعة للتقدم وشهادات إتمام."}
+              </p>
+            </div>
+            <div className="dashboard-cta-actions relative z-[1] mt-3 flex flex-wrap items-center gap-2 sm:mt-3.5">
               {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
                 <Link href={heroBanner.buttonUrl} className="touch-button-primary magnetic-button border border-white/20 bg-white text-slate-900 no-underline hover:bg-slate-100">
                   <BookOpen className="h-4 w-4" />
@@ -608,7 +614,7 @@ function DashboardPageInner() {
           </article>
 
           <article className={panelClass}>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
                 <BookMarked className="h-5 w-5 text-brand-600" />
                 <span>المسارات التعليمية</span>
@@ -618,11 +624,11 @@ function DashboardPageInner() {
               </Link>
             </div>
             {!subjectCards.length ? (
-              <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-5 text-sm text-slate-500">
+              <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-4 text-sm text-slate-500">
                 لا توجد مسارات تعليمية حاليًا
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3">
                 {subjectCards.map((path, idx) => (
                   <Link
                     key={path.id || `${path.title}-${idx}`}
@@ -646,8 +652,8 @@ function DashboardPageInner() {
           </article>
         </div>
 
-        <div className="flex flex-col gap-4 sm:gap-4 xl:min-h-0">
-          <article id="wallet" className="dashboard-wallet pressable flex min-h-0 flex-col p-4 sm:p-5 xl:min-h-[11rem] xl:justify-between">
+        <div className="order-1 flex flex-col gap-4 xl:order-2">
+          <article id="wallet" className="dashboard-wallet pressable flex min-h-0 flex-col p-4 sm:p-5">
             <div className="relative z-[1] flex items-start justify-between gap-2">
               <div>
                 <p className="flex items-center gap-1 text-xs font-semibold text-white/85">
@@ -668,7 +674,7 @@ function DashboardPageInner() {
             <button
               type="button"
               onClick={() => setRechargeOpen(true)}
-              className="dashboard-wallet-btn relative z-[1] touch-button magnetic-button mt-5 w-full rounded-xl bg-white font-bold text-brand-700 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.35)] ring-2 ring-white/25 hover:bg-slate-50 xl:mt-0"
+              className="dashboard-wallet-btn relative z-[1] touch-button magnetic-button mt-5 w-full rounded-xl bg-white font-bold text-brand-700 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.35)] ring-2 ring-white/25 hover:bg-slate-50 xl:mt-4"
             >
               <Wallet className="h-4 w-4" />
               شحن المحفظة
