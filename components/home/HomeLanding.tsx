@@ -19,13 +19,13 @@ const pillCtaClass =
   `inline-flex touch-manipulation items-center justify-center rounded-2xl bg-gradient-to-l from-brand-600 to-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-tactile-brand ring-1 ring-white/20 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:brightness-[1.015] hover:ring-white/28 hover:shadow-[0_12px_36px_-14px_rgba(24,117,245,0.28)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`;
 
 const btnHeroPrimary =
-  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_10px_28px_-8px_rgba(15,23,42,0.22)] ring-1 ring-white/50 transition-[transform,box-shadow,filter,background-color,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-white hover:ring-white/58 hover:shadow-[0_14px_40px_-16px_rgba(15,23,42,0.26)] hover:brightness-[1.01] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60`;
+  `magnetic-button inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl bg-white px-7 py-3.5 text-base font-extrabold text-slate-900 shadow-[0_1px_0_0_rgba(255,255,255,0.92)_inset,0_12px_30px_-10px_rgba(15,23,42,0.24)] ring-1 ring-white/55 transition-[transform,box-shadow,filter,background-color,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:bg-white hover:ring-white/65 hover:shadow-[0_18px_46px_-18px_rgba(15,23,42,0.32)] hover:brightness-[1.015] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.985] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70`;
 
 const btnHeroGhost =
-  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border-2 border-white/45 bg-slate-950 px-7 py-3.5 text-base font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14),0_10px_32px_-8px_rgba(0,0,0,0.55)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/55 hover:bg-slate-900 hover:shadow-[0_12px_36px_-8px_rgba(0,0,0,0.6)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60`;
+  `magnetic-button inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border-2 border-white/45 bg-slate-950/95 px-7 py-3.5 text-base font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_12px_34px_-10px_rgba(0,0,0,0.58)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/58 hover:bg-slate-900 hover:shadow-[0_16px_42px_-14px_rgba(0,0,0,0.62)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.986] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/65`;
 
 const btnHeroBrand =
-  `inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/22 bg-gradient-to-l from-brand-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_14px_36px_-8px_rgba(24,117,245,0.5)] ring-1 ring-white/28 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/38 hover:shadow-[0_18px_48px_-10px_rgba(24,117,245,0.45)] hover:brightness-[1.02] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.989] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/50`;
+  `magnetic-button inline-flex min-h-[3rem] touch-manipulation items-center justify-center rounded-2xl border border-white/24 bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-7 py-3.5 text-base font-bold text-white shadow-[0_1px_0_0_rgba(255,255,255,0.25)_inset,0_16px_42px_-10px_rgba(24,117,245,0.48)] ring-1 ring-white/30 transition-[transform,filter,box-shadow,ring-color] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:ring-white/44 hover:shadow-[0_22px_54px_-14px_rgba(24,117,245,0.5)] hover:brightness-[1.025] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.985] motion-reduce:active:scale-100 active:duration-[180ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-200/60`;
 
 const btnHeroPrimaryWide = btnHeroPrimary.replace("px-7", "px-8");
 const btnHeroGhostWide = btnHeroGhost.replace("px-7", "px-8");
@@ -105,7 +105,7 @@ function TeacherPortrait({
       />
 
       <div
-        className={`relative overflow-hidden rounded-[2.15rem] border border-white/14 bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-transparent shadow-portrait-halo backdrop-blur-sm sm:rounded-[2.45rem] ${
+        className={`hero-image-shell interactive-card premium-glow relative overflow-hidden rounded-[2.15rem] border border-white/14 bg-gradient-to-b from-white/[0.09] via-white/[0.04] to-transparent shadow-portrait-halo backdrop-blur-sm sm:rounded-[2.45rem] ${
           isHero ? "p-[5px] sm:p-2" : "p-1"
         }`}
       >
@@ -295,20 +295,75 @@ export default function HomeLanding() {
   const ny = motionOk ? nudge.y : 0;
   const s = scrollShift;
 
+  const updateTiltSurface = (el: HTMLElement, x: number, y: number) => {
+    el.style.setProperty("--tilt-rx", `${(y * -3.8).toFixed(2)}deg`);
+    el.style.setProperty("--tilt-ry", `${(x * 4.4).toFixed(2)}deg`);
+    el.style.setProperty("--spot-x", `${((x + 0.5) * 100).toFixed(1)}%`);
+    el.style.setProperty("--spot-y", `${((y + 0.5) * 100).toFixed(1)}%`);
+  };
+
+  const handleCardPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (!motionOk || e.pointerType === "touch") return;
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / Math.max(1, r.width) - 0.5;
+    const py = (e.clientY - r.top) / Math.max(1, r.height) - 0.5;
+    updateTiltSurface(el, Math.max(-0.38, Math.min(0.38, px)), Math.max(-0.36, Math.min(0.36, py)));
+  };
+
+  const handleCardPointerLeave = (e: React.PointerEvent<HTMLElement>) => {
+    updateTiltSurface(e.currentTarget, 0, 0);
+  };
+
+  const handleMagneticMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (!motionOk || e.pointerType === "touch") return;
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / Math.max(1, r.width) - 0.5;
+    const py = (e.clientY - r.top) / Math.max(1, r.height) - 0.5;
+    el.style.setProperty("--mx", `${(Math.max(-0.5, Math.min(0.5, px)) * 5).toFixed(2)}px`);
+    el.style.setProperty("--my", `${(Math.max(-0.5, Math.min(0.5, py)) * 4).toFixed(2)}px`);
+  };
+
+  const handleMagneticLeave = (e: React.PointerEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty("--mx", "0px");
+    e.currentTarget.style.setProperty("--my", "0px");
+  };
+
   return (
     <div className="bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
       {/* —— Hero —— */}
       <section
         id="hero"
         aria-labelledby="hero-title"
-        className="landing-hero-cinematic relative min-h-[min(92svh,58rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:140%_140%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:bg-[length:120%_120%]"
+        className="landing-hero-cinematic relative min-h-[min(95svh,60rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:145%_145%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:bg-[length:125%_125%]"
       >
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
-        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.5rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
-          <div className="mx-auto grid w-full max-w-[min(100%,80rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-8 lg:gap-y-0 xl:gap-x-12">
-            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[26rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[28rem] xl:pe-10 xl:pt-6">
-              <div className="relative overflow-hidden rounded-[1.65rem] border border-white/[0.09] bg-[#071225]/[0.82] px-5 py-7 shadow-[0_18px_48px_-18px_rgba(0,0,0,0.5)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.35rem] lg:px-7 lg:py-9">
+        <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
+          <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[30rem] xl:pe-10 xl:pt-6">
+              <div
+                className="hero-surface-card hero-parallax interactive-card premium-glow relative overflow-hidden rounded-[1.65rem] border border-white/[0.11] bg-[#071225]/[0.84] px-5 py-7 shadow-[0_22px_52px_-18px_rgba(0,0,0,0.56),0_0_0_1px_rgba(148,163,184,0.12)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.45rem] lg:px-7 lg:py-9"
+                style={{
+                  transform: motionOk
+                    ? `translate3d(${nx * -8}px, ${ny * -5 + s * -1.6}px, 0) rotateX(var(--tilt-rx,0deg)) rotateY(var(--tilt-ry,0deg))`
+                    : undefined,
+                  transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
+                  willChange: motionOk ? "transform" : undefined,
+                }}
+                onPointerMove={handleCardPointerMove}
+                onPointerLeave={handleCardPointerLeave}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-85"
+                  style={{
+                    background:
+                      "radial-gradient(120% 76% at 50% 0%, rgba(56,189,248,0.12), transparent 56%), radial-gradient(80% 62% at 100% 100%, rgba(99,102,241,0.1), transparent 58%)",
+                  }}
+                  aria-hidden
+                />
+                <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-l from-transparent via-white/26 to-transparent" aria-hidden />
                 <div className="relative z-[1]">
               <div
                 className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/45 px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
@@ -320,7 +375,7 @@ export default function HomeLanding() {
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white [text-shadow:0_1px_20px_rgba(0,0,0,0.55)] sm:text-[2.125rem] sm:leading-[1.12] md:text-5xl md:leading-[1.1] xl:text-[3.35rem] animate-hero-rise"
+                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.12] md:text-[3.25rem] md:leading-[1.09] xl:text-[3.75rem] animate-hero-rise"
                 style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (
@@ -332,7 +387,7 @@ export default function HomeLanding() {
               </h1>
 
               <p
-                className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.78] text-slate-200/90 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-[1.75] lg:mx-0 lg:max-w-none animate-hero-rise"
+                className="mx-auto mt-7 max-w-xl text-pretty text-base leading-[1.78] text-slate-200/90 sm:mt-8 sm:max-w-2xl sm:text-[1.06rem] sm:leading-[1.78] lg:mx-0 lg:max-w-none animate-hero-rise"
                 style={{ animationDelay: "0.28s" }}
               >
                 {heroSubtitle ||
@@ -344,17 +399,17 @@ export default function HomeLanding() {
                 style={{ animationDelay: "0.4s" }}
               >
                 {heroBanner?.buttonText && heroBanner?.buttonUrl ? (
-                  <Link href={heroBanner.buttonUrl} className={btnHeroPrimary}>
+                  <Link href={heroBanner.buttonUrl} className={btnHeroPrimary} onPointerMove={handleMagneticMove} onPointerLeave={handleMagneticLeave}>
                     {heroBanner.buttonText}
                   </Link>
                 ) : null}
-                <Link href="/courses" className={btnHeroPrimary}>
+                <Link href="/courses" className={btnHeroPrimary} onPointerMove={handleMagneticMove} onPointerLeave={handleMagneticLeave}>
                   ابدأ التعلم الآن
                 </Link>
-                <Link href="/courses" className={btnHeroGhost}>
+                <Link href="/courses" className={btnHeroGhost} onPointerMove={handleMagneticMove} onPointerLeave={handleMagneticLeave}>
                   استكشف الدورات
                 </Link>
-                <Link href="/register" className={btnHeroBrand}>
+                <Link href="/register" className={btnHeroBrand} onPointerMove={handleMagneticMove} onPointerLeave={handleMagneticLeave}>
                   إنشاء حساب
                 </Link>
               </div>
@@ -365,7 +420,9 @@ export default function HomeLanding() {
                     <Link
                       key={btn.id}
                       href={btn.route}
-                      className={`touch-manipulation rounded-xl border border-white/22 bg-slate-950/55 px-4 py-2 text-xs font-bold text-slate-100 shadow-[0_6px_20px_-10px_rgba(0,0,0,0.4)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/32 hover:bg-slate-950/70 hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.991] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                      className={`magnetic-button touch-manipulation rounded-xl border border-white/22 bg-slate-950/55 px-4 py-2 text-xs font-bold text-slate-100 shadow-[0_6px_20px_-10px_rgba(0,0,0,0.4)] transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/32 hover:bg-slate-950/70 hover:shadow-[0_12px_28px_-10px_rgba(0,0,0,0.48)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.988] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                      onPointerMove={handleMagneticMove}
+                      onPointerLeave={handleMagneticLeave}
                     >
                       {btn.label}
                     </Link>
@@ -375,7 +432,7 @@ export default function HomeLanding() {
               {dynamicContent.banners.length > 1 ? (
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                   {dynamicContent.banners.slice(0, 5).map((banner, idx) => (
-                    <span key={banner.id || idx} className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[11px] font-semibold text-slate-200">
+                    <span key={banner.id || idx} className="hero-benefit-pill rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[11px] font-semibold text-slate-200">
                       {banner.title}
                     </span>
                   ))}
@@ -389,7 +446,7 @@ export default function HomeLanding() {
                 {["منهج أدبي واضح", "لغة عربية رصينة", "تجربة تعلّم أنيقة"].map((label) => (
                   <span
                     key={label}
-                    className={`inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/40 px-3 py-1.5 shadow-sm transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_4px_20px_-8px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
+                    className={`hero-benefit-pill inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/40 px-3 py-1.5 shadow-sm transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(14,116,144,0.32)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.992] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
                       <IconCheck className="size-3" />
@@ -408,17 +465,21 @@ export default function HomeLanding() {
             >
               <div className="w-full max-w-[min(22rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(36rem,calc(50vw-1.5rem))] xl:max-w-[min(38rem,44vw)]">
                 <div
-                  className="relative [transform-style:preserve-3d]"
+                  className="hero-surface-card relative [transform-style:preserve-3d]"
                   style={{
                     transform: motionOk ? `translate3d(${nx * 1.1}px, ${ny * 0.85 + s * -2.5}px, 0)` : undefined,
                     transition: motionOk ? "transform 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                     willChange: motionOk ? "transform" : undefined,
                   }}
+                  onPointerMove={handleCardPointerMove}
+                  onPointerLeave={handleCardPointerLeave}
                 >
                   <div
-                    className="relative will-change-transform"
+                    className="hero-premium-frame relative will-change-transform"
                     style={{
-                      transform: motionOk ? `perspective(1400px) rotateX(${ny * -0.07}deg) rotateY(${nx * 0.08}deg)` : undefined,
+                      transform: motionOk
+                        ? `perspective(1400px) rotateX(calc(${ny * -0.07}deg + var(--tilt-rx,0deg))) rotateY(calc(${nx * 0.08}deg + var(--tilt-ry,0deg)))`
+                        : undefined,
                       transition: motionOk ? "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                     }}
                   >
