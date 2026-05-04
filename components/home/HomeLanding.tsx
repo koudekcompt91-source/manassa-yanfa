@@ -8,7 +8,6 @@ import { useDemoSection } from "@/lib/demo-store";
 import { useHeroAmbient } from "@/components/home/useHeroAmbient";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
-import BrandWideBanner from "@/components/brand/BrandWideBanner";
 import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
@@ -337,9 +336,6 @@ export default function HomeLanding() {
 
   return (
     <div className="premium-app-bg bg-gradient-to-b from-[#eef2f9] via-[#f4f6fb] to-[#f4f6fb] text-slate-900">
-      <div className={`${container} pt-4 sm:pt-5`}>
-        <BrandWideBanner priority />
-      </div>
       {/* —— Hero —— */}
       <section
         id="hero"
