@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useDemoSection } from "@/lib/demo-store";
 import RechargeWalletModal from "@/components/student/RechargeWalletModal";
+import BrandWideBanner from "@/components/brand/BrandWideBanner";
 import { logoutSession } from "@/lib/admin-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatDzd, formatDzdOrDash, formatDzdSigned } from "@/lib/format-money";
@@ -478,6 +479,7 @@ function DashboardPageInner() {
 
   return (
     <div className="soft-grid-bg premium-app-bg flex w-full flex-col gap-5 sm:gap-6">
+      <BrandWideBanner />
       <header className="dashboard-welcome interactive-card p-4 sm:p-5">
         <div className="dashboard-welcome-blob-1" aria-hidden />
         <div className="dashboard-welcome-blob-2" aria-hidden />

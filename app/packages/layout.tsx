@@ -9,11 +9,12 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/packages" },
+  /** Catalog mirrors `/courses`; consolidate signals on one URL. Per-course pages set their own canonical under `/packages/[slug]`. */
+  alternates: { canonical: "/courses" },
   openGraph: {
     title: `${title} | ${SITE_NAME}`,
     description,
-    url: absoluteUrl("/packages"),
+    url: absoluteUrl("/courses"),
     siteName: SITE_NAME,
     locale: "ar_DZ",
     type: "website",

@@ -3,9 +3,10 @@ import { CourseStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site-config";
 
-/** Course URLs are fetched at request time so builds work without DATABASE_URL. */
+/** Fetched at request time so builds work without DATABASE_URL. */
 export const dynamic = "force-dynamic";
 
+/** Production sitemap: homepage, course catalog, and one URL per published course (detail pages live under /packages/[slug]). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -17,28 +18,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/login`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/register`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
       url: `${SITE_URL}/courses`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/packages`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
     },
   ];
 
