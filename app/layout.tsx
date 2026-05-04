@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Cairo } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import AppMain from "@/components/AppMain";
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL } from "@/lib/site-config";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -12,12 +13,23 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "yanfa3 Education | أكاديمية الأدب العربي",
-  description:
-    "yanfa3 Education — أكاديمية عربية متخصصة في النحو والبلاغة والشعر والنقد وتحليل النصوص الأدبية.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: HOME_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: HOME_DESCRIPTION,
   icons: {
     icon: [{ url: "/brand/yanfa-icon-mark.png", type: "image/png" }],
     apple: [{ url: "/brand/yanfa-icon-mark.png", type: "image/png" }],
+  },
+  openGraph: {
+    type: "website",
+    locale: "ar_DZ",
+    siteName: SITE_NAME,
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

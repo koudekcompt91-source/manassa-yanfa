@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
 
-const title = "تسجيل الدخول";
+const title = "إنشاء حساب";
 const description =
-  "سجّل الدخول إلى منصة ينفع لمتابعة دورات الأدب العربي، تقدّمك الدراسي، والحصص والاختبارات.";
+  "أنشئ حسابًا طلابيًا على منصة ينفع وابدأ رحلتك في تعلم الأدب العربي مع الدروس المسجلة والمتابعة الذكية للتقدم.";
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/login" },
+  alternates: { canonical: "/register" },
   openGraph: {
     title: `${title} | ${SITE_NAME}`,
     description,
-    url: absoluteUrl("/login"),
+    url: absoluteUrl("/register"),
     siteName: SITE_NAME,
     locale: "ar_DZ",
     type: "website",
@@ -26,9 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-/** Keeps /login on the dynamic path so dev/prod always resolve this segment with the app shell. */
-export const dynamic = "force-dynamic";
-
-export default function LoginLayout({ children }: { children: ReactNode }) {
+export default function RegisterLayout({ children }: { children: ReactNode }) {
   return children;
 }
