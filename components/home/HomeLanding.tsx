@@ -8,6 +8,7 @@ import { useDemoSection } from "@/lib/demo-store";
 import { useHeroAmbient } from "@/components/home/useHeroAmbient";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
+import BismillahBadge from "@/components/brand/BismillahBadge";
 import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
@@ -345,6 +346,7 @@ export default function HomeLanding() {
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
+          <BismillahBadge variant="hero" scrollShift={s} motionOk={motionOk} className="mb-5 sm:mb-6 lg:mb-7" />
           <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
             <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[30rem] xl:pe-10 xl:pt-6">
               <div
