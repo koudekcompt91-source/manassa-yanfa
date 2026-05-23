@@ -76,13 +76,9 @@ function IconCheck(props: { className?: string }) {
 function TeacherPortrait({
   variant = "hero",
   priority = false,
-  motionOk = true,
-  scrollShift = 0,
 }: {
   variant?: "hero" | "section";
   priority?: boolean;
-  motionOk?: boolean;
-  scrollShift?: number;
 }) {
   const isHero = variant === "hero";
   /** Soft capsule silhouette — avoids a stark rectangular crop while keeping the subject intact */
@@ -90,44 +86,32 @@ function TeacherPortrait({
     ? "[clip-path:ellipse(100%_96%_at_50%_48%)] sm:[clip-path:ellipse(99%_94%_at_50%_47%)]"
     : "[clip-path:ellipse(100%_97%_at_50%_49%)]";
 
-  const floatStyle =
-    isHero && motionOk && scrollShift !== 0
-      ? { transform: `translate3d(0, ${(scrollShift * -0.1).toFixed(2)}px, 0)` }
-      : undefined;
-
   return (
-    <div
-      className={`group relative mx-auto w-full ${isHero ? "max-w-none pb-11 sm:pb-14 lg:pb-16" : "max-w-sm"}`}
-      style={floatStyle}
-    >
+    <div className={`relative mx-auto w-full ${isHero ? "" : "max-w-sm"}`}>
       <div
-        className={`pointer-events-none absolute rounded-full bg-gradient-to-br from-brand-500/45 via-indigo-500/32 to-teal-400/20 blur-3xl motion-safe:animate-soft-glow motion-reduce:animate-none motion-reduce:opacity-[0.68] ${
-          isHero ? "-inset-12 sm:-inset-20 lg:-inset-24" : "-inset-6"
+        className={`pointer-events-none absolute rounded-full bg-gradient-to-br from-brand-500/40 via-indigo-500/28 to-teal-400/18 blur-3xl motion-safe:animate-soft-glow motion-reduce:animate-none motion-reduce:opacity-[0.68] ${
+          isHero ? "-inset-10 sm:-inset-16" : "-inset-6"
         }`}
         aria-hidden
       />
       <div
-        className={`pointer-events-none absolute rounded-full bg-gradient-to-tl from-sky-400/20 via-transparent to-transparent blur-3xl motion-safe:animate-ambient-drift motion-reduce:animate-none ${
-          isHero ? "-end-10 -top-6 size-56 sm:size-72 lg:size-80" : "-end-4 -top-2 size-36"
+        className={`pointer-events-none absolute rounded-full bg-gradient-to-tl from-sky-400/15 via-transparent to-transparent blur-3xl motion-safe:animate-ambient-drift motion-reduce:animate-none ${
+          isHero ? "-end-8 -top-4 size-48 sm:size-64" : "-end-4 -top-2 size-36"
         }`}
         style={{ animationDelay: "-4s" }}
         aria-hidden
       />
       {/* Head-area bloom — stays behind the figure, no facial “beauty” filtering */}
       <div
-        className={`pointer-events-none absolute left-1/2 z-0 rounded-full bg-gradient-to-b from-brand-400/40 via-indigo-500/24 to-transparent blur-3xl ${
-          isHero
-            ? "top-[18%] h-[min(60%,28rem)] w-[min(98%,32rem)] -translate-x-1/2 -translate-y-1/2 lg:h-[min(62%,30rem)] lg:w-[min(100%,34rem)]"
-            : "top-[22%] h-[55%] w-[95%] -translate-x-1/2 -translate-y-1/2"
+        className={`pointer-events-none absolute left-1/2 z-0 rounded-full bg-gradient-to-b from-brand-400/35 via-indigo-500/20 to-transparent blur-3xl ${
+          isHero ? "top-[20%] h-[min(52%,22rem)] w-[min(92%,26rem)] -translate-x-1/2 -translate-y-1/2" : "top-[22%] h-[55%] w-[95%] -translate-x-1/2 -translate-y-1/2"
         }`}
         aria-hidden
       />
 
       <div
-        className={`hero-image-shell interactive-card premium-glow relative overflow-hidden rounded-[2.15rem] border border-white/14 bg-gradient-to-b from-white/[0.09] via-white/[0.04] to-transparent backdrop-blur-sm sm:rounded-[2.45rem] ${
-          isHero
-            ? "p-[5px] shadow-portrait-halo shadow-[0_0_80px_-20px_rgba(47,148,255,0.42)] transition-[transform,box-shadow] duration-[650ms] ease-out motion-safe:group-hover:scale-[1.015] motion-reduce:group-hover:scale-100 motion-safe:group-hover:shadow-[0_0_120px_-12px_rgba(47,148,255,0.55),0_48px_110px_-32px_rgba(15,23,42,0.68)] sm:p-2 lg:rounded-[2.65rem]"
-            : "p-1 shadow-portrait-halo"
+        className={`hero-image-shell interactive-card premium-glow relative overflow-hidden rounded-[2.15rem] border border-white/14 bg-gradient-to-b from-white/[0.09] via-white/[0.04] to-transparent shadow-portrait-halo backdrop-blur-sm sm:rounded-[2.45rem] ${
+          isHero ? "p-[5px] sm:p-2" : "p-1"
         }`}
       >
         <div
@@ -159,14 +143,10 @@ function TeacherPortrait({
               width={TEACHER_IMAGE_WIDTH}
               height={TEACHER_IMAGE_HEIGHT}
               priority={priority}
-              sizes={
+              sizes={isHero ? "(max-width: 640px) 90vw, (max-width: 1024px) 50vw, (max-width: 1536px) 42vw, 38rem" : "(max-width: 768px) 100vw, 320px"}
+              className={`relative z-[1] h-auto w-full object-cover transition duration-[900ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                 isHero
-                  ? "(max-width: 640px) 94vw, (max-width: 768px) 88vw, (max-width: 1024px) 62vw, (max-width: 1536px) 54vw, 52rem"
-                  : "(max-width: 768px) 100vw, 320px"
-              }
-              className={`relative z-[1] h-auto w-full object-cover transition-[transform,filter] duration-[700ms] ease-out motion-safe:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100 ${
-                isHero
-                  ? "object-[center_18%] scale-[1.001] sm:object-[center_16%] lg:scale-[1.004]"
+                  ? "object-[center_18%] scale-[1.001] sm:object-[center_16%] lg:scale-[1.002]"
                   : "object-[center_20%] scale-[1.001]"
               }`}
             />
@@ -184,7 +164,7 @@ function TeacherPortrait({
         </div>
       </div>
       {isHero ? (
-        <div className="pointer-events-none absolute -bottom-7 inset-x-5 z-[3] mx-auto max-w-md rounded-2xl border border-white/14 bg-slate-950/90 px-4 py-3.5 text-center shadow-[0_20px_40px_-14px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.06),0_0_32px_-8px_rgba(47,148,255,0.28),inset_0_1px_0_0_rgba(255,255,255,0.08)] backdrop-blur-md sm:-bottom-9 sm:max-w-lg sm:px-5 lg:-bottom-11">
+        <div className="pointer-events-none absolute -bottom-6 inset-x-4 z-[3] mx-auto max-w-md rounded-2xl border border-white/14 bg-slate-950/90 px-4 py-3.5 text-center shadow-[0_20px_40px_-14px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.06),inset_0_1px_0_0_rgba(255,255,255,0.08)] backdrop-blur-md sm:-bottom-8 sm:px-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">وجه المنصة التعليمية</p>
           <p className="mt-1 text-base font-extrabold text-white sm:text-lg">{TEACHER_NAME}</p>
           <p className="mt-0.5 text-xs font-medium text-slate-300 sm:text-sm">أستاذ الأدب العربي وعلومه — قراءة منهجية، أسلوب رصين، ولغة أدبية أنيقة</p>
@@ -361,14 +341,13 @@ export default function HomeLanding() {
       <section
         id="hero"
         aria-labelledby="hero-title"
-        className="landing-hero-cinematic relative min-h-[min(96svh,62rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:145%_145%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:min-h-[min(98svh,64rem)] sm:bg-[length:125%_125%] lg:min-h-[min(100svh,68rem)]"
+        className="landing-hero-cinematic relative min-h-[min(95svh,60rem)] overflow-hidden border-b border-slate-900/25 bg-slate-950 bg-hero-mesh bg-[length:145%_145%] motion-safe:animate-hero-mesh-flow motion-reduce:animate-none sm:bg-[length:125%_125%]"
       >
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
-          <BismillahBadge variant="hero" scrollShift={s} motionOk={motionOk} className="mb-5 sm:mb-6 lg:mb-7" />
-          <div className="mx-auto grid w-full max-w-[min(100%,92rem)] items-center gap-8 sm:gap-10 md:gap-12 lg:grid-cols-12 lg:items-center lg:gap-x-6 xl:gap-x-10">
-            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-4 lg:mx-0 lg:max-w-[25rem] lg:justify-self-end lg:pe-4 lg:pt-2 lg:text-start xl:max-w-[27rem] xl:pe-8 xl:pt-4">
+          <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[30rem] xl:pe-10 xl:pt-6">
               <div
                 className="hero-surface-card hero-parallax interactive-card premium-glow relative overflow-hidden rounded-[1.65rem] border border-white/[0.11] bg-[#071225]/[0.84] px-5 py-7 shadow-[0_22px_52px_-18px_rgba(0,0,0,0.56),0_0_0_1px_rgba(148,163,184,0.12)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.45rem] lg:px-7 lg:py-9"
                 style={{
@@ -398,6 +377,8 @@ export default function HomeLanding() {
                 <IconSpark className="size-4 shrink-0 text-brand-200" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
+
+              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-5 sm:mb-6" />
 
               <h1
                 id="hero-title"
@@ -486,14 +467,14 @@ export default function HomeLanding() {
             </div>
 
             <div
-              className="order-1 flex w-full justify-center justify-self-center px-0 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-8 lg:max-w-none lg:justify-self-start lg:ps-2 lg:pt-0 xl:ps-6"
+              className="order-1 flex w-full justify-center justify-self-center px-1 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-7 lg:max-w-none lg:justify-self-start lg:ps-4 lg:pt-2 xl:ps-8 xl:pt-3"
               style={{ animationDelay: "0.08s" }}
             >
-              <div className="w-full max-w-[min(26rem,94vw)] sm:max-w-[min(30rem,90vw)] md:max-w-[min(36rem,88vw)] lg:max-w-[min(44rem,58vw)] xl:max-w-[min(50rem,60vw)] 2xl:max-w-[min(54rem,62vw)]">
+              <div className="w-full max-w-[min(22rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(36rem,calc(50vw-1.5rem))] xl:max-w-[min(38rem,44vw)]">
                 <div
                   className="hero-surface-card relative [transform-style:preserve-3d]"
                   style={{
-                    transform: motionOk ? `translate3d(${nx * 1.15}px, ${ny * 0.9 + s * -3.2}px, 0)` : undefined,
+                    transform: motionOk ? `translate3d(${nx * 1.1}px, ${ny * 0.85 + s * -2.5}px, 0)` : undefined,
                     transition: motionOk ? "transform 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                     willChange: motionOk ? "transform" : undefined,
                   }}
@@ -509,7 +490,7 @@ export default function HomeLanding() {
                       transition: motionOk ? "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
                     }}
                   >
-                    <TeacherPortrait variant="hero" priority motionOk={motionOk} scrollShift={s} />
+                    <TeacherPortrait variant="hero" priority />
                   </div>
                 </div>
               </div>
