@@ -322,11 +322,6 @@ export default function HomeLanding() {
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
-          <BismillahBadge
-            variant="hero"
-            motionOk={motionOk}
-            className="pointer-events-none absolute inset-x-0 top-[5.35rem] z-20 sm:top-[6.65rem] md:top-[6.85rem] lg:top-[7.45rem]"
-          />
           <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-center lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
             <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-0 lg:text-start xl:max-w-[30rem] xl:pe-10">
               <div
@@ -342,6 +337,8 @@ export default function HomeLanding() {
                 />
                 <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-l from-transparent via-white/26 to-transparent" aria-hidden />
                 <div className="relative z-[1]">
+              <BismillahBadge variant="hero" motionOk={motionOk} />
+
               <div
                 className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/45 px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                 style={{ animationDelay: "0ms" }}
