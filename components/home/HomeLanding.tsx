@@ -325,7 +325,7 @@ export default function HomeLanding() {
           <BismillahBadge
             variant="hero"
             motionOk={motionOk}
-            className="pointer-events-none absolute inset-x-0 top-[4.65rem] z-20 sm:top-[5.35rem] md:top-[5.65rem] lg:top-[6.1rem]"
+            className="pointer-events-none absolute inset-x-0 top-[5.35rem] z-20 sm:top-[6.65rem] md:top-[6.85rem] lg:top-[7.45rem]"
           />
           <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-center lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
             <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-0 lg:text-start xl:max-w-[30rem] xl:pe-10">
