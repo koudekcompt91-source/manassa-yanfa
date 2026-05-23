@@ -144,10 +144,10 @@ function TeacherPortrait({
               height={TEACHER_IMAGE_HEIGHT}
               priority={priority}
               sizes={isHero ? "(max-width: 640px) 90vw, (max-width: 1024px) 50vw, (max-width: 1536px) 42vw, 38rem" : "(max-width: 768px) 100vw, 320px"}
-              className={`relative z-[1] h-auto w-full object-cover transition duration-[900ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+              className={`relative z-[1] h-auto w-full object-cover ${
                 isHero
-                  ? "object-[center_18%] scale-[1.001] sm:object-[center_16%] lg:scale-[1.002]"
-                  : "object-[center_20%] scale-[1.001]"
+                  ? "object-[center_18%] sm:object-[center_16%] lg:scale-[1.03]"
+                  : "object-[center_20%]"
               }`}
             />
           </div>
@@ -296,30 +296,6 @@ export default function HomeLanding() {
       : (announcements || []).filter((row: { placement?: string }) => row.placement === "homepage" || row.placement === "global");
   const featuredCourses = dynamicContent.featuredCourses.length ? dynamicContent.featuredCourses : fallbackFeaturedCourses;
 
-  const nx = motionOk ? nudge.x : 0;
-  const ny = motionOk ? nudge.y : 0;
-  const s = scrollShift;
-
-  const updateTiltSurface = (el: HTMLElement, x: number, y: number) => {
-    el.style.setProperty("--tilt-rx", `${(y * -3.8).toFixed(2)}deg`);
-    el.style.setProperty("--tilt-ry", `${(x * 4.4).toFixed(2)}deg`);
-    el.style.setProperty("--spot-x", `${((x + 0.5) * 100).toFixed(1)}%`);
-    el.style.setProperty("--spot-y", `${((y + 0.5) * 100).toFixed(1)}%`);
-  };
-
-  const handleCardPointerMove = (e: React.PointerEvent<HTMLElement>) => {
-    if (!motionOk || e.pointerType === "touch") return;
-    const el = e.currentTarget;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / Math.max(1, r.width) - 0.5;
-    const py = (e.clientY - r.top) / Math.max(1, r.height) - 0.5;
-    updateTiltSurface(el, Math.max(-0.38, Math.min(0.38, px)), Math.max(-0.36, Math.min(0.36, py)));
-  };
-
-  const handleCardPointerLeave = (e: React.PointerEvent<HTMLElement>) => {
-    updateTiltSurface(e.currentTarget, 0, 0);
-  };
-
   const handleMagneticMove = (e: React.PointerEvent<HTMLElement>) => {
     if (!motionOk || e.pointerType === "touch") return;
     const el = e.currentTarget;
@@ -346,19 +322,10 @@ export default function HomeLanding() {
         <HeroAmbientLayers motionOk={motionOk} nudge={nudge} scrollShift={scrollShift} />
 
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
-          <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-start lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
-            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-5 lg:text-start xl:max-w-[30rem] xl:pe-10 xl:pt-6">
+          <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-center lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-0 lg:text-start xl:max-w-[30rem] xl:pe-10">
               <div
                 className="hero-surface-card hero-parallax interactive-card premium-glow relative overflow-hidden rounded-[1.65rem] border border-white/[0.11] bg-[#071225]/[0.84] px-5 py-7 shadow-[0_22px_52px_-18px_rgba(0,0,0,0.56),0_0_0_1px_rgba(148,163,184,0.12)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.45rem] lg:px-7 lg:py-9"
-                style={{
-                  transform: motionOk
-                    ? `translate3d(${nx * -8}px, ${ny * -5 + s * -1.6}px, 0) rotateX(var(--tilt-rx,0deg)) rotateY(var(--tilt-ry,0deg))`
-                    : undefined,
-                  transition: motionOk ? "transform 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
-                  willChange: motionOk ? "transform" : undefined,
-                }}
-                onPointerMove={handleCardPointerMove}
-                onPointerLeave={handleCardPointerLeave}
               >
                 <div
                   className="pointer-events-none absolute inset-0 opacity-85"
@@ -378,7 +345,7 @@ export default function HomeLanding() {
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
-              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-5 sm:mb-6" />
+              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-4 sm:mb-5" />
 
               <h1
                 id="hero-title"
@@ -467,32 +434,11 @@ export default function HomeLanding() {
             </div>
 
             <div
-              className="order-1 flex w-full justify-center justify-self-center px-1 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-7 lg:max-w-none lg:justify-self-start lg:ps-4 lg:pt-2 xl:ps-8 xl:pt-3"
+              className="order-1 flex w-full justify-center justify-self-center px-1 animate-hero-rise sm:px-0 lg:order-2 lg:col-span-7 lg:max-w-none lg:justify-self-start lg:ps-4 lg:pt-0 xl:ps-8"
               style={{ animationDelay: "0.08s" }}
             >
-              <div className="w-full max-w-[min(22rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(36rem,calc(50vw-1.5rem))] xl:max-w-[min(38rem,44vw)]">
-                <div
-                  className="hero-surface-card relative [transform-style:preserve-3d]"
-                  style={{
-                    transform: motionOk ? `translate3d(${nx * 1.1}px, ${ny * 0.85 + s * -2.5}px, 0)` : undefined,
-                    transition: motionOk ? "transform 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
-                    willChange: motionOk ? "transform" : undefined,
-                  }}
-                  onPointerMove={handleCardPointerMove}
-                  onPointerLeave={handleCardPointerLeave}
-                >
-                  <div
-                    className="hero-premium-frame relative will-change-transform"
-                    style={{
-                      transform: motionOk
-                        ? `perspective(1400px) rotateX(calc(${ny * -0.07}deg + var(--tilt-rx,0deg))) rotateY(calc(${nx * 0.08}deg + var(--tilt-ry,0deg)))`
-                        : undefined,
-                      transition: motionOk ? "transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : undefined,
-                    }}
-                  >
-                    <TeacherPortrait variant="hero" priority />
-                  </div>
-                </div>
+              <div className="w-full max-w-[min(23rem,88vw)] sm:max-w-md md:max-w-lg lg:w-full lg:max-w-[min(37rem,calc(50vw-1.5rem))] xl:max-w-[min(40rem,44vw)]">
+                <TeacherPortrait variant="hero" priority />
               </div>
             </div>
           </div>
