@@ -12,7 +12,7 @@ type BismillahBadgeProps = {
 const variantStyles = {
   hero: {
     shell:
-      "border-white/14 bg-white/[0.05] text-sky-50/90 shadow-[0_0_18px_-10px_rgba(47,148,255,0.28),0_2px_12px_-8px_rgba(2,6,23,0.4),0_0_0_1px_rgba(255,255,255,0.04)_inset,inset_0_1px_0_0_rgba(255,255,255,0.08)]",
+      "border-white/15 bg-white/[0.06] text-sky-50/92 shadow-[0_0_20px_-10px_rgba(47,148,255,0.3),0_4px_14px_-8px_rgba(2,6,23,0.45),0_0_0_1px_rgba(255,255,255,0.05)_inset,inset_0_1px_0_0_rgba(255,255,255,0.1)]",
   },
   light: {
     shell:
@@ -26,19 +26,19 @@ export default function BismillahBadge({
   className = "",
 }: BismillahBadgeProps) {
   const styles = variantStyles[variant];
+  const fadeClass = motionOk ? "motion-safe:animate-bismillah-fade-in motion-reduce:animate-none" : "";
+  const floatClass = motionOk ? "motion-safe:animate-bismillah-float motion-reduce:animate-none" : "";
 
   return (
-    <div
-      className={`flex w-full justify-center ${motionOk ? "motion-safe:animate-bismillah-fade-in motion-reduce:animate-none" : ""} motion-reduce:opacity-100 ${className}`.trim()}
-    >
+    <div className={`flex w-full justify-center px-3 sm:px-0 ${fadeClass} motion-reduce:opacity-100 ${className}`.trim()}>
       <p
-        className={`relative inline-flex max-w-[min(100%,32rem)] items-center justify-center rounded-full border px-3 py-1 text-center backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-sm sm:px-4 sm:py-1.5 ${styles.shell}`}
+        className={`relative inline-flex max-w-[min(100%,34rem)] items-center justify-center rounded-full border px-4 py-1.5 text-center font-sans backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-sm sm:px-5 sm:py-2 ${floatClass} ${styles.shell}`}
       >
         <span
-          className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-l from-transparent via-white/25 to-transparent opacity-70"
+          className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-l from-transparent via-white/28 to-transparent opacity-75"
           aria-hidden
         />
-        <span className="relative z-[1] text-pretty text-[0.6875rem] font-medium leading-[1.8] tracking-[0.01em] sm:text-xs sm:leading-[1.85]">
+        <span className="relative z-[1] text-pretty text-xs font-medium leading-[1.85] tracking-[0.01em] sm:text-[0.8125rem] sm:leading-[1.9]">
           {BISMILLAH}
         </span>
       </p>
