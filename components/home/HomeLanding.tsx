@@ -337,8 +337,6 @@ export default function HomeLanding() {
                 />
                 <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-l from-transparent via-white/26 to-transparent" aria-hidden />
                 <div className="relative z-[1]">
-              <BismillahBadge variant="hero" motionOk={motionOk} />
-
               <div
                 className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/45 px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                 style={{ animationDelay: "0ms" }}
@@ -347,9 +345,11 @@ export default function HomeLanding() {
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
+              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-3 mx-auto lg:mx-0" />
+
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-black leading-[1.12] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.12] md:text-[3.25rem] md:leading-[1.09] xl:text-[3.75rem] animate-hero-rise"
+                className="text-balance text-3xl font-extrabold leading-[1.15] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.14] md:text-[3.25rem] md:leading-[1.1] xl:text-[3.75rem] animate-hero-rise"
                 style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (

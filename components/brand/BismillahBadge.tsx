@@ -25,12 +25,10 @@ export default function BismillahBadge({
   const fadeClass = motionOk ? "motion-safe:animate-bismillah-fade-in motion-reduce:animate-none" : "";
 
   return (
-    <div className={`flex w-full justify-center ${className}`.trim()}>
-      <p
-        className={`mb-3 inline-flex items-center justify-center rounded-full border px-[14px] py-[6px] text-[13px] font-medium leading-normal tracking-normal ${fadeClass} motion-reduce:opacity-100 ${shell}`}
-      >
-        {BISMILLAH}
-      </p>
-    </div>
+    <p
+      className={`inline-flex w-fit items-center justify-center rounded-full border px-[14px] py-[6px] text-[13px] font-medium leading-normal tracking-normal ${fadeClass} motion-reduce:opacity-100 ${shell} ${className}`.trim()}
+    >
+      {BISMILLAH}
+    </p>
   );
 }
