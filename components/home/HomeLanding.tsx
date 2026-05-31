@@ -345,11 +345,11 @@ export default function HomeLanding() {
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
-              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-3 mx-auto lg:mx-0" />
+              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-[10px] mx-auto lg:mx-0" />
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-extrabold leading-[1.15] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.14] md:text-[3.25rem] md:leading-[1.1] xl:text-[3.75rem] animate-hero-rise"
+                className="text-balance text-3xl font-extrabold leading-[1.16] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.15] md:text-[3.25rem] md:leading-[1.11] xl:text-[3.75rem] animate-hero-rise"
                 style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (
