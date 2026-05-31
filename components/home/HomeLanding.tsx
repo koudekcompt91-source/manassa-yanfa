@@ -8,7 +8,6 @@ import { useDemoSection } from "@/lib/demo-store";
 import { useHeroAmbient } from "@/components/home/useHeroAmbient";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
-import BismillahBadge from "@/components/brand/BismillahBadge";
 import { BRAND_NAME } from "@/lib/brand";
 
 const container = "container-landing";
@@ -323,7 +322,7 @@ export default function HomeLanding() {
 
         <div className={`${container} relative z-10 flex min-h-[inherit] flex-col justify-center pt-[4.75rem] pb-16 sm:pt-24 sm:pb-20 lg:py-28`}>
           <div className="mx-auto grid w-full max-w-[min(100%,82rem)] items-center gap-10 sm:gap-12 lg:grid-cols-12 lg:items-center lg:gap-x-9 lg:gap-y-0 xl:gap-x-14">
-            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:justify-self-end lg:pe-6 lg:pt-0 lg:text-start xl:max-w-[30rem] xl:pe-10">
+            <div className="relative z-[1] order-2 mx-auto w-full max-w-xl text-center lg:order-1 lg:col-span-5 lg:mx-0 lg:max-w-[27rem] lg:self-center lg:justify-self-end lg:pe-6 lg:pt-0 lg:text-start xl:max-w-[30rem] xl:pe-10">
               <div
                 className="hero-surface-card hero-parallax interactive-card premium-glow relative overflow-hidden rounded-[1.65rem] border border-white/[0.11] bg-[#071225]/[0.84] px-5 py-7 shadow-[0_22px_52px_-18px_rgba(0,0,0,0.56),0_0_0_1px_rgba(148,163,184,0.12)] backdrop-blur-sm motion-reduce:backdrop-blur-none sm:rounded-2xl sm:px-6 sm:py-8 lg:rounded-[1.45rem] lg:px-7 lg:py-9"
               >
@@ -345,11 +344,13 @@ export default function HomeLanding() {
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
-              <BismillahBadge variant="hero" motionOk={motionOk} className="mb-[10px] mx-auto lg:mx-0" />
+              <p className="inline-flex mb-3 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/80 text-[13px] backdrop-blur-md w-fit mx-auto">
+                بسم الله الرحمن الرحيم
+              </p>
 
               <h1
                 id="hero-title"
-                className="text-balance text-3xl font-extrabold leading-[1.16] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.15] md:text-[3.25rem] md:leading-[1.11] xl:text-[3.75rem] animate-hero-rise"
+                className="text-balance text-3xl font-extrabold leading-[1.18] tracking-tight text-white [text-shadow:0_2px_22px_rgba(0,0,0,0.6)] sm:text-[2.2rem] sm:leading-[1.16] md:text-[3.25rem] md:leading-[1.12] xl:text-[3.75rem] animate-hero-rise"
                 style={{ animationDelay: "0.16s" }}
               >
                 {heroTitle || (
