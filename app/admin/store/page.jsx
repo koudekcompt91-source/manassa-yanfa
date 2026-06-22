@@ -13,6 +13,7 @@ import {
   AdminToolbar,
 } from "@/components/admin/AdminUI";
 import { formatDzd } from "@/lib/format-money";
+import { ALGERIA_WILAYAS } from "@/lib/algeria-wilayas";
 
 const EMPTY_ITEM_FORM = {
   title: "",
@@ -20,6 +21,7 @@ const EMPTY_ITEM_FORM = {
   price: 0,
   isFree: false,
   imageUrl: "",
+  wilaya: "",
   teacherId: "",
   status: "DRAFT",
 };
@@ -128,6 +130,7 @@ export default function AdminStorePage() {
       price: Number(item.price || 0),
       isFree: Boolean(item.isFree),
       imageUrl: item.imageUrl || "",
+      wilaya: item.wilaya || "",
       teacherId: item.teacherId || "",
       status: item.status || "DRAFT",
     });
@@ -290,6 +293,16 @@ export default function AdminStorePage() {
                 <AdminFormField label="رابط الصورة (اختياري)">
                   <AdminInput value={form.imageUrl} onChange={(e) => setForm((s) => ({ ...s, imageUrl: e.target.value }))} placeholder="https://..." />
                 </AdminFormField>
+                <AdminFormField label="الولاية (اختياري)">
+                  <AdminSelect value={form.wilaya} onChange={(e) => setForm((s) => ({ ...s, wilaya: e.target.value }))}>
+                    <option value="">بدون ولاية محددة</option>
+                    {ALGERIA_WILAYAS.map((w) => (
+                      <option key={w} value={w}>
+                        {w}
+                      </option>
+                    ))}
+                  </AdminSelect>
+                </AdminFormField>
                 <AdminFormField label="النوع">
                   <AdminSelect
                     value={form.isFree ? "free" : "paid"}
@@ -417,6 +430,7 @@ export default function AdminStorePage() {
                         </td>
                         <td className="px-3 py-4">
                           <p className="font-semibold text-slate-900">{o.fullName} {o.lastName}</p>
+                          {o.wilaya ? <p className="mt-1 text-xs text-slate-500">الولاية: {o.wilaya}</p> : null}
                           {o.studentEmail ? <p className="mt-1 text-xs text-slate-500" dir="ltr">{o.studentEmail}</p> : null}
                         </td>
                         <td className="px-3 py-4" dir="ltr">{o.phone}</td>

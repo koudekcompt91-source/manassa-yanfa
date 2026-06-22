@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDzd } from "@/lib/format-money";
+import { ALGERIA_WILAYAS } from "@/lib/algeria-wilayas";
 
 function isRemoteCover(src) {
   const s = String(src || "").trim();
@@ -26,9 +27,10 @@ export default function StorePage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [wilayaFilter, setWilayaFilter] = useState("الكل");
 
   const [modalItem, setModalItem] = useState(null);
-  const [form, setForm] = useState({ fullName: "", lastName: "", phone: "" });
+  const [form, setForm] = useState({ fullName: "", lastName: "", phone: "", wilaya: "" });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [banner, setBanner] = useState("");
@@ -52,7 +54,7 @@ export default function StorePage() {
 
   function openPurchase(item) {
     setModalItem(item);
-    setForm({ fullName: "", lastName: "", phone: "" });
+    setForm({ fullName: "", lastName: "", phone: "", wilaya: "" });
     setFormError("");
   }
 
@@ -70,6 +72,10 @@ export default function StorePage() {
       setFormError("يرجى تعبئة جميع الحقول المطلوبة.");
       return;
     }
+    if (!form.wilaya.trim()) {
+      setFormError("يرجى اختيار الولاية.");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/store/orders", {
@@ -81,6 +87,7 @@ export default function StorePage() {
           fullName: form.fullName.trim(),
           lastName: form.lastName.trim(),
           phone: form.phone.trim(),
+          wilaya: form.wilaya,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -96,10 +103,15 @@ export default function StorePage() {
     }
   }
 
-  const filtered = items.filter((item) => {
-    const target = `${item.title} ${item.description} ${item.teacherName}`.toLowerCase();
-    return target.includes(query.trim().toLowerCase());
-  });
+  const filtered = useMemo(() => {
+    return items.filter((item) => {
+      const target = `${item.title} ${item.description} ${item.teacherName}`.toLowerCase();
+      const matchesQuery = target.includes(query.trim().toLowerCase());
+      // Items without a wilaya tag only appear under "الكل"; a specific wilaya shows only matching items.
+      const matchesWilaya = wilayaFilter === "الكل" || String(item.wilaya || "") === wilayaFilter;
+      return matchesQuery && matchesWilaya;
+    });
+  }, [items, query, wilayaFilter]);
 
   return (
     <section className="container-page premium-app-bg space-y-8 py-8 sm:py-10">
@@ -107,13 +119,28 @@ export default function StorePage() {
         <p className="text-sm font-bold text-brand-700">المتجر</p>
         <h1 className="mt-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">متجر المنصة</h1>
         <p className="mt-2 text-slate-600">تصفّح العناصر المقدّمة من الأساتذة وأرسل طلب شراء بسهولة.</p>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="ابحث في المتجر…"
-          className="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
-        />
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ابحث في المتجر…"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+          />
+          <select
+            value={wilayaFilter}
+            onChange={(e) => setWilayaFilter(e.target.value)}
+            aria-label="فلتر حسب الولاية"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm sm:w-64"
+          >
+            <option value="الكل">فلتر حسب الولاية: الكل</option>
+            {ALGERIA_WILAYAS.map((w) => (
+              <option key={w} value={w}>
+                {w}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
 
       {banner ? (
@@ -149,6 +176,11 @@ export default function StorePage() {
                     >
                       {isFree ? "مجاني" : "مدفوع"}
                     </span>
+                    {item.wilaya ? (
+                      <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-800">
+                        {item.wilaya}
+                      </span>
+                    ) : null}
                   </div>
                   <h2 className="mt-2 text-lg font-extrabold text-slate-900">{item.title}</h2>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
@@ -249,6 +281,27 @@ export default function StorePage() {
                   className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 text-sm text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
                   placeholder="06xxxxxxxx"
                 />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="store-wilaya" className="block text-sm font-bold text-slate-700">
+                  الولاية <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="store-wilaya"
+                  value={form.wilaya}
+                  onChange={(e) => setForm((s) => ({ ...s, wilaya: e.target.value }))}
+                  required
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 text-sm text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
+                >
+                  <option value="" disabled>
+                    اختر الولاية
+                  </option>
+                  {ALGERIA_WILAYAS.map((w) => (
+                    <option key={w} value={w}>
+                      {w}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {formError ? (

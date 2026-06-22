@@ -14,6 +14,7 @@ function normalizeItem(item: {
   price: number;
   isFree: boolean;
   imageUrl: string | null;
+  wilaya: string | null;
   teacherId: string | null;
   status: StoreItemStatus;
   order: number;
@@ -29,6 +30,7 @@ function normalizeItem(item: {
     price: item.price,
     isFree: item.isFree,
     imageUrl: item.imageUrl,
+    wilaya: item.wilaya,
     teacherId: item.teacherId,
     teacherName: item.teacher?.fullName || "",
     status: item.status,

@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         fullName: valid.value.fullName,
         lastName: valid.value.lastName,
         phone: valid.value.phone,
+        wilaya: valid.value.wilaya,
         status: "PENDING",
       },
     });

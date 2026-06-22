@@ -17,7 +17,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
     const existing = await prisma.storeItem.findUnique({
       where: { id: params.id },
-      select: { id: true, title: true, description: true, price: true, isFree: true, imageUrl: true, teacherId: true, status: true },
+      select: { id: true, title: true, description: true, price: true, isFree: true, imageUrl: true, wilaya: true, teacherId: true, status: true },
     });
     if (!existing) {
       return NextResponse.json({ ok: false, message: "العنصر غير موجود." }, { status: 404 });
@@ -40,6 +40,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       price: body?.price ?? existing.price,
       isFree: body?.isFree ?? existing.isFree,
       imageUrl: body?.imageUrl ?? existing.imageUrl,
+      wilaya: body?.wilaya ?? existing.wilaya,
       teacherId: body?.teacherId ?? existing.teacherId,
       status: body?.status ?? existing.status,
     };
@@ -74,6 +75,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         price: item.price,
         isFree: item.isFree,
         imageUrl: item.imageUrl,
+        wilaya: item.wilaya,
         teacherId: item.teacherId,
         teacherName: item.teacher?.fullName || "",
         status: item.status,

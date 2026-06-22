@@ -42,6 +42,7 @@ export async function GET(req: Request) {
         fullName: o.fullName,
         lastName: o.lastName,
         phone: o.phone,
+        wilaya: o.wilaya || "",
         status: o.status,
         studentEmail: o.student?.email || "",
         studentName: o.student?.fullName || "",

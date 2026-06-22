@@ -461,6 +461,8 @@ model StoreItem {
   price       Int             @default(0)
   isFree      Boolean         @default(false)
   imageUrl    String?
+  /** Optional wilaya tag for geographic filtering on the storefront. */
+  wilaya      String?
   /** Owning teacher (User with role TEACHER). Nullable so deleting a teacher keeps the item. */
   teacherId   String?
   teacher     User?           @relation("StoreItemTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
@@ -485,6 +487,8 @@ model StoreOrder {
   fullName    String
   lastName    String
   phone       String
+  /** Student wilaya captured at request time (required at app level; default '' keeps legacy rows safe). */
+  wilaya      String           @default("")
   status      StoreOrderStatus @default(PENDING)
   note        String?
   createdAt   DateTime         @default(now())
