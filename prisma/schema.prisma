@@ -82,6 +82,18 @@ enum AnnouncementType {
   URGENT
 }
 
+enum StoreItemStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum StoreOrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FULFILLED
+}
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -106,6 +118,8 @@ model User {
   assessmentSubmissions AssessmentSubmission[]
   lessonProgresses   LessonProgress[]
   certificates       Certificate[]
+  storeItems         StoreItem[]         @relation("StoreItemTeacher")
+  storeOrders        StoreOrder[]        @relation("StoreOrderStudent")
 }
 
 model RechargeRequest {
@@ -438,4 +452,45 @@ model Certificate {
   @@unique([studentId, courseId])
   @@index([certificateCode, status])
   @@index([courseId, status, issuedAt])
+}
+
+model StoreItem {
+  id          String          @id @default(cuid())
+  title       String
+  description String          @default("")
+  price       Int             @default(0)
+  isFree      Boolean         @default(false)
+  imageUrl    String?
+  /** Owning teacher (User with role TEACHER). Nullable so deleting a teacher keeps the item. */
+  teacherId   String?
+  teacher     User?           @relation("StoreItemTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
+  status      StoreItemStatus @default(DRAFT)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  orders      StoreOrder[]
+
+  @@index([status, order])
+  @@index([teacherId, status])
+}
+
+model StoreOrder {
+  id          String           @id @default(cuid())
+  storeItemId String
+  storeItem   StoreItem        @relation(fields: [storeItemId], references: [id], onDelete: Cascade)
+  /** Requesting student (nullable so deleting a user keeps the order record). */
+  studentId   String?
+  student     User?            @relation("StoreOrderStudent", fields: [studentId], references: [id], onDelete: SetNull)
+  fullName    String
+  lastName    String
+  phone       String
+  status      StoreOrderStatus @default(PENDING)
+  note        String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([storeItemId, createdAt])
+  @@index([studentId, createdAt])
+  @@index([status, createdAt])
 }

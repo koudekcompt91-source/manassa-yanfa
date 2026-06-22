@@ -85,7 +85,13 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(NextResponse.next());
   }
 
-  if (path.startsWith("/dashboard") || path === "/profile" || path.startsWith("/profile/")) {
+  if (
+    path.startsWith("/dashboard") ||
+    path === "/profile" ||
+    path.startsWith("/profile/") ||
+    path === "/store" ||
+    path.startsWith("/store/")
+  ) {
     const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
     if (studentRole !== "STUDENT") {
       return applySecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));

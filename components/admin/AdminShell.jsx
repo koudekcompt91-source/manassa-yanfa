@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Settings,
   Shapes,
+  ShoppingBag,
   UserRound,
   Users,
 } from "lucide-react";
@@ -21,6 +22,7 @@ import {
 const adminLinks = [
   { href: "/admin/dashboard", label: "لوحة التحكم", Icon: LayoutDashboard },
   { href: "/admin/courses", label: "الدورات", Icon: BookOpen },
+  { href: "/admin/store", label: "المتجر", Icon: ShoppingBag },
   { href: "/admin/teachers", label: "الأساتذة", Icon: UserRound },
   { href: "/admin/students", label: "الطلاب", Icon: Users },
   { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },

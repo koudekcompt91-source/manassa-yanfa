@@ -12,6 +12,7 @@ import {
   BookOpen,
   Award,
   Home,
+  ShoppingBag,
   UserRound,
   Wallet,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/dashboard", label: "الرئيسية", id: "home", Icon: Home },
   { href: "/dashboard#my-courses", label: "دوراتي", id: "my-courses", Icon: BookOpen },
   { href: "/courses", label: "الدورات", id: "explore", Icon: BookOpen },
+  { href: "/store", label: "المتجر", id: "store", Icon: ShoppingBag },
   { href: "/dashboard#wallet", label: "المحفظة", id: "wallet", Icon: Wallet },
   { href: "/dashboard/notifications", label: "الإشعارات", id: "notifications", Icon: Bell },
   { href: "/dashboard/certificates", label: "الشهادات", id: "certificates", Icon: Award },
@@ -40,6 +42,7 @@ function useHash() {
 function navActive(pathname, hash, item) {
   if (item.id === "explore")
     return pathname === "/courses" || pathname.startsWith("/courses/") || pathname === "/packages" || pathname.startsWith("/packages/");
+  if (item.id === "store") return pathname === "/store" || pathname.startsWith("/store/");
   if (item.id === "account") return pathname.startsWith("/profile");
   if (item.id === "home") return pathname === "/dashboard" && (!hash || hash === "#");
   if (item.id === "my-courses") return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
@@ -54,7 +57,9 @@ function isStudentLockedRoute(pathname) {
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/") ||
     pathname === "/profile" ||
-    pathname.startsWith("/profile/")
+    pathname.startsWith("/profile/") ||
+    pathname === "/store" ||
+    pathname.startsWith("/store/")
   );
 }
 
