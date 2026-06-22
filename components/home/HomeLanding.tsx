@@ -336,6 +336,10 @@ export default function HomeLanding() {
                 />
                 <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-l from-transparent via-white/26 to-transparent" aria-hidden />
                 <div className="relative z-[1]">
+              <p className="mx-auto mb-5 block w-fit rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 text-[13px] leading-none text-white/80 shadow-[0_2px_14px_-6px_rgba(0,0,0,0.5)] backdrop-blur-md motion-safe:animate-bismillah-fade-in motion-reduce:animate-none motion-reduce:opacity-100">
+                بسم الله الرحمن الرحيم
+              </p>
+
               <div
                 className={`mb-6 inline-flex touch-manipulation items-center gap-2 rounded-full border border-white/14 bg-slate-950/45 px-4 py-2 text-xs font-semibold text-slate-200 shadow-sm sm:text-sm animate-hero-rise transition-[transform,border-color,background-color,box-shadow] ${easeTactile} motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0 hover:border-white/22 hover:bg-slate-950/55 hover:shadow-[0_6px_24px_-10px_rgba(0,0,0,0.35)] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.993] motion-reduce:active:scale-100 active:duration-[180ms] ease-out`}
                 style={{ animationDelay: "0ms" }}
@@ -343,10 +347,6 @@ export default function HomeLanding() {
                 <IconSpark className="size-4 shrink-0 text-brand-200" />
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
-
-              <p className="mx-auto mb-5 block w-fit rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 text-[13px] leading-none text-white/80 shadow-[0_2px_14px_-6px_rgba(0,0,0,0.5)] backdrop-blur-md motion-safe:animate-bismillah-fade-in motion-reduce:animate-none motion-reduce:opacity-100">
-                بسم الله الرحمن الرحيم
-              </p>
 
               <h1
                 id="hero-title"
