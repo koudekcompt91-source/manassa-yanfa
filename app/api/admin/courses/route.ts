@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { CourseAccessType, CourseStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
+import { isValidStudentLevelCode, mapStudentLevelCodeToArabic } from "@/lib/student-level-codes";
 
 function slugify(input: string): string {
   return String(input || "")
@@ -64,7 +65,6 @@ function validateCoursePayload(body: any) {
   const categoryId = String(body?.categoryId || "").trim() || null;
   const teacherId = String(body?.teacherId || "").trim() || null;
   const thumbnailUrl = String(body?.thumbnailUrl || body?.coverImage || "").trim() || null;
-  const academicLevel = String(body?.academicLevel || "").trim() || null;
   const level = String(body?.level || "").trim() || null;
   const statusRaw = String(body?.status || "").trim().toUpperCase();
   const accessRaw = String(body?.accessType || "").trim().toUpperCase();
@@ -77,6 +77,17 @@ function validateCoursePayload(body: any) {
   if (accessType === "PAID" && (!Number.isFinite(price) || price <= 0)) {
     return { ok: false as const, message: "أدخل سعرًا صحيحًا للدورة المدفوعة." };
   }
+  if (level && !isValidStudentLevelCode(level)) {
+    return { ok: false as const, message: "المستوى الدراسي المختار غير صالح." };
+  }
+  // A course can only be published once it has a valid level assigned.
+  if (status === "PUBLISHED" && !isValidStudentLevelCode(level)) {
+    return { ok: false as const, message: "يجب اختيار المستوى الدراسي قبل نشر الدورة." };
+  }
+  // Keep the Arabic label in sync with the canonical level code for consistent filtering.
+  const academicLevel = isValidStudentLevelCode(level)
+    ? mapStudentLevelCodeToArabic(level)
+    : String(body?.academicLevel || "").trim() || null;
 
   return {
     ok: true as const,

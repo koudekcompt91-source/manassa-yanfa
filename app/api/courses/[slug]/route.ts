@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStudentSessionFromCookies } from "@/lib/auth/session";
+import { studentSeesPackage } from "@/lib/academic-levels";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,19 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     const session = await getStudentSessionFromCookies();
     let enrolled = false;
     if (session?.sub) {
+      const viewer = await prisma.user.findUnique({
+        where: { id: session.sub },
+        select: { role: true, level: true, academicLevel: true },
+      });
+
+      // Block direct-URL access to another level's course for logged-in students.
+      if (viewer?.role === "STUDENT" && !studentSeesPackage(viewer.academicLevel, course, viewer.level)) {
+        return NextResponse.json(
+          { ok: false, message: "هذه الدورة غير متاحة لمستواك الدراسي." },
+          { status: 404 }
+        );
+      }
+
       const enrollment = await prisma.enrollment.findUnique({
         where: { userId_packageId: { userId: session.sub, packageId: course.id } },
         select: { id: true },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { CourseAccessType, CourseStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
+import { isValidStudentLevelCode, mapStudentLevelCodeToArabic } from "@/lib/student-level-codes";
 
 function normalizeCourse(course: {
   id: string;
@@ -68,8 +69,21 @@ function validatePatch(body: any) {
   if (body?.categoryId !== undefined) data.categoryId = String(body.categoryId || "").trim() || null;
   if (body?.teacherId !== undefined) data.teacherId = String(body.teacherId || "").trim() || null;
   if (body?.thumbnailUrl !== undefined || body?.coverImage !== undefined) data.thumbnailUrl = String(body.thumbnailUrl || body.coverImage || "").trim() || null;
-  if (body?.academicLevel !== undefined) data.academicLevel = String(body.academicLevel || "").trim() || null;
-  if (body?.level !== undefined) data.level = String(body.level || "").trim() || null;
+  if (body?.level !== undefined) {
+    const level = String(body.level || "").trim() || null;
+    if (level && !isValidStudentLevelCode(level)) {
+      return { ok: false as const, message: "المستوى الدراسي المختار غير صالح." };
+    }
+    data.level = level;
+    // Keep the Arabic label in sync with the canonical level code.
+    if (isValidStudentLevelCode(level)) {
+      data.academicLevel = mapStudentLevelCodeToArabic(level);
+    } else if (body?.academicLevel !== undefined) {
+      data.academicLevel = String(body.academicLevel || "").trim() || null;
+    }
+  } else if (body?.academicLevel !== undefined) {
+    data.academicLevel = String(body.academicLevel || "").trim() || null;
+  }
   if (status !== undefined) data.status = status as CourseStatus;
   if (accessType !== undefined) data.accessType = accessType as CourseAccessType;
   if (body?.isFeatured !== undefined) data.isFeatured = Boolean(body.isFeatured);
@@ -90,6 +104,24 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   try {
     const valid = validatePatch(await req.json());
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
+
+    const existing = await prisma.course.findUnique({
+      where: { id: params.id },
+      select: { status: true, level: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
+    }
+
+    // A course can only be published once it has a valid level assigned.
+    const nextStatus = valid.data.status ?? existing.status;
+    const effectiveLevel = valid.data.level !== undefined ? valid.data.level : existing.level;
+    if (nextStatus === "PUBLISHED" && !isValidStudentLevelCode(effectiveLevel)) {
+      return NextResponse.json(
+        { ok: false, message: "يجب اختيار المستوى الدراسي قبل نشر الدورة." },
+        { status: 400 }
+      );
+    }
 
     const course = await prisma.course.update({
       where: { id: params.id },

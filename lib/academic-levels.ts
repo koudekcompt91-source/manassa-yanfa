@@ -1,5 +1,12 @@
 /** Canonical Arabic labels stored on User, Package, and Lesson (CMS). */
-export const ACADEMIC_LEVELS = ["الثالثة متوسط", "الرابعة متوسط", "الأولى ثانوي", "الثانية ثانوي"] as const;
+export const ACADEMIC_LEVELS = [
+  "الأولى متوسط",
+  "الثانية متوسط",
+  "الثالثة متوسط",
+  "الرابعة متوسط",
+  "الأولى ثانوي",
+  "الثانية ثانوي",
+] as const;
 
 export type AcademicLevelLabel = (typeof ACADEMIC_LEVELS)[number];
 

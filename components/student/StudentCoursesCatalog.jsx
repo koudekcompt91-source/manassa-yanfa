@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { studentSeesPackage } from "@/lib/academic-levels";
+import { getDisplayLevelLabel } from "@/lib/student-level-codes";
 import { useDemoSection } from "@/lib/demo-store";
 import { formatDzd } from "@/lib/format-money";
 
@@ -256,6 +257,11 @@ export default function StudentCoursesCatalog() {
         <div className="flex flex-1 flex-col p-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">{pathName || categoryName}</span>
+            {getDisplayLevelLabel(pkg) ? (
+              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-800">
+                {getDisplayLevelLabel(pkg)}
+              </span>
+            ) : null}
             <span
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
                 isFree ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"

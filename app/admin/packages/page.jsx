@@ -13,8 +13,12 @@ import {
   AdminToolbar,
 } from "@/components/admin/AdminUI";
 import { useDemoSection } from "@/lib/demo-store";
-import { ACADEMIC_LEVELS, DEFAULT_ACADEMIC_LEVEL } from "@/lib/academic-levels";
-import { STUDENT_LEVEL_SELECT_OPTIONS } from "@/lib/student-level-codes";
+import { DEFAULT_ACADEMIC_LEVEL } from "@/lib/academic-levels";
+import {
+  STUDENT_LEVEL_SELECT_OPTIONS,
+  mapStudentLevelCodeToArabic,
+  getDisplayLevelLabel,
+} from "@/lib/student-level-codes";
 import { formatDzd } from "@/lib/format-money";
 
 const EMPTY_COURSE_FORM = {
@@ -77,6 +81,7 @@ export default function AdminPackagesPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("الكل");
   const [categoryFilter, setCategoryFilter] = useState("الكل");
+  const [levelFilter, setLevelFilter] = useState("الكل");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -168,9 +173,10 @@ export default function AdminPackagesPage() {
           statusFilter === "الكل" ||
           (statusFilter === "published" ? course.status === "PUBLISHED" : course.status !== "PUBLISHED");
         const matchesCategory = categoryFilter === "الكل" || course.categoryId === categoryFilter;
-        return matchesQuery && matchesStatus && matchesCategory;
+        const matchesLevel = levelFilter === "الكل" || course.level === levelFilter;
+        return matchesQuery && matchesStatus && matchesCategory && matchesLevel;
       });
-  }, [courses, categories, teachers, query, statusFilter, categoryFilter]);
+  }, [courses, categories, teachers, query, statusFilter, categoryFilter, levelFilter]);
 
   function resetCourseForm() {
     setCourseForm(EMPTY_COURSE_FORM);
@@ -219,6 +225,10 @@ export default function AdminPackagesPage() {
       }
       if (courseForm.accessType === "PAID" && (!(Number(courseForm.price) > 0) || !Number.isFinite(Number(courseForm.price)))) {
         setCourseFormError("أدخل سعرًا صحيحًا للدورة المدفوعة.");
+        return;
+      }
+      if (courseForm.status === "PUBLISHED" && !courseForm.level) {
+        setCourseFormError("يجب اختيار المستوى الدراسي قبل نشر الدورة.");
         return;
       }
 
@@ -842,6 +852,14 @@ export default function AdminPackagesPage() {
             <option value="published">منشورة</option>
             <option value="draft">مسودة</option>
           </AdminSelect>
+          <AdminSelect value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}>
+            <option value="الكل">كل المستويات</option>
+            {STUDENT_LEVEL_SELECT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </AdminSelect>
           {!showCourseForm ? (
             <AdminActionButton onClick={openCreateForm} tone="primary" className="rounded-xl px-4 py-2 text-sm font-bold">
               إضافة دورة جديدة
@@ -918,24 +936,31 @@ export default function AdminPackagesPage() {
                 <AdminInput value="0" disabled readOnly />
               </AdminFormField>
             )}
-            <AdminFormField label="المستوى الدراسي">
-              <AdminSelect value={courseForm.academicLevel} onChange={(e) => setCourseForm((s) => ({ ...s, academicLevel: e.target.value }))}>
-                {ACADEMIC_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </AdminSelect>
-            </AdminFormField>
-            <AdminFormField label="رمز المستوى (اختياري)">
-              <AdminSelect value={courseForm.level} onChange={(e) => setCourseForm((s) => ({ ...s, level: e.target.value }))}>
-                <option value="">بدون رمز</option>
+            <AdminFormField label="المستوى الدراسي (مطلوب للنشر)">
+              <AdminSelect
+                value={courseForm.level}
+                onChange={(e) => {
+                  const code = e.target.value;
+                  setCourseForm((s) => ({
+                    ...s,
+                    level: code,
+                    academicLevel: code ? mapStudentLevelCodeToArabic(code) : s.academicLevel,
+                  }));
+                }}
+                required
+              >
+                <option value="" disabled>
+                  اختر المستوى الدراسي
+                </option>
                 {STUDENT_LEVEL_SELECT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}
               </AdminSelect>
+              <p className="mt-1 text-xs text-slate-500">
+                لا يمكن نشر الدورة دون اختيار المستوى. سيراها طلاب هذا المستوى فقط.
+              </p>
             </AdminFormField>
             {courseFormError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:col-span-2">{courseFormError}</p> : null}
             <div className="flex flex-wrap gap-2 md:col-span-2">
@@ -971,7 +996,18 @@ export default function AdminPackagesPage() {
                 {rows.map((course) => (
                   <tr key={course.id} className="border-b border-slate-100 align-top text-slate-700 transition hover:bg-slate-50/50">
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-900">{course.title}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-slate-900">{course.title}</p>
+                        {getDisplayLevelLabel(course) ? (
+                          <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800">
+                            {course.level || getDisplayLevelLabel(course)}
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                            بدون مستوى
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-xs leading-5 text-slate-500">{shortText(course.description)}</p>
                     </td>
                     <td className="px-3 py-4">{course.categoryName}</td>
