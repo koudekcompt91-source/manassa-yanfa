@@ -344,7 +344,7 @@ export default function HomeLanding() {
                 أكاديمية عربية للأدب وعلومه — بإشراف مباشر من الأستاذ {TEACHER_NAME}
               </div>
 
-              <p className="block mx-auto mb-5 w-fit px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/80 text-[13px] leading-none backdrop-blur-md">
+              <p className="mx-auto mb-5 block w-fit rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 text-[13px] leading-none text-white/80 shadow-[0_2px_14px_-6px_rgba(0,0,0,0.5)] backdrop-blur-md motion-safe:animate-bismillah-fade-in motion-reduce:animate-none motion-reduce:opacity-100">
                 بسم الله الرحمن الرحيم
               </p>
 

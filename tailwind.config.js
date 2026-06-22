@@ -93,8 +93,8 @@ module.exports = {
           "100%": { opacity: "1", transform: "translate3d(0, 0, 0)" },
         },
         "bismillah-fade-in": {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
+          "0%": { opacity: "0", transform: "translate3d(0, -5px, 0)" },
+          "100%": { opacity: "1", transform: "translate3d(0, 0, 0)" },
         },
         "bismillah-float": {
           "0%, 100%": { transform: "translate3d(0, 0, 0)" },
@@ -107,7 +107,7 @@ module.exports = {
         "ambient-drift": "ambient-drift 52s ease-in-out infinite",
         "hero-rise": "hero-rise 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both",
         "nav-choreo": "nav-choreo 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both",
-        "bismillah-fade-in": "bismillah-fade-in 0.35s ease-out both",
+        "bismillah-fade-in": "bismillah-fade-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both",
         "hero-aurora": "hero-aurora 48s ease-in-out infinite",
         "hero-veil": "hero-veil 60s ease-in-out infinite",
         "hero-mesh-flow": "hero-mesh-flow 88s ease-in-out infinite",
