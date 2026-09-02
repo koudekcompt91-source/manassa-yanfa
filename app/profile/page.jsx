@@ -6,6 +6,7 @@ import { useDemoSection } from "@/lib/demo-store";
 import { logoutSession } from "@/lib/admin-auth";
 import { useRouter } from "next/navigation";
 import { formatDzd } from "@/lib/format-money";
+import { getStudentHomePath } from "@/lib/subscription";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -52,6 +53,9 @@ export default function ProfilePage() {
           <p className="mt-1 text-sm text-slate-700">البريد: {user?.email || "—"}</p>
           <p className="mt-1 text-sm text-slate-700">الهاتف: {user?.phone || "—"}</p>
           <p className="mt-1 text-sm text-slate-700">رصيد المحفظة: {formatDzd(user?.walletBalance ?? 0)}</p>
+          <p className="mt-1 text-sm text-slate-700">
+            نوع الاشتراك: {user?.subscriptionType === "FREE" ? "مجاني" : "كامل / مدفوع"}
+          </p>
           <p className="mt-1 text-sm text-slate-700">الحالة: {user?.status === "ACTIVE" ? "نشط" : "معطّل"}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -62,7 +66,10 @@ export default function ProfilePage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900">التسجيلات</h2>
           <p className="mt-3 text-sm text-slate-700">عدد الدورات: {(meState?.enrollments || []).length}</p>
-          <Link href="/dashboard" className="mt-3 inline-block text-sm font-bold text-brand-700 underline">
+          <Link
+            href={getStudentHomePath(user?.subscriptionType)}
+            className="mt-3 inline-block text-sm font-bold text-brand-700 underline"
+          >
             لوحة التحكم
           </Link>
         </div>

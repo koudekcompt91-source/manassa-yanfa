@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { CourseAccessType, CourseStatus } from "@prisma/client";
+import { CourseAccessType, CourseStatus, SubscriptionType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { isValidStudentLevelCode, mapStudentLevelCodeToArabic } from "@/lib/student-level-codes";
+import { normalizeSubscriptionType } from "@/lib/subscription";
 
 function slugify(input: string): string {
   return String(input || "")
@@ -24,6 +25,7 @@ function normalizeCourse(course: {
   thumbnailUrl: string | null;
   status: CourseStatus;
   accessType: CourseAccessType;
+  minSubscription: SubscriptionType;
   price: number;
   isFeatured: boolean;
   order: number;
@@ -45,6 +47,7 @@ function normalizeCourse(course: {
     coverImage: course.thumbnailUrl,
     status: course.status,
     accessType: course.accessType,
+    minSubscription: course.minSubscription,
     isPublished: course.status === "PUBLISHED",
     priceType: course.accessType === "PAID" ? "premium" : "free",
     priceMad: course.price,
@@ -70,6 +73,10 @@ function validateCoursePayload(body: any) {
   const accessRaw = String(body?.accessType || "").trim().toUpperCase();
   const status = statusRaw === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
   const accessType = accessRaw === "PAID" ? "PAID" : "FREE";
+  // Default minSubscription follows accessType when omitted (FREE = shared/both, PAID = paid-only).
+  const minSubscription = body?.minSubscription
+    ? normalizeSubscriptionType(body.minSubscription)
+    : (accessType as SubscriptionType);
   const numericPrice = Number(body?.price ?? body?.priceMad ?? 0);
   const price = accessType === "PAID" ? Math.round(numericPrice) : 0;
 
@@ -101,6 +108,7 @@ function validateCoursePayload(body: any) {
       level,
       status: status as CourseStatus,
       accessType: accessType as CourseAccessType,
+      minSubscription: minSubscription as SubscriptionType,
       price,
       isFeatured: Boolean(body?.isFeatured),
     },

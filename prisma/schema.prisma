@@ -18,6 +18,12 @@ enum UserStatus {
   DISABLED
 }
 
+/** Account plan: FREE = limited free-dashboard; PAID = full dashboard (default for legacy users). */
+enum SubscriptionType {
+  FREE
+  PAID
+}
+
 enum CourseAccessType {
   FREE
   PAID
@@ -106,6 +112,8 @@ model User {
   level            String        @default("unknown")
   phone            String?
   walletBalance  Int           @default(0)
+  /** FREE → /free-dashboard; PAID → /dashboard. Default PAID keeps existing users unchanged. */
+  subscriptionType SubscriptionType @default(PAID)
   status         UserStatus    @default(ACTIVE)
   createdAt      DateTime      @default(now())
 
@@ -238,6 +246,13 @@ model Course {
   title        String
   description  String           @default("")
   accessType   CourseAccessType @default(FREE)
+  /**
+   * Minimum student subscription required to see this course.
+   * FREE  → visible to FREE and PAID (shared / "both")
+   * PAID  → visible to PAID only
+   * Default FREE keeps new courses open; migration backfills PAID courses from accessType.
+   */
+  minSubscription SubscriptionType @default(FREE)
   price        Int              @default(0)
   status       CourseStatus     @default(DRAFT)
   categoryId   String?
@@ -256,6 +271,8 @@ model Course {
   assessments  Assessment[]
   lessonProgresses LessonProgress[]
   certificates      Certificate[]
+
+  @@index([status, minSubscription])
 }
 
 model Lesson {

@@ -29,6 +29,7 @@ const EMPTY_COURSE_FORM = {
   thumbnailUrl: "",
   status: "DRAFT",
   accessType: "FREE",
+  minSubscription: "FREE",
   price: 0,
   academicLevel: DEFAULT_ACADEMIC_LEVEL,
   level: "",
@@ -205,6 +206,7 @@ export default function AdminPackagesPage() {
       thumbnailUrl: course.coverImage || "",
       status: course.status || "DRAFT",
       accessType: course.accessType || "FREE",
+      minSubscription: course.minSubscription || course.accessType || "FREE",
       price: Number(course.price ?? course.priceMad ?? 0) || 0,
       academicLevel: course.academicLevel || DEFAULT_ACADEMIC_LEVEL,
       level: course.level || "",
@@ -296,7 +298,11 @@ export default function AdminPackagesPage() {
       method: "PATCH",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessType: nextAccessType, price: nextPrice }),
+      body: JSON.stringify({
+        accessType: nextAccessType,
+        price: nextPrice,
+        minSubscription: nextAccessType,
+      }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
@@ -913,12 +919,23 @@ export default function AdminPackagesPage() {
                   setCourseForm((s) => ({
                     ...s,
                     accessType: e.target.value,
+                    // Keep minSubscription aligned unless admin already chose explicitly.
+                    minSubscription: e.target.value === "PAID" ? "PAID" : s.minSubscription || "FREE",
                     price: e.target.value === "PAID" ? s.price || 1 : 0,
                   }))
                 }
               >
                 <option value="FREE">مجانية</option>
                 <option value="PAID">مدفوعة</option>
+              </AdminSelect>
+            </AdminFormField>
+            <AdminFormField label="الحد الأدنى للاشتراك">
+              <AdminSelect
+                value={courseForm.minSubscription}
+                onChange={(e) => setCourseForm((s) => ({ ...s, minSubscription: e.target.value }))}
+              >
+                <option value="FREE">مجاني + كامل (للجميع)</option>
+                <option value="PAID">الحساب الكامل فقط</option>
               </AdminSelect>
             </AdminFormField>
             {courseForm.accessType === "PAID" ? (
@@ -1016,6 +1033,9 @@ export default function AdminPackagesPage() {
                     <td className="px-3 py-4">
                       <span className={`rounded-full px-2 py-1 text-xs font-semibold ${course.accessType === "PAID" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-700"}`}>
                         {course.accessType === "PAID" ? "مدفوعة" : "مجانية"}
+                      </span>
+                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${course.minSubscription === "PAID" ? "bg-indigo-100 text-indigo-800" : "bg-sky-100 text-sky-800"}`}>
+                        {course.minSubscription === "PAID" ? "اشتراك كامل" : "متاح للمجاني"}
                       </span>
                       <span className="mt-1 block font-semibold text-slate-900">{formatDzd(Number(course.price ?? course.priceMad ?? 0))}</span>
                     </td>

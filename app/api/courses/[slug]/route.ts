@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStudentSessionFromCookies } from "@/lib/auth/session";
 import { studentSeesPackage } from "@/lib/academic-levels";
+import { studentSeesCourseBySubscription } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         thumbnailUrl: true,
         status: true,
         accessType: true,
+        minSubscription: true,
         price: true,
         isFeatured: true,
         order: true,
@@ -41,7 +43,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     if (session?.sub) {
       const viewer = await prisma.user.findUnique({
         where: { id: session.sub },
-        select: { role: true, level: true, academicLevel: true },
+        select: { role: true, level: true, academicLevel: true, subscriptionType: true },
       });
 
       // Block direct-URL access to another level's course for logged-in students.
@@ -49,6 +51,17 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         return NextResponse.json(
           { ok: false, message: "هذه الدورة غير متاحة لمستواك الدراسي." },
           { status: 404 }
+        );
+      }
+
+      // Subscription gate: FREE students cannot open PAID-min courses via direct URL.
+      if (
+        viewer?.role === "STUDENT" &&
+        !studentSeesCourseBySubscription(viewer.subscriptionType, course.minSubscription)
+      ) {
+        return NextResponse.json(
+          { ok: false, message: "هذه الدورة غير متاحة في الحساب المجاني." },
+          { status: 403 }
         );
       }
 

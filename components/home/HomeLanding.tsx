@@ -9,6 +9,7 @@ import { useHeroAmbient } from "@/components/home/useHeroAmbient";
 import HeroAmbientLayers from "@/components/home/HeroAmbientLayers";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import { BRAND_NAME } from "@/lib/brand";
+import { getStudentHomePath } from "@/lib/subscription";
 
 const container = "container-landing";
 
@@ -196,7 +197,7 @@ export default function HomeLanding() {
         const data = await r.json().catch(() => ({}));
         if (cancelled) return;
         if (data?.user?.role === "STUDENT") {
-          router.replace("/dashboard");
+          router.replace(getStudentHomePath(data.user.subscriptionType));
           return;
         }
       } catch {

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { CourseAccessType, CourseStatus } from "@prisma/client";
+import { CourseAccessType, CourseStatus, SubscriptionType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { isValidStudentLevelCode, mapStudentLevelCodeToArabic } from "@/lib/student-level-codes";
+import { normalizeSubscriptionType } from "@/lib/subscription";
 
 function normalizeCourse(course: {
   id: string;
@@ -14,6 +15,7 @@ function normalizeCourse(course: {
   thumbnailUrl: string | null;
   status: CourseStatus;
   accessType: CourseAccessType;
+  minSubscription: SubscriptionType;
   price: number;
   isFeatured: boolean;
   order: number;
@@ -33,6 +35,7 @@ function normalizeCourse(course: {
     coverImage: course.thumbnailUrl,
     status: course.status,
     accessType: course.accessType,
+    minSubscription: course.minSubscription,
     isPublished: course.status === "PUBLISHED",
     priceType: course.accessType === "PAID" ? "premium" : "free",
     priceMad: course.price,
@@ -55,6 +58,8 @@ function validatePatch(body: any) {
   const accessType = accessRaw === "PAID" ? "PAID" : accessRaw === "FREE" ? "FREE" : undefined;
   const statusRaw = body?.status !== undefined ? String(body.status || "").toUpperCase() : undefined;
   const status = statusRaw === "PUBLISHED" ? "PUBLISHED" : statusRaw === "DRAFT" ? "DRAFT" : undefined;
+  const minSubscription =
+    body?.minSubscription !== undefined ? normalizeSubscriptionType(body.minSubscription) : undefined;
 
   const priceCandidate = body?.price ?? body?.priceMad;
   const numericPrice = priceCandidate !== undefined ? Math.round(Number(priceCandidate)) : undefined;
@@ -86,6 +91,7 @@ function validatePatch(body: any) {
   }
   if (status !== undefined) data.status = status as CourseStatus;
   if (accessType !== undefined) data.accessType = accessType as CourseAccessType;
+  if (minSubscription !== undefined) data.minSubscription = minSubscription as SubscriptionType;
   if (body?.isFeatured !== undefined) data.isFeatured = Boolean(body.isFeatured);
   if (body?.order !== undefined) data.order = Math.max(0, Number(body.order) || 0);
 

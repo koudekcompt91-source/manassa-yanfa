@@ -8,6 +8,7 @@ import {
   mapStudentLevelCodeToArabic,
 } from "@/lib/student-level-codes";
 import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
+import { normalizeSubscriptionType } from "@/lib/subscription";
 
 export const runtime = "nodejs";
 
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
     const confirmPassword = String(body.confirmPassword || "");
     const levelRaw = String(body.level || "").trim();
     const academicLevelLegacy = String(body.academicLevel || "").trim();
+    // Default PAID keeps legacy clients / paid flow unchanged.
+    const subscriptionType = normalizeSubscriptionType(body.subscriptionType);
 
     step = "validate";
     if (!fullName || !email) {
@@ -45,8 +48,11 @@ export async function POST(req: Request) {
     if (password.length < 6) {
       return NextResponse.json({ ok: false, message: "كلمة المرور يجب ألا تقل عن 6 أحرف." }, { status: 400 });
     }
-    if (password !== confirmPassword) {
-      return NextResponse.json({ ok: false, message: "كلمتا المرور غير متطابقتين." }, { status: 400 });
+    // FREE registration may omit confirmPassword in the UI; require it only for PAID / when provided.
+    if (subscriptionType === "PAID" || confirmPassword) {
+      if (password !== confirmPassword) {
+        return NextResponse.json({ ok: false, message: "كلمتا المرور غير متطابقتين." }, { status: 400 });
+      }
     }
 
     let level = levelRaw;
@@ -83,6 +89,7 @@ export async function POST(req: Request) {
         role: "STUDENT",
         level,
         academicLevel,
+        subscriptionType,
         walletBalance: 0,
         status: "ACTIVE",
       },
@@ -91,6 +98,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       message: "تم إنشاء الحساب بنجاح. سجّل دخولك الآن.",
+      subscriptionType: user.subscriptionType,
     });
   } catch (e) {
     console.error(`[register] failed at step="${step}"`);

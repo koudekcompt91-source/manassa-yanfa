@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { CourseAccessType, CourseStatus } from "@prisma/client";
+import { CourseAccessType, CourseStatus, SubscriptionType } from "@prisma/client";
 import { getStudentSessionFromCookies } from "@/lib/auth/session";
 import { studentSeesPackage } from "@/lib/academic-levels";
+import { studentSeesCourseBySubscription } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ function normalizeCourse(course: {
   thumbnailUrl: string | null;
   status: CourseStatus;
   accessType: CourseAccessType;
+  minSubscription: SubscriptionType;
   price: number;
   isFeatured: boolean;
   order: number;
@@ -34,6 +36,7 @@ function normalizeCourse(course: {
     isPublished: course.status === "PUBLISHED",
     status: course.status,
     accessType: course.accessType,
+    minSubscription: course.minSubscription,
     priceMad: course.price,
     price: course.price,
     priceType: course.accessType === "PAID" ? "premium" : "free",
@@ -61,11 +64,13 @@ export async function GET() {
     if (session?.sub) {
       const viewer = await prisma.user.findUnique({
         where: { id: session.sub },
-        select: { role: true, level: true, academicLevel: true },
+        select: { role: true, level: true, academicLevel: true, subscriptionType: true },
       });
       if (viewer?.role === "STUDENT") {
-        visible = courses.filter((course) =>
-          studentSeesPackage(viewer.academicLevel, course, viewer.level)
+        visible = courses.filter(
+          (course) =>
+            studentSeesPackage(viewer.academicLevel, course, viewer.level) &&
+            studentSeesCourseBySubscription(viewer.subscriptionType, course.minSubscription)
         );
       }
     }

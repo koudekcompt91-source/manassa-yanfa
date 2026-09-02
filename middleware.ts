@@ -80,6 +80,7 @@ export async function middleware(request: NextRequest) {
   if (path === "/login") {
     const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
     if (studentRole === "STUDENT") {
+      // Always land on /dashboard; server layout redirects FREE → /free-dashboard via DB.
       return applySecurityHeaders(NextResponse.redirect(new URL("/dashboard", request.url)));
     }
     return applySecurityHeaders(NextResponse.next());
@@ -87,6 +88,8 @@ export async function middleware(request: NextRequest) {
 
   if (
     path.startsWith("/dashboard") ||
+    path === "/free-dashboard" ||
+    path.startsWith("/free-dashboard/") ||
     path === "/profile" ||
     path.startsWith("/profile/") ||
     path === "/store" ||

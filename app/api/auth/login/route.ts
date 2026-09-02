@@ -108,6 +108,7 @@ export async function POST(req: Request) {
         academicLevel: user.academicLevel,
         level: user.level,
         walletBalance: user.walletBalance,
+        subscriptionType: user.subscriptionType,
       },
     });
 

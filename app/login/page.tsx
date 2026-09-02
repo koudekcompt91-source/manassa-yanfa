@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import AuthPageShell from "@/components/auth/AuthPageShell";
 import { authStore } from "@/lib/auth";
+import { getStudentHomePath } from "@/lib/subscription";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +20,9 @@ export default function LoginPage() {
     fetch("/api/auth/me", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.user?.role === "STUDENT") router.replace("/dashboard");
+        if (data?.user?.role === "STUDENT") {
+          router.replace(getStudentHomePath(data.user.subscriptionType));
+        }
       })
       .catch(() => {});
   }, [router]);
@@ -49,7 +52,7 @@ export default function LoginPage() {
         return;
       }
       if (data.user) authStore.saveUser(data.user);
-      router.push("/dashboard");
+      router.push(getStudentHomePath(data.user?.subscriptionType));
     } catch {
       setError("تعذّر الاتصال بالخادم.");
       setLoading(false);

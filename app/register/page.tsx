@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LockKeyhole, Mail, UserRound } from "lucide-react";
+import { Crown, Gift, LockKeyhole, Mail, UserRound } from "lucide-react";
 import AuthPageShell from "@/components/auth/AuthPageShell";
 import {
   premiumAuthAlertErrorClass,
@@ -11,8 +11,20 @@ import {
 } from "@/components/auth/premiumAuthFormClasses";
 import { STUDENT_LEVEL_SELECT_OPTIONS } from "@/lib/student-level-codes";
 
+type Plan = "choose" | "FREE" | "PAID";
+
+const inputClass =
+  "h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]";
+
+const selectClass =
+  "h-12 w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50/80 px-4 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]";
+
+const submitClass =
+  "inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_16px_32px_-12px_rgba(24,117,245,0.5)] ring-1 ring-white/25 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_20px_38px_-12px_rgba(24,117,245,0.58)] active:translate-y-0 active:scale-[0.992] disabled:cursor-not-allowed disabled:opacity-60";
+
 export default function RegisterPage() {
   const router = useRouter();
+  const [plan, setPlan] = useState<Plan>("choose");
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -26,10 +38,11 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (plan !== "FREE" && plan !== "PAID") return;
     setError("");
     setSuccess("");
 
-    if (form.password !== form.confirmPassword) {
+    if (plan === "PAID" && form.password !== form.confirmPassword) {
       setError("كلمتا المرور غير متطابقتين.");
       return;
     }
@@ -47,8 +60,9 @@ export default function RegisterPage() {
           fullName: form.fullName.trim(),
           email: form.email.trim(),
           password: form.password,
-          confirmPassword: form.confirmPassword,
+          confirmPassword: plan === "FREE" ? form.password : form.confirmPassword,
           level: form.level,
+          subscriptionType: plan,
         }),
       });
       const data = await res.json();
@@ -68,7 +82,7 @@ export default function RegisterPage() {
   return (
     <AuthPageShell
       title="إنشاء حساب جديد"
-      subtitle="ابدأ رحلتك التعليمية الآن."
+      subtitle="اختر نوع التسجيل المناسب لك."
       mode="light-edu"
       brandHeadline="ابدأ رحلتك التعليمية بثقة"
       brandSubtitle="أنشئ حسابك للوصول إلى الدروس، الحصص المباشرة، الاختبارات، والتقدم داخل منصة ينفع."
@@ -76,151 +90,207 @@ export default function RegisterPage() {
       authNavHref="/login"
       authNavLabel="تسجيل الدخول"
     >
-      <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-6" noValidate>
-        <div className="group space-y-2">
-          <label htmlFor="register-name" className="block text-sm font-black text-slate-700">
-            الاسم الكامل
-          </label>
-          <div className="relative">
-            <UserRound className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              id="register-name"
-              name="fullName"
-              type="text"
-              autoComplete="name"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
-              placeholder="أدخل اسمك الكامل"
-              value={form.fullName}
-              onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))}
-              required
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "register-error" : undefined}
-            />
-          </div>
-        </div>
-
-        <div className="group space-y-2">
-          <label htmlFor="register-level" className="block text-sm font-black text-slate-700">
-            المستوى الدراسي
-          </label>
-          <select
-            id="register-level"
-            name="level"
-            required
-            value={form.level}
-            onChange={(e) => setForm((p) => ({ ...p, level: e.target.value }))}
-            className="h-12 w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50/80 px-4 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "register-error" : undefined}
+      {plan === "choose" ? (
+        <div className="space-y-4">
+          <p className="text-center text-sm font-semibold text-slate-600">كيف تريد التسجيل؟</p>
+          <button
+            type="button"
+            onClick={() => {
+              setPlan("FREE");
+              setError("");
+            }}
+            className="group flex w-full flex-col items-start gap-2 rounded-2xl border-2 border-emerald-200 bg-gradient-to-l from-emerald-50 to-white p-5 text-right shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md"
           >
-            <option value="" disabled>
-              اختر مستواك الدراسي
-            </option>
-            {STUDENT_LEVEL_SELECT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-800">
+              <Gift className="h-3.5 w-3.5" />
+              تسجيل مجاني
+            </span>
+            <span className="text-lg font-extrabold text-slate-900">حساب مجاني</span>
+            <span className="text-sm leading-relaxed text-slate-600">
+              دورات مجانية، مستندات PDF، وألعاب تعليمية لاحقًا — بلا محفظة ولا متجر.
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPlan("PAID");
+              setError("");
+            }}
+            className="group flex w-full flex-col items-start gap-2 rounded-2xl border-2 border-brand-200 bg-gradient-to-l from-sky-50 to-white p-5 text-right shadow-sm transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md"
+          >
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-extrabold text-brand-800">
+              <Crown className="h-3.5 w-3.5" />
+              تسجيل مدفوع
+            </span>
+            <span className="text-lg font-extrabold text-slate-900">الحساب الكامل</span>
+            <span className="text-sm leading-relaxed text-slate-600">
+              الوصول الكامل للمنصة كما هو اليوم: الدورات، المحفظة، المتجر، والشهادات.
+            </span>
+          </button>
+          <p className="pt-2 text-center text-sm text-slate-600">
+            لديك حساب بالفعل؟{" "}
+            <Link href="/login" className="font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
+              تسجيل الدخول
+            </Link>
+          </p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} method="post" className="space-y-5 sm:space-y-6" noValidate>
+          <button
+            type="button"
+            onClick={() => {
+              setPlan("choose");
+              setError("");
+              setSuccess("");
+            }}
+            className="text-sm font-bold text-brand-700 underline underline-offset-2"
+          >
+            ← العودة لاختيار نوع الحساب
+          </button>
+
+          <div
+            className={`rounded-xl border px-3.5 py-2.5 text-sm font-bold ${
+              plan === "FREE"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-brand-200 bg-brand-50 text-brand-800"
+            }`}
+          >
+            {plan === "FREE" ? "أنت تسجّل في الحساب المجاني" : "أنت تسجّل في الحساب الكامل (مدفوع)"}
+          </div>
+
+          <div className="group space-y-2">
+            <label htmlFor="register-name" className="block text-sm font-black text-slate-700">
+              الاسم الكامل
+            </label>
+            <div className="relative">
+              <UserRound className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                id="register-name"
+                name="fullName"
+                type="text"
+                autoComplete="name"
+                className={inputClass}
+                placeholder="أدخل اسمك الكامل"
+                value={form.fullName}
+                onChange={(e) => setForm((p) => ({ ...p, fullName: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="group space-y-2">
+            <label htmlFor="register-level" className="block text-sm font-black text-slate-700">
+              المستوى الدراسي
+            </label>
+            <select
+              id="register-level"
+              name="level"
+              required
+              value={form.level}
+              onChange={(e) => setForm((p) => ({ ...p, level: e.target.value }))}
+              className={selectClass}
+            >
+              <option value="" disabled>
+                اختر مستواك الدراسي
               </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="group space-y-2">
-          <label htmlFor="register-email" className="block text-sm font-black text-slate-700">
-            البريد الإلكتروني
-          </label>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              id="register-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              dir="ltr"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] font-mono text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
-              placeholder="أدخل بريدك الإلكتروني"
-              value={form.email}
-              onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-              required
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "register-error" : undefined}
-            />
+              {STUDENT_LEVEL_SELECT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
 
-        <div className="group space-y-2">
-          <label htmlFor="register-password" className="block text-sm font-black text-slate-700">
-            كلمة المرور
-          </label>
-          <div className="relative">
-            <LockKeyhole className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              id="register-password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
-              placeholder="أنشئ كلمة مرور"
-              value={form.password}
-              onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-              required
-              minLength={6}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "register-error" : undefined}
-            />
+          {/* Email kept for both plans — existing login auth requires it (no JWT/login changes). */}
+          <div className="group space-y-2">
+            <label htmlFor="register-email" className="block text-sm font-black text-slate-700">
+              البريد الإلكتروني
+            </label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                id="register-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                dir="ltr"
+                className={`${inputClass} font-mono`}
+                placeholder="أدخل بريدك الإلكتروني"
+                value={form.email}
+                onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                required
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="group space-y-2">
-          <label htmlFor="register-confirm" className="block text-sm font-black text-slate-700">
-            تأكيد كلمة المرور
-          </label>
-          <div className="relative">
-            <LockKeyhole className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              id="register-confirm"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 pe-10 text-[0.94rem] text-slate-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_10px_22px_-20px_rgba(15,23,42,0.24)] transition-[border-color,box-shadow,background-color] placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 focus:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_14px_24px_-20px_rgba(37,99,235,0.35)]"
-              placeholder="أنشئ كلمة مرور"
-              value={form.confirmPassword}
-              onChange={(e) => setForm((p) => ({ ...p, confirmPassword: e.target.value }))}
-              required
-              minLength={6}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "register-error" : undefined}
-            />
+          <div className="group space-y-2">
+            <label htmlFor="register-password" className="block text-sm font-black text-slate-700">
+              كلمة المرور
+            </label>
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                id="register-password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                className={inputClass}
+                placeholder="أنشئ كلمة مرور"
+                value={form.password}
+                onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                required
+                minLength={6}
+              />
+            </div>
           </div>
-        </div>
 
-        {error ? (
-          <p id="register-error" role="alert" className={premiumAuthAlertErrorClass}>
-            {error}
+          {plan === "PAID" ? (
+            <div className="group space-y-2">
+              <label htmlFor="register-confirm" className="block text-sm font-black text-slate-700">
+                تأكيد كلمة المرور
+              </label>
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute end-0 top-1/2 me-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="register-confirm"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  className={inputClass}
+                  placeholder="أنشئ كلمة مرور"
+                  value={form.confirmPassword}
+                  onChange={(e) => setForm((p) => ({ ...p, confirmPassword: e.target.value }))}
+                  required
+                  minLength={6}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {error ? (
+            <p id="register-error" role="alert" className={premiumAuthAlertErrorClass}>
+              {error}
+            </p>
+          ) : null}
+          {success ? (
+            <p role="status" className={premiumAuthAlertSuccessClass}>
+              {success}
+            </p>
+          ) : null}
+
+          <button type="submit" disabled={loading || !!success} className={submitClass}>
+            {loading ? "جاري إنشاء الحساب…" : plan === "FREE" ? "إنشاء حساب مجاني" : "إنشاء حساب"}
+          </button>
+
+          <p className="pt-1.5 text-center text-sm text-slate-600">
+            لديك حساب بالفعل؟{" "}
+            <Link href="/login" className="font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
+              تسجيل الدخول
+            </Link>
           </p>
-        ) : null}
-        {success ? (
-          <p role="status" className={premiumAuthAlertSuccessClass}>
-            {success}
-          </p>
-        ) : null}
-
-        <button
-          type="submit"
-          disabled={loading || !!success}
-          className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_16px_32px_-12px_rgba(24,117,245,0.5)] ring-1 ring-white/25 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_20px_38px_-12px_rgba(24,117,245,0.58)] active:translate-y-0 active:scale-[0.992] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? "جاري إنشاء الحساب…" : "إنشاء حساب"}
-        </button>
-
-        <p className="pt-1.5 text-center text-sm text-slate-600">
-          لديك حساب بالفعل؟{" "}
-          <Link href="/login" className="font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
-            تسجيل الدخول
-          </Link>
-        </p>
-        <p className="text-center text-xs text-slate-500">بياناتك تظهر فقط داخل حسابك بعد تسجيل الدخول.</p>
-      </form>
+        </form>
+      )}
     </AuthPageShell>
   );
 }

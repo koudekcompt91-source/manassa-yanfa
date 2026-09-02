@@ -33,6 +33,7 @@ export async function GET(req: Request) {
         level: true,
         phone: true,
         walletBalance: true,
+        subscriptionType: true,
         status: true,
         createdAt: true,
       },
