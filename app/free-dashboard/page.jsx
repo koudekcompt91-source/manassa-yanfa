@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import FreeCourseCard from "@/components/student/FreeCourseCard";
 
-/**
- * FREE course catalog — fixed order (do not reorder):
- * 1 دروسي · 2 ملخصاتي · 3 فروضي · 4 اختباراتي · 5 الدورات
- */
+/** Exact order — do not reorder. All sections unlocked in UI. */
 const FREE_CATALOG = [
   {
     id: "lessons",
@@ -17,7 +14,6 @@ const FREE_CATALOG = [
     href: "/courses",
     showFree: true,
     showPdf: false,
-    locked: false,
   },
   {
     id: "summaries",
@@ -28,7 +24,6 @@ const FREE_CATALOG = [
     href: "/free-dashboard#summaries",
     showFree: true,
     showPdf: true,
-    locked: false,
   },
   {
     id: "assignments",
@@ -36,10 +31,9 @@ const FREE_CATALOG = [
     description: "الواجبات والتمارين التطبيقية لمتابعة مستواك خطوة بخطوة.",
     icon: "chart",
     tone: "orange",
-    href: null,
-    showFree: false,
+    href: "/free-dashboard#assignments",
+    showFree: true,
     showPdf: false,
-    locked: true,
   },
   {
     id: "quizzes",
@@ -47,10 +41,9 @@ const FREE_CATALOG = [
     description: "اختبارات وتمارين تقييمية لقياس فهمك وتقدمك الدراسي.",
     icon: "exam",
     tone: "purple",
-    href: null,
-    showFree: false,
+    href: "/free-dashboard#quizzes",
+    showFree: true,
     showPdf: false,
-    locked: true,
   },
   {
     id: "courses",
@@ -61,7 +54,6 @@ const FREE_CATALOG = [
     href: "/courses",
     showFree: true,
     showPdf: false,
-    locked: false,
   },
 ];
 
@@ -84,9 +76,9 @@ export default function FreeDashboardPage() {
   }, []);
 
   return (
-    <div className="-mx-4 min-h-[70vh] bg-[#f7f9fc] px-4 py-3 sm:-mx-6 sm:px-6 sm:py-5">
+    <div className="-mx-4 min-h-[70vh] bg-[#f7f9fc] px-4 py-4 sm:-mx-6 sm:px-6 sm:py-6">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-8 rounded-[1.125rem] border border-slate-200/80 bg-white px-6 py-7 text-center shadow-[0_10px_28px_-20px_rgba(15,23,42,0.22)] sm:mb-10 sm:px-10 sm:py-9">
+        <header className="mb-8 rounded-2xl border border-slate-200/80 bg-white px-6 py-7 text-center shadow-[0_10px_28px_-20px_rgba(15,23,42,0.18)] sm:mb-8 sm:px-10 sm:py-8">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             مرحباً بك في الحساب المجاني
           </h1>
@@ -95,20 +87,18 @@ export default function FreeDashboardPage() {
           </p>
         </header>
 
-        <section aria-label="كتالوج الأقسام المجانية" className="flex flex-col gap-5 sm:gap-6">
+        <section aria-label="كتالوج الأقسام" className="flex w-full flex-col gap-5 sm:gap-6">
           {FREE_CATALOG.map((item) => (
-            <div key={item.id} id={item.id}>
+            <div key={item.id} id={item.id} className="w-full">
               <FreeCourseCard
                 title={item.title}
                 description={item.description}
                 icon={item.icon}
                 tone={item.tone}
-                href={item.locked ? null : item.href}
-                locked={item.locked}
+                href={item.href}
                 showFree={item.showFree}
                 showPdf={item.showPdf}
-                levelLabel={!item.locked && levelLabel ? levelLabel : ""}
-                ctaLabel="دخول القسم"
+                levelLabel={levelLabel}
               />
             </div>
           ))}
