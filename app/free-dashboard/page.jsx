@@ -76,7 +76,7 @@ export default function FreeDashboardPage() {
   }, []);
 
   return (
-    <div className="-mx-4 min-h-[70vh] bg-[#f7f9fc] px-4 py-4 sm:-mx-6 sm:px-6 sm:py-6">
+    <div className="w-full bg-[#f7f9fc]">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-8 rounded-2xl border border-slate-200/80 bg-white px-6 py-7 text-center shadow-[0_10px_28px_-20px_rgba(15,23,42,0.18)] sm:mb-8 sm:px-10 sm:py-8">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
