@@ -12,6 +12,8 @@ import {
 } from "@/components/auth/premiumAuthFormClasses";
 import { BRAND_NAME } from "@/lib/brand";
 import { STUDENT_LEVEL_SELECT_OPTIONS } from "@/lib/student-level-codes";
+import { authStore } from "@/lib/auth";
+import { getStudentHomePath } from "@/lib/subscription";
 
 type Plan = "choose" | "FREE" | "PAID";
 
@@ -73,6 +75,35 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
+
+      // FREE: sign in with existing login API, then land on free courses dashboard.
+      // PAID: keep existing “go to login” flow unchanged.
+      if (plan === "FREE") {
+        setSuccess("تم إنشاء الحساب بنجاح! جاري الدخول إلى لوحة الدورات…");
+        try {
+          const loginRes = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              email: form.email.trim(),
+              password: form.password,
+              intent: "student",
+            }),
+          });
+          const loginData = await loginRes.json().catch(() => ({}));
+          if (loginRes.ok && loginData?.ok && loginData.user) {
+            authStore.saveUser(loginData.user);
+            router.push(getStudentHomePath(loginData.user.subscriptionType || "FREE"));
+            return;
+          }
+        } catch {
+          /* fall through to login page */
+        }
+        setTimeout(() => router.push("/login"), 800);
+        return;
+      }
+
       setSuccess("تم إنشاء الحساب بنجاح! جاري التحويل لتسجيل الدخول…");
       setTimeout(() => router.push("/login"), 1200);
     } catch {
