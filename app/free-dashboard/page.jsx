@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FreeCoursesSection from "@/components/student/free-dashboard/FreeCoursesSection";
 import FreeVideoSection from "@/components/student/free-dashboard/FreeVideoSection";
 import FreePdfsSection from "@/components/student/free-dashboard/FreePdfsSection";
@@ -16,18 +16,19 @@ export default function FreeDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState("");
+  // React StrictMode re-invokes effects in dev; fetch exactly once.
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
     fetch("/api/free/courses", { credentials: "include" })
       .then(async (r) => {
         const data = await r.json().catch(() => ({}));
         return { okHttp: r.ok, data };
       })
       .then(({ okHttp, data }) => {
-        if (cancelled) return;
-
-        const list = Array.isArray(data?.courses) ? data.courses : [];
         console.log("[free-dashboard] courses:", data);
 
         if (!okHttp || data?.ok === false) {
@@ -37,35 +38,26 @@ export default function FreeDashboardPage() {
           return;
         }
 
+        const list = Array.isArray(data?.courses) ? data.courses : [];
         setError("");
         setCourses(list);
-        setSelectedId((prev) => {
-          if (prev && list.some((c) => (c.id || c.slug) === prev)) return prev;
-          return list[0]?.id || list[0]?.slug || "";
-        });
+        setSelectedId(list[0]?.id || "");
       })
       .catch(() => {
-        if (!cancelled) {
-          setError("تعذّر الاتصال بالخادم.");
-          setCourses([]);
-          setSelectedId("");
-        }
+        setError("تعذّر الاتصال بالخادم.");
+        setCourses([]);
+        setSelectedId("");
       })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .finally(() => setLoading(false));
   }, []);
 
   const selected = useMemo(() => {
     if (!selectedId) return null;
-    return courses.find((c) => (c.id || c.slug) === selectedId) || null;
+    return courses.find((c) => c.id === selectedId) || null;
   }, [courses, selectedId]);
 
   function selectCourse(course) {
-    const id = course?.id || course?.slug || "";
+    const id = course?.id || "";
     if (!id) return;
     setSelectedId(id);
     requestAnimationFrame(() => {

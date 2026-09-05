@@ -57,10 +57,11 @@ export default function FreeCoursesSection({
       ) : (
         <div className="flex flex-col gap-5 sm:gap-6">
           {courses.map((course, index) => {
-            const id = course?.id || course?.slug || `course-${index}`;
-            const title = course?.title || "دورة";
-            const description = String(course?.description || "").trim() || "دورة مجانية — اختر لعرض المحتوى.";
-            const level = course?.academicLevel || course?.level || "";
+            const id = course.id;
+            const title = course.title || "دورة";
+            const description = String(course.description || "").trim() || "دورة مجانية — اختر لعرض المحتوى.";
+            // Single badge only — no overlapping FREE / level / system badges.
+            const badge = course.academicLevel || course.level || "FREE";
             const isActive = selectedId === id;
             return (
               <article
@@ -80,15 +81,10 @@ export default function FreeCoursesSection({
                   <div dir="rtl" className="min-w-0 flex-1 text-right">
                     <h3 className="text-xl font-extrabold text-slate-900 sm:text-[1.35rem]">{title}</h3>
                     <p className="mt-1.5 text-sm leading-7 text-slate-500 line-clamp-2">{description}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-extrabold text-emerald-800">
-                        FREE
+                    <div className="mt-3">
+                      <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-extrabold text-emerald-800">
+                        {badge}
                       </span>
-                      {level ? (
-                        <span className="rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-extrabold text-sky-800">
-                          {level}
-                        </span>
-                      ) : null}
                     </div>
                     <div className="mt-4">
                       <button
