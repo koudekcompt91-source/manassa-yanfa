@@ -1,179 +1,119 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { BookOpen, FileText, Gamepad2, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import FreeCourseCard from "@/components/student/FreeCourseCard";
 
-function isFreeCourse(course) {
-  const minSub = String(course?.minSubscription || "FREE").toUpperCase();
-  const access = String(course?.accessType || "").toUpperCase();
-  const priceType = String(course?.priceType || "").toLowerCase();
-  return minSub === "FREE" || access === "FREE" || priceType === "free" || Number(course?.price || 0) <= 0;
-}
+/**
+ * FREE course catalog — fixed order (do not reorder):
+ * 1 دروسي · 2 ملخصاتي · 3 فروضي · 4 اختباراتي · 5 الدورات
+ */
+const FREE_CATALOG = [
+  {
+    id: "lessons",
+    title: "دروسي",
+    description: "تابع دروسك المجانية المسجّلة وابدأ التعلم حسب مستواك الدراسي.",
+    icon: "book",
+    tone: "blue",
+    href: "/courses",
+    showFree: true,
+    showPdf: false,
+    locked: false,
+  },
+  {
+    id: "summaries",
+    title: "ملخصاتي",
+    description: "ملخصات PDF مختصرة تساعدك على المراجعة السريعة للمواضيع الأساسية.",
+    icon: "document",
+    tone: "green",
+    href: "/free-dashboard#summaries",
+    showFree: true,
+    showPdf: true,
+    locked: false,
+  },
+  {
+    id: "assignments",
+    title: "فروضي",
+    description: "الواجبات والتمارين التطبيقية لمتابعة مستواك خطوة بخطوة.",
+    icon: "chart",
+    tone: "orange",
+    href: null,
+    showFree: false,
+    showPdf: false,
+    locked: true,
+  },
+  {
+    id: "quizzes",
+    title: "اختباراتي",
+    description: "اختبارات وتمارين تقييمية لقياس فهمك وتقدمك الدراسي.",
+    icon: "exam",
+    tone: "purple",
+    href: null,
+    showFree: false,
+    showPdf: false,
+    locked: true,
+  },
+  {
+    id: "courses",
+    title: "الدورات",
+    description: "تصفّح الدورات المجانية المتاحة لمستواك وادخل إلى محتوى الدورة مباشرة.",
+    icon: "star",
+    tone: "sky",
+    href: "/courses",
+    showFree: true,
+    showPdf: false,
+    locked: false,
+  },
+];
 
 export default function FreeDashboardPage() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState("");
+  const [levelLabel, setLevelLabel] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      fetch("/api/auth/me", { credentials: "include" }).then((r) => r.json()),
-      fetch("/api/courses", { credentials: "include" }).then((r) => r.json()),
-    ])
-      .then(([me, coursesRes]) => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
         if (cancelled) return;
-        if (me?.user?.fullName) setUserName(me.user.fullName);
-        const list = Array.isArray(coursesRes?.courses) ? coursesRes.courses : [];
-        setCourses(list);
+        const level = data?.user?.academicLevel || data?.user?.level || "";
+        setLevelLabel(level && level !== "unknown" ? String(level) : "");
       })
-      .catch(() => {
-        if (!cancelled) setCourses([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const { freeCourses, lockedCourses } = useMemo(() => {
-    const free = [];
-    const locked = [];
-    for (const c of courses) {
-      if (isFreeCourse(c)) free.push(c);
-      else locked.push(c);
-    }
-    return { freeCourses: free, lockedCourses: locked };
-  }, [courses]);
-
-  // Always surface a locked “paid content” row (games) so locked UX is visible even when API returns only FREE courses.
-  const lockedPlaceholders = [
-    {
-      id: "locked-games",
-      title: "الألعاب التعليمية",
-      description: "محتوى مدفوع — الألعاب التفاعلية متاحة في الحساب الكامل.",
-      lessonsCount: undefined,
-    },
-  ];
-
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-10">
-      <header className="rounded-[1.125rem] border border-slate-200/90 bg-gradient-to-l from-white via-white to-brand-50/40 p-6 shadow-[0_14px_36px_-24px_rgba(15,23,42,0.3)] sm:p-8">
-        <div className="flex flex-wrap items-start gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-indigo-600 text-white shadow-sm">
-            <Sparkles className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-brand-700">مرحباً بك في الحساب المجاني</p>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-              {userName ? `أهلاً ${userName}` : "لوحة التعلم المجاني"}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-              اطّلع على الدورات المجانية والمستندات المتاحة لمستواك. الألعاب قيد التطوير وستُفعَّل لاحقًا.
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <section id="courses" className="scroll-mt-28 space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
-            <BookOpen className="h-4 w-4" />
-          </span>
-          <div>
-            <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">الدورات المتاحة</h2>
-            <p className="text-xs font-semibold text-slate-500">
-              {loading ? "جاري التحميل…" : `${freeCourses.length} دورة مجانية`}
-            </p>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="space-y-4">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-36 animate-pulse rounded-[1.125rem] border border-slate-200/80 bg-slate-100/80"
-              />
-            ))}
-          </div>
-        ) : !freeCourses.length ? (
-          <p className="rounded-[1.125rem] border border-dashed border-slate-200 bg-slate-50/60 py-12 text-center text-sm text-slate-500">
-            لا توجد دورات مجانية متاحة لمستواك حاليًا.
+    <div className="-mx-4 min-h-[70vh] bg-[#f7f9fc] px-4 py-3 sm:-mx-6 sm:px-6 sm:py-5">
+      <div className="mx-auto w-full max-w-3xl">
+        <header className="mb-8 rounded-[1.125rem] border border-slate-200/80 bg-white px-6 py-7 text-center shadow-[0_10px_28px_-20px_rgba(15,23,42,0.22)] sm:mb-10 sm:px-10 sm:py-9">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+            مرحباً بك في الحساب المجاني
+          </h1>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
+            ابدأ من الأقسام المتاحة أدناه وتابع محتواك التعليمي المجاني بسهولة.
           </p>
-        ) : (
-          <div className="space-y-4 sm:space-y-5">
-            {freeCourses.map((course, index) => (
+        </header>
+
+        <section aria-label="كتالوج الأقسام المجانية" className="flex flex-col gap-5 sm:gap-6">
+          {FREE_CATALOG.map((item) => (
+            <div key={item.id} id={item.id}>
               <FreeCourseCard
-                key={course.id}
-                course={course}
-                iconVariant={index % 3 === 1 ? "grad" : "book"}
-                badgeExtra={["مجانية"]}
+                title={item.title}
+                description={item.description}
+                icon={item.icon}
+                tone={item.tone}
+                href={item.locked ? null : item.href}
+                locked={item.locked}
+                showFree={item.showFree}
+                showPdf={item.showPdf}
+                levelLabel={!item.locked && levelLabel ? levelLabel : ""}
+                ctaLabel="دخول القسم"
               />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section id="documents" className="scroll-mt-28 space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-            <FileText className="h-[1.125rem] w-[1.125rem]" />
-          </span>
-          <div>
-            <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">المحتوى المجاني</h2>
-            <p className="text-xs font-semibold text-slate-500">مستندات PDF مرتبطة بالدورات</p>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="space-y-4">
-            <div className="h-32 animate-pulse rounded-[1.125rem] border border-slate-200/80 bg-slate-100/80" />
-          </div>
-        ) : !freeCourses.length ? (
-          <p className="rounded-[1.125rem] border border-dashed border-slate-200 bg-slate-50/60 py-10 text-center text-sm text-slate-500">
-            لا توجد مستندات PDF مرتبطة بالدورات المجانية بعد.
-          </p>
-        ) : (
-          <div className="space-y-4 sm:space-y-5">
-            {freeCourses.map((course) => (
-              <FreeCourseCard
-                key={`doc-${course.id}`}
-                course={{
-                  ...course,
-                  description: "مستند تعليمي مرتبط بالدورة المجانية",
-                }}
-                iconVariant="file"
-                badgeExtra={["PDF", "مجانية"]}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section id="games" className="scroll-mt-28 space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
-            <Gamepad2 className="h-[1.125rem] w-[1.125rem]" />
-          </span>
-          <div>
-            <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">محتوى مقفل</h2>
-            <p className="text-xs font-semibold text-slate-500">يظهر معطلًا — محتوى مدفوع</p>
-          </div>
-        </div>
-
-        <div className="space-y-4 sm:space-y-5">
-          {lockedCourses.map((course) => (
-            <FreeCourseCard key={`locked-${course.id}`} course={course} locked iconVariant="grad" badgeExtra={["مدفوع"]} />
+            </div>
           ))}
-          {lockedPlaceholders.map((item) => (
-            <FreeCourseCard key={item.id} course={item} locked iconVariant="book" badgeExtra={["قريبًا"]} />
-          ))}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
