@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookOpen, PlayCircle } from "lucide-react";
-import { getDisplayLevelLabel } from "@/lib/student-level-codes";
 
 const TONES = [
   "from-brand-600 to-indigo-600",
@@ -25,18 +24,34 @@ export default function FreeDashboardPage() {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/free/courses", { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        return { okHttp: r.ok, data };
+      })
+      .then(({ okHttp, data }) => {
         if (cancelled) return;
-        if (!data?.ok) {
+
+        // TEMP: no client-side filtering — render whatever the API returns.
+        const list = Array.isArray(data?.courses) ? data.courses : [];
+        // eslint-disable-next-line no-console
+        console.log("[free-dashboard] courses from fetch:", list, "raw:", data);
+
+        if (!okHttp || data?.ok === false) {
           setError(data?.message || "تعذّر تحميل الدورات.");
           setCourses([]);
           return;
         }
-        setCourses(Array.isArray(data.courses) ? data.courses : []);
+
+        setError("");
+        setCourses(list);
       })
-      .catch(() => {
-        if (!cancelled) setError("تعذّر الاتصال بالخادم.");
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.log("[free-dashboard] fetch error:", err);
+        if (!cancelled) {
+          setError("تعذّر الاتصال بالخادم.");
+          setCourses([]);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -58,7 +73,7 @@ export default function FreeDashboardPage() {
           </p>
         </header>
 
-        <section aria-label="قائمة الدورات المجانية">
+        <section aria-label="قائمة الدورات">
           <div className="mb-5 flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
               <BookOpen className="h-4 w-4" />
@@ -73,20 +88,29 @@ export default function FreeDashboardPage() {
               ))}
             </div>
           ) : error ? (
-            <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-6 text-center text-sm text-red-700">
+            <p
+              role="alert"
+              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-8 text-center text-sm font-semibold text-red-700"
+            >
               {error}
             </p>
-          ) : !courses.length ? (
-            <p className="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
-              لا توجد دورات مجانية منشورة بعد.
+          ) : courses.length === 0 ? (
+            <p
+              role="status"
+              className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-12 text-center text-sm font-semibold text-slate-500"
+            >
+              لا توجد دورات
             </p>
           ) : (
             <div className="flex flex-col gap-5 sm:gap-6">
               {courses.map((course, index) => {
-                const level = getDisplayLevelLabel(course) || course.academicLevel || "";
+                const id = course?.id || course?.slug || `course-${index}`;
+                const title = course?.title || "دورة";
+                const description = String(course?.description || "").trim() || "دورة مجانية — اضغط للمشاهدة.";
+                const level = course?.academicLevel || course?.level || "";
                 return (
                   <article
-                    key={course.id}
+                    key={id}
                     className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.2)] transition hover:-translate-y-0.5 hover:border-brand-300/50 hover:shadow-md sm:p-6"
                   >
                     <div dir="ltr" className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
@@ -96,10 +120,8 @@ export default function FreeDashboardPage() {
                         <PlayCircle className="h-9 w-9" strokeWidth={1.75} />
                       </div>
                       <div dir="rtl" className="min-w-0 flex-1 text-right">
-                        <h3 className="text-xl font-extrabold text-slate-900 sm:text-[1.35rem]">{course.title}</h3>
-                        <p className="mt-1.5 text-sm leading-7 text-slate-500 line-clamp-2">
-                          {(course.description || "").trim() || "دورة مجانية — اضغط للمشاهدة."}
-                        </p>
+                        <h3 className="text-xl font-extrabold text-slate-900 sm:text-[1.35rem]">{title}</h3>
+                        <p className="mt-1.5 text-sm leading-7 text-slate-500 line-clamp-2">{description}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-extrabold text-emerald-800">
                             FREE
@@ -109,7 +131,7 @@ export default function FreeDashboardPage() {
                               {level}
                             </span>
                           ) : null}
-                          {course.hasVideo ? (
+                          {course?.hasVideo || course?.videoUrl ? (
                             <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-extrabold text-violet-800">
                               فيديو
                             </span>
@@ -117,7 +139,7 @@ export default function FreeDashboardPage() {
                         </div>
                         <div className="mt-4">
                           <Link
-                            href={`/free-dashboard/courses/${encodeURIComponent(course.id)}`}
+                            href={`/free-dashboard/courses/${encodeURIComponent(course?.id || course?.slug || "")}`}
                             className="touch-button-primary inline-flex h-11 w-full items-center justify-center px-5 text-sm font-extrabold sm:w-auto"
                           >
                             دخول الدورة

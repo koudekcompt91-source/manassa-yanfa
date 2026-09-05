@@ -5,7 +5,10 @@ import { requireFreeStudentApi } from "@/lib/subscription-server";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/** FREE LMS course detail — watch-only; never returns PAID system courses. */
+/**
+ * FREE dashboard course detail.
+ * TEMP: system filter disabled to match catalog fallback.
+ */
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const guard = await requireFreeStudentApi();
   if (!guard.ok) return guard.response;
@@ -18,7 +21,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 
     const course = await prisma.course.findFirst({
       where: {
-        system: "FREE",
         status: "PUBLISHED",
         OR: [{ id: ref }, { slug: ref }],
       },
@@ -35,7 +37,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     });
 
     if (!course) {
-      return NextResponse.json({ ok: false, message: "الدورة غير متاحة في النظام المجاني." }, { status: 404 });
+      return NextResponse.json({ ok: false, message: "الدورة غير متاحة." }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -44,11 +46,11 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         id: course.id,
         slug: course.slug,
         title: course.title,
-        description: course.description,
+        description: course.description || "",
         videoUrl: course.videoUrl || "",
-        coverImage: course.thumbnailUrl,
-        level: course.level,
-        academicLevel: course.academicLevel,
+        coverImage: course.thumbnailUrl || "",
+        level: course.level || "",
+        academicLevel: course.academicLevel || "",
       },
     });
   } catch (e) {
