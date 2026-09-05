@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
 import { isValidYoutubeUrl } from "@/lib/youtube";
+import { loadFreeCourseMedia, syncCoursePdfs, syncCourseVideo } from "@/lib/free-course-media";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,12 +17,25 @@ function slugify(input: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function normalize(course: {
+function isValidVideoUrl(url: string): boolean {
+  if (isValidYoutubeUrl(url)) return true;
+  return /\.mp4(\?|$)/i.test(url);
+}
+
+function parsePdfsFromBody(body: any) {
+  if (Array.isArray(body?.pdfs)) return body.pdfs;
+  const lines = String(body?.pdfUrls || "")
+    .split("\n")
+    .map((s: string) => s.trim())
+    .filter(Boolean);
+  return lines.map((url: string, i: number) => ({ title: `مستند PDF ${i + 1}`, url }));
+}
+
+async function normalizeWithMedia(course: {
   id: string;
   slug: string;
   title: string;
   description: string;
-  videoUrl: string | null;
   thumbnailUrl: string | null;
   status: string;
   order: number;
@@ -30,12 +44,15 @@ function normalize(course: {
   createdAt: Date;
   updatedAt: Date;
 }) {
+  const media = await loadFreeCourseMedia(course.id);
   return {
     id: course.id,
     slug: course.slug,
     title: course.title,
     description: course.description,
-    videoUrl: course.videoUrl || "",
+    videoUrl: media.videoUrl,
+    pdfs: media.pdfs,
+    pdfUrls: media.pdfs.map((p) => p.url).join("\n"),
     type: "FREE" as const,
     system: "FREE" as const,
     coverImage: course.thumbnailUrl,
@@ -59,7 +76,8 @@ export async function GET() {
       where: { system: "FREE" },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
-    return NextResponse.json({ ok: true, courses: courses.map(normalize) });
+    const mapped = await Promise.all(courses.map((c) => normalizeWithMedia(c)));
+    return NextResponse.json({ ok: true, courses: mapped });
   } catch (e) {
     console.error("[admin/free-courses][GET]", e);
     return NextResponse.json({ ok: false, message: "تعذّر تحميل الدورات المجانية." }, { status: 500 });
@@ -80,15 +98,16 @@ export async function POST(req: Request) {
     const level = String(body?.level || "").trim() || null;
     const statusRaw = String(body?.status || "").toUpperCase();
     const status = statusRaw === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+    const pdfs = parsePdfsFromBody(body);
 
     if (!title) {
       return NextResponse.json({ ok: false, message: "عنوان الدورة مطلوب." }, { status: 400 });
     }
-    if (videoUrl && !isValidYoutubeUrl(videoUrl)) {
-      return NextResponse.json({ ok: false, message: "رابط يوتيوب غير صالح. يُقبل رابط YouTube فقط." }, { status: 400 });
+    if (videoUrl && !isValidVideoUrl(videoUrl)) {
+      return NextResponse.json({ ok: false, message: "رابط فيديو غير صالح. يُقبل YouTube أو MP4." }, { status: 400 });
     }
     if (status === "PUBLISHED" && !videoUrl) {
-      return NextResponse.json({ ok: false, message: "أضف رابط يوتيوب قبل نشر الدورة." }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "أضف رابط الفيديو قبل نشر الدورة." }, { status: 400 });
     }
 
     const baseSlug = slugify(title) || `free-course-${Date.now()}`;
@@ -121,10 +140,13 @@ export async function POST(req: Request) {
       },
     });
 
+    await syncCourseVideo(course.id, videoUrl);
+    await syncCoursePdfs(course.id, pdfs);
+
     return NextResponse.json({
       ok: true,
       message: "تم إنشاء الدورة المجانية.",
-      course: normalize(course),
+      course: await normalizeWithMedia(course),
     });
   } catch (e) {
     console.error("[admin/free-courses][POST]", e);

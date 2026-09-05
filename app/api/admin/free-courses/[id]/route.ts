@@ -2,16 +2,30 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
 import { isValidYoutubeUrl } from "@/lib/youtube";
+import { loadFreeCourseMedia, syncCoursePdfs, syncCourseVideo } from "@/lib/free-course-media";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function normalize(course: {
+function isValidVideoUrl(url: string): boolean {
+  if (isValidYoutubeUrl(url)) return true;
+  return /\.mp4(\?|$)/i.test(url);
+}
+
+function parsePdfsFromBody(body: any) {
+  if (Array.isArray(body?.pdfs)) return body.pdfs;
+  const lines = String(body?.pdfUrls || "")
+    .split("\n")
+    .map((s: string) => s.trim())
+    .filter(Boolean);
+  return lines.map((url: string, i: number) => ({ title: `مستند PDF ${i + 1}`, url }));
+}
+
+async function normalizeWithMedia(course: {
   id: string;
   slug: string;
   title: string;
   description: string;
-  videoUrl: string | null;
   thumbnailUrl: string | null;
   status: string;
   order: number;
@@ -20,12 +34,15 @@ function normalize(course: {
   createdAt: Date;
   updatedAt: Date;
 }) {
+  const media = await loadFreeCourseMedia(course.id);
   return {
     id: course.id,
     slug: course.slug,
     title: course.title,
     description: course.description,
-    videoUrl: course.videoUrl || "",
+    videoUrl: media.videoUrl,
+    pdfs: media.pdfs,
+    pdfUrls: media.pdfs.map((p) => p.url).join("\n"),
     type: "FREE" as const,
     system: "FREE" as const,
     coverImage: course.thumbnailUrl,
@@ -53,6 +70,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       return NextResponse.json({ ok: false, message: "دورة مجانية غير موجودة." }, { status: 404 });
     }
 
+    const media = await loadFreeCourseMedia(existing.id);
     const body = await req.json();
     const data: Record<string, unknown> = {};
 
@@ -62,16 +80,20 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       data.title = title;
     }
     if (body?.description !== undefined) data.description = String(body.description || "").trim();
+
+    let nextVideo = media.videoUrl || existing.videoUrl || null;
     if (body?.videoUrl !== undefined) {
       const videoUrl = String(body.videoUrl || "").trim() || null;
-      if (videoUrl && !isValidYoutubeUrl(videoUrl)) {
+      if (videoUrl && !isValidVideoUrl(videoUrl)) {
         return NextResponse.json(
-          { ok: false, message: "رابط يوتيوب غير صالح. يُقبل رابط YouTube فقط." },
+          { ok: false, message: "رابط فيديو غير صالح. يُقبل YouTube أو MP4." },
           { status: 400 }
         );
       }
+      nextVideo = videoUrl;
       data.videoUrl = videoUrl;
     }
+
     if (body?.thumbnailUrl !== undefined || body?.coverImage !== undefined) {
       data.thumbnailUrl = String(body.thumbnailUrl || body.coverImage || "").trim() || null;
     }
@@ -83,12 +105,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     if (body?.order !== undefined) data.order = Math.max(0, Number(body.order) || 0);
 
     const nextStatus = (data.status as string) || existing.status;
-    const nextVideo = data.videoUrl !== undefined ? data.videoUrl : existing.videoUrl;
     if (nextStatus === "PUBLISHED" && !nextVideo) {
-      return NextResponse.json({ ok: false, message: "أضف رابط يوتيوب قبل نشر الدورة." }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "أضف رابط الفيديو قبل نشر الدورة." }, { status: 400 });
     }
 
-    // Never allow flipping system away from FREE via this endpoint.
     data.system = "FREE";
     data.accessType = "FREE";
     data.minSubscription = "FREE";
@@ -99,7 +119,18 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       data,
     });
 
-    return NextResponse.json({ ok: true, message: "تم تحديث الدورة.", course: normalize(course) });
+    if (body?.videoUrl !== undefined) {
+      await syncCourseVideo(course.id, nextVideo);
+    }
+    if (body?.pdfs !== undefined || body?.pdfUrls !== undefined) {
+      await syncCoursePdfs(course.id, parsePdfsFromBody(body));
+    }
+
+    return NextResponse.json({
+      ok: true,
+      message: "تم تحديث الدورة.",
+      course: await normalizeWithMedia(course),
+    });
   } catch (e) {
     console.error("[admin/free-courses/:id][PATCH]", e);
     return NextResponse.json({ ok: false, message: "تعذّر تحديث الدورة." }, { status: 500 });

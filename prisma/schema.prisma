@@ -278,9 +278,37 @@ model Course {
   assessments  Assessment[]
   lessonProgresses LessonProgress[]
   certificates      Certificate[]
+  courseVideo  CourseVideo?
+  coursePdfs   CoursePDF[]
 
   @@index([status, minSubscription])
   @@index([system, status, order])
+}
+
+/** Dedicated FREE LMS video row — one primary videoUrl per course. */
+model CourseVideo {
+  id        String   @id @default(cuid())
+  courseId  String   @unique
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  videoUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+/** Dedicated FREE LMS PDF documents — never derived from description. */
+model CoursePDF {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId, order])
 }
 
 model Lesson {

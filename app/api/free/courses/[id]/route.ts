@@ -5,17 +5,10 @@ import { requireFreeStudentApi } from "@/lib/subscription-server";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function extractPdfs(description: string, courseId: string) {
-  const text = String(description || "");
-  const matches = text.match(/https?:\/\/[^\s"'<>]+\.pdf(?:\?[^\s"'<>]*)?/gi) || [];
-  return matches.map((url, i) => ({
-    id: `${courseId}-pdf-${i}`,
-    title: `مستند PDF ${i + 1}`,
-    url,
-  }));
-}
-
-/** FREE course detail — same FREE_ALLOWED rule as catalog. */
+/**
+ * FREE course detail — same rule as catalog:
+ * published only; no system / subscription / accessType logic.
+ */
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const guard = await requireFreeStudentApi();
   if (!guard.ok) return guard.response;
@@ -29,29 +22,27 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     const course = await prisma.course.findFirst({
       where: {
         status: "PUBLISHED",
-        AND: [
-          { OR: [{ id: ref }, { slug: ref }] },
-          { OR: [{ system: "FREE" }, { minSubscription: "FREE" }, { accessType: "FREE" }] },
-        ],
+        OR: [{ id: ref }, { slug: ref }],
       },
       select: {
         id: true,
         slug: true,
         title: true,
         description: true,
-        videoUrl: true,
         thumbnailUrl: true,
         level: true,
         academicLevel: true,
-        system: true,
+        courseVideo: { select: { videoUrl: true } },
+        coursePdfs: {
+          orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+          select: { id: true, title: true, url: true, order: true },
+        },
       },
     });
 
     if (!course) {
       return NextResponse.json({ ok: false, message: "الدورة غير متاحة." }, { status: 404 });
     }
-
-    const pdfs = extractPdfs(course.description || "", course.id);
 
     return NextResponse.json({
       ok: true,
@@ -60,14 +51,16 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         slug: course.slug,
         title: course.title,
         description: course.description || "",
-        videoUrl: course.videoUrl || "",
-        type: course.system,
-        system: course.system,
+        videoUrl: course.courseVideo?.videoUrl || "",
         coverImage: course.thumbnailUrl || "",
         level: course.level || "",
         academicLevel: course.academicLevel || "",
-        pdfs,
-        hasPdf: pdfs.length > 0,
+        pdfs: (course.coursePdfs || []).map((p) => ({
+          id: p.id,
+          title: p.title,
+          url: p.url,
+          order: p.order,
+        })),
       },
     });
   } catch (e) {

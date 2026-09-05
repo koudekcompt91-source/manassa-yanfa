@@ -17,6 +17,7 @@ const EMPTY = {
   title: "",
   description: "",
   videoUrl: "",
+  pdfUrls: "",
   thumbnailUrl: "",
   level: "",
   status: "DRAFT",
@@ -58,6 +59,7 @@ export default function AdminFreeCoursesPage() {
       title: course.title || "",
       description: course.description || "",
       videoUrl: course.videoUrl || "",
+      pdfUrls: course.pdfUrls || (Array.isArray(course.pdfs) ? course.pdfs.map((p) => p.url).join("\n") : ""),
       thumbnailUrl: course.coverImage || "",
       level: course.level || "",
       status: course.status || "DRAFT",
@@ -72,12 +74,12 @@ export default function AdminFreeCoursesPage() {
       setError("عنوان الدورة مطلوب.");
       return;
     }
-    if (form.videoUrl.trim() && !/youtube\.com|youtu\.be/i.test(form.videoUrl)) {
-      setError("يُقبل رابط YouTube فقط.");
+    if (form.videoUrl.trim() && !/youtube\.com|youtu\.be|\.mp4(\?|$)/i.test(form.videoUrl)) {
+      setError("يُقبل رابط YouTube أو ملف MP4 فقط.");
       return;
     }
     if (form.status === "PUBLISHED" && !form.videoUrl.trim()) {
-      setError("أضف رابط يوتيوب قبل النشر.");
+      setError("أضف رابط الفيديو قبل النشر.");
       return;
     }
     setSaving(true);
@@ -166,12 +168,22 @@ export default function AdminFreeCoursesPage() {
               <option value="PUBLISHED">منشورة</option>
             </AdminSelect>
           </AdminFormField>
-          <AdminFormField label="رابط يوتيوب (YouTube فقط)">
+          <AdminFormField label="رابط الفيديو (YouTube أو MP4)">
             <AdminInput
               value={form.videoUrl}
               onChange={(e) => setForm((s) => ({ ...s, videoUrl: e.target.value }))}
-              placeholder="https://www.youtube.com/watch?v=..."
+              placeholder="https://www.youtube.com/watch?v=... أو رابط .mp4"
               dir="ltr"
+            />
+          </AdminFormField>
+          <AdminFormField label="روابط PDF (سطر لكل رابط — جدول CoursePDF)">
+            <textarea
+              value={form.pdfUrls}
+              onChange={(e) => setForm((s) => ({ ...s, pdfUrls: e.target.value }))}
+              placeholder={"https://example.com/doc1.pdf\nhttps://example.com/doc2.pdf"}
+              dir="ltr"
+              rows={3}
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
             />
           </AdminFormField>
           <AdminFormField label="رابط صورة الغلاف (اختياري)">
