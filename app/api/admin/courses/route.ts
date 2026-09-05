@@ -122,6 +122,7 @@ export async function GET() {
   }
 
   const courses = await prisma.course.findMany({
+    where: { system: "PAID" },
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     include: { _count: { select: { lessons: true } } },
   });
@@ -146,7 +147,10 @@ export async function POST(req: Request) {
       slug = `${baseSlug}-${i++}`;
     }
 
-    const orderMax = await prisma.course.aggregate({ _max: { order: true } });
+    const orderMax = await prisma.course.aggregate({
+      where: { system: "PAID" },
+      _max: { order: true },
+    });
     const order = (orderMax._max.order ?? 0) + 1;
 
     const course = await prisma.course.create({
@@ -154,6 +158,7 @@ export async function POST(req: Request) {
         ...valid.value,
         slug,
         order,
+        system: "PAID",
       },
       include: { _count: { select: { lessons: true } } },
     });

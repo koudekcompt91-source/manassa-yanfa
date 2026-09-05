@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { prisma } from "@/lib/prisma";
 import { serializeCertificate } from "@/lib/certificates";
+import { requirePaidStudentApi } from "@/lib/subscription-server";
 
 export async function GET() {
   const guard = await requireStudentApiSession();
   if (!guard.ok) return guard.response;
+  const paid = await requirePaidStudentApi();
+  if (!paid.ok) return paid.response;
 
   try {
     const rows = await prisma.certificate.findMany({

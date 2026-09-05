@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStudentSessionFromCookies } from "@/lib/auth/session";
 import { studentSeesPackage } from "@/lib/academic-levels";
-import { studentSeesCourseBySubscription } from "@/lib/subscription";
+import { isFreeSubscription, studentSeesCourseBySubscription } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +10,20 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
   try {
     const ref = decodeURIComponent(String(params.slug || "")).trim();
     if (!ref) return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
+
+    const session = await getStudentSessionFromCookies();
+    if (session?.sub) {
+      const earlyViewer = await prisma.user.findUnique({
+        where: { id: session.sub },
+        select: { role: true, subscriptionType: true },
+      });
+      if (earlyViewer?.role === "STUDENT" && isFreeSubscription(earlyViewer.subscriptionType)) {
+        return NextResponse.json(
+          { ok: false, message: "هذه الميزة متاحة للحساب الكامل فقط.", code: "PAID_REQUIRED" },
+          { status: 403 }
+        );
+      }
+    }
 
     const course = await prisma.course.findFirst({
       where: {
@@ -27,6 +41,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         status: true,
         accessType: true,
         minSubscription: true,
+        system: true,
         price: true,
         isFeatured: true,
         order: true,
@@ -39,7 +54,6 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
       return NextResponse.json({ ok: false, message: "الدورة غير متاحة." }, { status: 404 });
     }
 
-    const session = await getStudentSessionFromCookies();
     let enrolled = false;
     if (session?.sub) {
       const viewer = await prisma.user.findUnique({
@@ -55,7 +69,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         );
       }
 
-      // Subscription gate: FREE students cannot open PAID-min courses via direct URL.
+      // Defense in depth: PAID catalog rows must stay PAID-system only.
       if (
         viewer?.role === "STUDENT" &&
         !studentSeesCourseBySubscription(viewer.subscriptionType, course.minSubscription)
@@ -104,6 +118,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
       ok: true,
       course: {
         ...course,
+        type: course.system,
         coverImage: course.thumbnailUrl,
         isPublished: true,
         priceMad: course.price,

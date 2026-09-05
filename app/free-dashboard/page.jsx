@@ -31,10 +31,9 @@ export default function FreeDashboardPage() {
       .then(({ okHttp, data }) => {
         if (cancelled) return;
 
-        // TEMP: no client-side filtering — render whatever the API returns.
+        // TEMP recovery: render all courses from API — no client-side filtering.
         const list = Array.isArray(data?.courses) ? data.courses : [];
-        // eslint-disable-next-line no-console
-        console.log("[free-dashboard] courses from fetch:", list, "raw:", data);
+        console.log("[free-dashboard] courses:", data);
 
         if (!okHttp || data?.ok === false) {
           setError(data?.message || "تعذّر تحميل الدورات.");
@@ -45,9 +44,7 @@ export default function FreeDashboardPage() {
         setError("");
         setCourses(list);
       })
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.log("[free-dashboard] fetch error:", err);
+      .catch(() => {
         if (!cancelled) {
           setError("تعذّر الاتصال بالخادم.");
           setCourses([]);
@@ -99,7 +96,7 @@ export default function FreeDashboardPage() {
               role="status"
               className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-12 text-center text-sm font-semibold text-slate-500"
             >
-              لا توجد دورات
+              لا توجد دورات حالياً
             </p>
           ) : (
             <div className="flex flex-col gap-5 sm:gap-6">

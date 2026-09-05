@@ -72,8 +72,12 @@ export default function AdminFreeCoursesPage() {
       setError("عنوان الدورة مطلوب.");
       return;
     }
+    if (form.videoUrl.trim() && !/youtube\.com|youtu\.be/i.test(form.videoUrl)) {
+      setError("يُقبل رابط YouTube فقط.");
+      return;
+    }
     if (form.status === "PUBLISHED" && !form.videoUrl.trim()) {
-      setError("أضف رابط الفيديو قبل النشر.");
+      setError("أضف رابط يوتيوب قبل النشر.");
       return;
     }
     setSaving(true);
@@ -117,10 +121,10 @@ export default function AdminFreeCoursesPage() {
 
   return (
     <AdminShell
-      title="نظام التعلم المجاني"
-      subtitle="إنشاء دورات مجانية وربط فيديو لكل دورة — منفصل تمامًا عن النظام المدفوع."
+      title="إدارة المحتوى المجاني"
+      subtitle="إنشاء وتعديل وحذف الدورات المجانية مع رابط يوتيوب — منفصل تمامًا عن النظام المدفوع."
     >
-      <AdminSectionCard title="إدارة الدورات المجانية">
+      <AdminSectionCard title="إدارة المحتوى المجاني">
         {banner ? (
           <p
             className={`mb-4 rounded-xl border px-3 py-2 text-sm ${
@@ -162,11 +166,11 @@ export default function AdminFreeCoursesPage() {
               <option value="PUBLISHED">منشورة</option>
             </AdminSelect>
           </AdminFormField>
-          <AdminFormField label="رابط الفيديو (YouTube أو ملف mp4)">
+          <AdminFormField label="رابط يوتيوب (YouTube فقط)">
             <AdminInput
               value={form.videoUrl}
               onChange={(e) => setForm((s) => ({ ...s, videoUrl: e.target.value }))}
-              placeholder="https://youtube.com/... أو رابط الفيديو المباشر"
+              placeholder="https://www.youtube.com/watch?v=..."
               dir="ltr"
             />
           </AdminFormField>

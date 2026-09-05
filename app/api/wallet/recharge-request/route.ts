@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { submitRechargeRequestDb } from "@/lib/server-wallet";
+import { requirePaidStudentApi } from "@/lib/subscription-server";
 
 export async function POST(req: Request) {
   const guard = await requireStudentApiSession();
   if (!guard.ok) return guard.response;
+  const paid = await requirePaidStudentApi();
+  if (!paid.ok) return paid.response;
   const session = guard.session;
 
   try {

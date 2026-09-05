@@ -16,9 +16,10 @@ export function isFreeSubscription(subscriptionType: unknown): boolean {
 }
 
 /**
- * Course visibility by subscription:
- * - PAID students see all courses
- * - FREE students see only courses with minSubscription === FREE (shared / "both")
+ * Within a learning system, gate by course.minSubscription:
+ * - PAID students see all courses in that system
+ * - FREE students see only minSubscription === FREE
+ * Prefer Course.system for FREE vs PAID LMS isolation (enforced in APIs).
  */
 export function studentSeesCourseBySubscription(
   userSubscription: unknown,
@@ -26,4 +27,10 @@ export function studentSeesCourseBySubscription(
 ): boolean {
   if (normalizeSubscriptionType(userSubscription) === "PAID") return true;
   return normalizeSubscriptionType(courseMinSubscription) === "FREE";
+}
+
+/** Course.system / type isolation: FREE users → FREE only; PAID users → all systems. */
+export function studentSeesCourseBySystem(userSubscription: unknown, courseSystem: unknown): boolean {
+  if (normalizeSubscriptionType(userSubscription) === "PAID") return true;
+  return normalizeSubscriptionType(courseSystem) === "FREE";
 }

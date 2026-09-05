@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { CourseAccessType, CourseStatus, SubscriptionType } from "@prisma/client";
 import { getStudentSessionFromCookies } from "@/lib/auth/session";
 import { studentSeesPackage } from "@/lib/academic-levels";
-import { studentSeesCourseBySubscription } from "@/lib/subscription";
+import { isFreeSubscription, studentSeesCourseBySubscription } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,7 @@ function normalizeCourse(course: {
   status: CourseStatus;
   accessType: CourseAccessType;
   minSubscription: SubscriptionType;
+  system: SubscriptionType;
   price: number;
   isFeatured: boolean;
   order: number;
@@ -37,6 +38,8 @@ function normalizeCourse(course: {
     status: course.status,
     accessType: course.accessType,
     minSubscription: course.minSubscription,
+    type: course.system,
+    system: course.system,
     priceMad: course.price,
     price: course.price,
     priceType: course.accessType === "PAID" ? "premium" : "free",
@@ -48,19 +51,33 @@ function normalizeCourse(course: {
   };
 }
 
+/**
+ * PAID platform catalog (system/type = PAID).
+ * Logged-in FREE students get 403. Anonymous browsing remains for marketing pages.
+ */
 export async function GET() {
   try {
+    const session = await getStudentSessionFromCookies();
+    if (session?.sub) {
+      const viewerCheck = await prisma.user.findUnique({
+        where: { id: session.sub },
+        select: { role: true, subscriptionType: true },
+      });
+      if (viewerCheck?.role === "STUDENT" && isFreeSubscription(viewerCheck.subscriptionType)) {
+        return NextResponse.json(
+          { ok: false, message: "هذه الميزة متاحة للحساب الكامل فقط.", code: "PAID_REQUIRED" },
+          { status: 403 }
+        );
+      }
+    }
+
     const courses = await prisma.course.findMany({
       where: { status: "PUBLISHED", system: "PAID" },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       include: { _count: { select: { lessons: true } } },
     });
 
-    // Strict per-level isolation: a logged-in student only receives courses
-    // matching their assigned level. Anonymous visitors keep browsing the full
-    // public catalog (access to content is still gated by enrollment/payment).
     let visible = courses;
-    const session = await getStudentSessionFromCookies();
     if (session?.sub) {
       const viewer = await prisma.user.findUnique({
         where: { id: session.sub },
@@ -72,15 +89,6 @@ export async function GET() {
             studentSeesPackage(viewer.academicLevel, course, viewer.level) &&
             studentSeesCourseBySubscription(viewer.subscriptionType, course.minSubscription)
         );
-        // FREE accounts: only free-priced / free-access catalog rows (defense in depth).
-        if (viewer.subscriptionType === "FREE") {
-          visible = visible.filter(
-            (course) =>
-              course.accessType === "FREE" ||
-              course.minSubscription === "FREE" ||
-              Number(course.price || 0) <= 0
-          );
-        }
       }
     }
 

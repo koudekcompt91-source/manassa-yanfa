@@ -113,9 +113,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
     const existing = await prisma.course.findUnique({
       where: { id: params.id },
-      select: { status: true, level: true },
+      select: { status: true, level: true, system: true },
     });
-    if (!existing) {
+    if (!existing || existing.system !== "PAID") {
       return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
     }
 
@@ -128,6 +128,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         { status: 400 }
       );
     }
+
+    // Never allow flipping a PAID-system course into FREE LMS via this endpoint.
+    valid.data.system = "PAID";
 
     const course = await prisma.course.update({
       where: { id: params.id },
@@ -148,6 +151,13 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
     return NextResponse.json({ ok: false, message: "غير مصرّح." }, { status: 403 });
   }
   try {
+    const existing = await prisma.course.findUnique({
+      where: { id: params.id },
+      select: { id: true, system: true },
+    });
+    if (!existing || existing.system !== "PAID") {
+      return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
+    }
     await prisma.course.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true, message: "تم حذف الدورة." });
   } catch (e) {

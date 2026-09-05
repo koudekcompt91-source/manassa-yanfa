@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * FREE dashboard course detail.
- * TEMP: system filter disabled to match catalog fallback.
+ * FREE dashboard course detail (RECOVERY).
+ * TEMP: no system filter — any PUBLISHED course by id/slug.
  */
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const guard = await requireFreeStudentApi();
@@ -33,6 +33,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         thumbnailUrl: true,
         level: true,
         academicLevel: true,
+        system: true,
       },
     });
 
@@ -48,6 +49,8 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         title: course.title,
         description: course.description || "",
         videoUrl: course.videoUrl || "",
+        type: course.system,
+        system: course.system,
         coverImage: course.thumbnailUrl || "",
         level: course.level || "",
         academicLevel: course.academicLevel || "",

@@ -2,7 +2,7 @@
 
 import { extractYoutubeVideoId, youtubeEmbedUrlFromId } from "@/lib/youtube";
 
-/** Watch-only video for FREE LMS (YouTube embed or direct media URL). */
+/** Watch-only YouTube embed for FREE LMS. */
 export default function FreeCourseVideoPlayer({ videoUrl, title }) {
   const url = String(videoUrl || "").trim();
   if (!url) {
@@ -14,32 +14,23 @@ export default function FreeCourseVideoPlayer({ videoUrl, title }) {
   }
 
   const ytId = extractYoutubeVideoId(url);
-  if (ytId) {
+  if (!ytId) {
     return (
-      <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
-        <iframe
-          title={title || "فيديو الدورة"}
-          src={youtubeEmbedUrlFromId(ytId)}
-          className="h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+      <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-dashed border-amber-300 bg-amber-50 text-sm font-semibold text-amber-800">
+        رابط يوتيوب غير صالح. يُقبل رابط YouTube فقط.
       </div>
     );
   }
 
   return (
     <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
-      <video
-        className="h-full w-full"
-        controls
-        playsInline
-        preload="metadata"
-        src={url}
+      <iframe
         title={title || "فيديو الدورة"}
-      >
-        متصفحك لا يدعم تشغيل الفيديو.
-      </video>
+        src={youtubeEmbedUrlFromId(ytId)}
+        className="h-full w-full"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
     </div>
   );
 }

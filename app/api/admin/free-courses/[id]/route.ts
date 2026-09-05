@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
+import { isValidYoutubeUrl } from "@/lib/youtube";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,6 +26,8 @@ function normalize(course: {
     title: course.title,
     description: course.description,
     videoUrl: course.videoUrl || "",
+    type: "FREE" as const,
+    system: "FREE" as const,
     coverImage: course.thumbnailUrl,
     status: course.status,
     isPublished: course.status === "PUBLISHED",
@@ -59,7 +62,16 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       data.title = title;
     }
     if (body?.description !== undefined) data.description = String(body.description || "").trim();
-    if (body?.videoUrl !== undefined) data.videoUrl = String(body.videoUrl || "").trim() || null;
+    if (body?.videoUrl !== undefined) {
+      const videoUrl = String(body.videoUrl || "").trim() || null;
+      if (videoUrl && !isValidYoutubeUrl(videoUrl)) {
+        return NextResponse.json(
+          { ok: false, message: "رابط يوتيوب غير صالح. يُقبل رابط YouTube فقط." },
+          { status: 400 }
+        );
+      }
+      data.videoUrl = videoUrl;
+    }
     if (body?.thumbnailUrl !== undefined || body?.coverImage !== undefined) {
       data.thumbnailUrl = String(body.thumbnailUrl || body.coverImage || "").trim() || null;
     }
@@ -73,7 +85,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const nextStatus = (data.status as string) || existing.status;
     const nextVideo = data.videoUrl !== undefined ? data.videoUrl : existing.videoUrl;
     if (nextStatus === "PUBLISHED" && !nextVideo) {
-      return NextResponse.json({ ok: false, message: "أضف رابط الفيديو قبل نشر الدورة." }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "أضف رابط يوتيوب قبل نشر الدورة." }, { status: 400 });
     }
 
     // Never allow flipping system away from FREE via this endpoint.

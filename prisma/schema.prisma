@@ -258,7 +258,7 @@ model Course {
    * Default FREE keeps new courses open; migration backfills PAID courses from accessType.
    */
   minSubscription SubscriptionType @default(FREE)
-  /** Primary video for FREE LMS courses (YouTube or direct mp4/https URL). */
+  /** Primary video for FREE LMS courses (YouTube URL only). */
   videoUrl     String?
   price        Int              @default(0)
   status       CourseStatus     @default(DRAFT)

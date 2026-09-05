@@ -10,7 +10,10 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     if (!ref) return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
 
     const course = await prisma.course.findFirst({
-      where: { OR: [{ slug: ref }, { id: ref }] },
+      where: {
+        system: "PAID",
+        OR: [{ slug: ref }, { id: ref }],
+      },
       select: { id: true, accessType: true, status: true },
     });
 
@@ -19,6 +22,18 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     }
 
     const studentSession = await getStudentSessionFromCookies();
+    if (studentSession?.sub) {
+      const viewer = await prisma.user.findUnique({
+        where: { id: studentSession.sub },
+        select: { role: true, subscriptionType: true },
+      });
+      if (viewer?.role === "STUDENT" && String(viewer.subscriptionType || "").toUpperCase() === "FREE") {
+        return NextResponse.json(
+          { ok: false, message: "هذه الميزة متاحة للحساب الكامل فقط.", code: "PAID_REQUIRED" },
+          { status: 403 }
+        );
+      }
+    }
     let enrolled = false;
     if (studentSession?.sub) {
       const enrollment = await prisma.enrollment.findUnique({

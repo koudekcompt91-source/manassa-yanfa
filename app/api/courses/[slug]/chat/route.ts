@@ -9,8 +9,20 @@ export const dynamic = "force-dynamic";
 const MAX_MESSAGE_LEN = 1000;
 
 async function resolveStudentCourseAccess(slugOrId: string, studentId: string) {
+  const viewer = await prisma.user.findUnique({
+    where: { id: studentId },
+    select: { role: true, subscriptionType: true },
+  });
+  if (!viewer || viewer.role !== "STUDENT") return { ok: false as const, code: 403 };
+  if (String(viewer.subscriptionType || "").toUpperCase() === "FREE") {
+    return { ok: false as const, code: 403 };
+  }
+
   const course = await prisma.course.findFirst({
-    where: { OR: [{ slug: slugOrId }, { id: slugOrId }] },
+    where: {
+      system: "PAID",
+      OR: [{ slug: slugOrId }, { id: slugOrId }],
+    },
     select: {
       id: true,
       slug: true,
