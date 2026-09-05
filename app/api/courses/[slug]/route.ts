@@ -13,6 +13,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
 
     const course = await prisma.course.findFirst({
       where: {
+        system: "PAID",
         OR: [{ slug: ref }, { id: ref }],
       },
       select: {

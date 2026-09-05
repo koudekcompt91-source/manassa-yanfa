@@ -51,7 +51,7 @@ function normalizeCourse(course: {
 export async function GET() {
   try {
     const courses = await prisma.course.findMany({
-      where: { status: "PUBLISHED" },
+      where: { status: "PUBLISHED", system: "PAID" },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       include: { _count: { select: { lessons: true } } },
     });

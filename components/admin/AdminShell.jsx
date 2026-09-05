@@ -22,6 +22,7 @@ import {
 const adminLinks = [
   { href: "/admin/dashboard", label: "لوحة التحكم", Icon: LayoutDashboard },
   { href: "/admin/courses", label: "الدورات", Icon: BookOpen },
+  { href: "/admin/free-courses", label: "التعلم المجاني", Icon: BookOpen },
   { href: "/admin/store", label: "المتجر", Icon: ShoppingBag },
   { href: "/admin/teachers", label: "الأساتذة", Icon: UserRound },
   { href: "/admin/students", label: "الطلاب", Icon: Users },
@@ -40,6 +41,9 @@ const adminLinks = [
 function isActiveLink(pathname, href) {
   if (href === "/admin/dashboard") {
     return pathname === "/admin/dashboard" || pathname === "/admin";
+  }
+  if (href === "/admin/free-courses") {
+    return pathname === "/admin/free-courses" || pathname.startsWith("/admin/free-courses/");
   }
   if (href === "/admin/courses") {
     // Keep old route compatibility while showing the new label.

@@ -71,3 +71,27 @@ export async function requirePaidStudentApi(): Promise<
   }
   return { ok: true, ctx };
 }
+
+/** API guard: FREE LMS endpoints — students with FREE subscription only. */
+export async function requireFreeStudentApi(): Promise<
+  | { ok: true; ctx: StudentSubscriptionContext }
+  | { ok: false; response: NextResponse }
+> {
+  const ctx = await resolveStudentSubscription();
+  if (!ctx) {
+    return {
+      ok: false,
+      response: NextResponse.json({ ok: false, message: "يجب تسجيل الدخول أولًا." }, { status: 401 }),
+    };
+  }
+  if (!isFreeSubscription(ctx.subscriptionType)) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { ok: false, message: "هذه الميزة متاحة للحساب المجاني فقط.", code: "FREE_REQUIRED" },
+        { status: 403 }
+      ),
+    };
+  }
+  return { ok: true, ctx };
+}

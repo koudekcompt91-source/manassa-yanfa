@@ -247,12 +247,19 @@ model Course {
   description  String           @default("")
   accessType   CourseAccessType @default(FREE)
   /**
+   * Learning system isolation: FREE LMS vs PAID platform.
+   * Default PAID keeps existing courses in the paid system.
+   */
+  system        SubscriptionType @default(PAID)
+  /**
    * Minimum student subscription required to see this course.
    * FREE  → visible to FREE and PAID (shared / "both")
    * PAID  → visible to PAID only
    * Default FREE keeps new courses open; migration backfills PAID courses from accessType.
    */
   minSubscription SubscriptionType @default(FREE)
+  /** Primary video for FREE LMS courses (YouTube or direct mp4/https URL). */
+  videoUrl     String?
   price        Int              @default(0)
   status       CourseStatus     @default(DRAFT)
   categoryId   String?
@@ -273,6 +280,7 @@ model Course {
   certificates      Certificate[]
 
   @@index([status, minSubscription])
+  @@index([system, status, order])
 }
 
 model Lesson {
