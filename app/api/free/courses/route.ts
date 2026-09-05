@@ -6,10 +6,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * FREE dashboard catalog — single source of truth.
- * ONLY filter: status = PUBLISHED.
- * No system / subscription / accessType business logic.
- * Media fields come from CourseVideo + CoursePDF tables (shape only).
+ * FREE dashboard data — single source of truth.
+ * ONLY filter: status = PUBLISHED. No system / subscription / accessType logic.
+ * Returns pre-categorized structures so the UI renders without transforming:
+ *   courses     → دروسي
+ *   notes       → ملخصاتي (CoursePDF rows)
+ *   assignments → فروضي
  */
 export async function GET() {
   const guard = await requireFreeStudentApi();
@@ -27,8 +29,6 @@ export async function GET() {
         thumbnailUrl: true,
         level: true,
         academicLevel: true,
-        order: true,
-        createdAt: true,
         courseVideo: { select: { videoUrl: true } },
         coursePdfs: {
           orderBy: [{ order: "asc" }, { createdAt: "asc" }],
@@ -37,7 +37,7 @@ export async function GET() {
       },
     });
 
-    const payload = courses.map((c) => ({
+    const coursesPayload = courses.map((c) => ({
       id: c.id,
       slug: c.slug,
       title: c.title,
@@ -46,17 +46,29 @@ export async function GET() {
       coverImage: c.thumbnailUrl || "",
       level: c.level || "",
       academicLevel: c.academicLevel || "",
-      pdfs: (c.coursePdfs || []).map((p) => ({
+    }));
+
+    const notes = courses.flatMap((c) =>
+      (c.coursePdfs || []).map((p) => ({
         id: p.id,
         title: p.title,
         url: p.url,
-        order: p.order,
-      })),
-    }));
+        courseId: c.id,
+        courseTitle: c.title,
+      }))
+    );
 
-    console.log("FREE COURSES API RESPONSE:", payload);
+    console.log("FREE COURSES API RESPONSE:", {
+      courses: coursesPayload.length,
+      notes: notes.length,
+    });
 
-    return NextResponse.json({ ok: true, courses: payload });
+    return NextResponse.json({
+      ok: true,
+      courses: coursesPayload,
+      notes,
+      assignments: [],
+    });
   } catch (e) {
     console.error("[free/courses][GET]", e);
     return NextResponse.json({ ok: false, message: "تعذّر تحميل الدورات المجانية." }, { status: 500 });

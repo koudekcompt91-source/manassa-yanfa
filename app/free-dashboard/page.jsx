@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FreeCoursesSection from "@/components/student/free-dashboard/FreeCoursesSection";
-import FreeVideoSection from "@/components/student/free-dashboard/FreeVideoSection";
-import FreePdfsSection from "@/components/student/free-dashboard/FreePdfsSection";
-import FreeLockedSection from "@/components/student/free-dashboard/FreeLockedSection";
+import FreeNotesSection from "@/components/student/free-dashboard/FreeNotesSection";
+import FreeAssignmentsSection from "@/components/student/free-dashboard/FreeAssignmentsSection";
 
 /**
  * LOCKED structure (do not change order):
- * 1 الدورات → 2 الفيديو → 3 المستندات → 4 الألعاب
- * API → UI → Render. No access/filter/transform logic.
+ * 1 دروسي → 2 ملخصاتي → 3 فروضي
+ * API → render. Each section is independent; no cross-rendering.
  */
 export default function FreeDashboardPage() {
-  const [courses, setCourses] = useState([]);
+  const [data, setData] = useState({ courses: [], notes: [], assignments: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedId, setSelectedId] = useState("");
   // React StrictMode re-invokes effects in dev; fetch exactly once.
   const fetchedRef = useRef(false);
 
@@ -25,45 +23,31 @@ export default function FreeDashboardPage() {
 
     fetch("/api/free/courses", { credentials: "include" })
       .then(async (r) => {
-        const data = await r.json().catch(() => ({}));
-        return { okHttp: r.ok, data };
+        const body = await r.json().catch(() => ({}));
+        return { okHttp: r.ok, body };
       })
-      .then(({ okHttp, data }) => {
-        console.log("[free-dashboard] courses:", data);
+      .then(({ okHttp, body }) => {
+        console.log("[free-dashboard] courses:", body);
 
-        if (!okHttp || data?.ok === false) {
-          setError(data?.message || "تعذّر تحميل الدورات.");
-          setCourses([]);
-          setSelectedId("");
+        if (!okHttp || body?.ok === false) {
+          setError(body?.message || "تعذّر تحميل المحتوى.");
+          setData({ courses: [], notes: [], assignments: [] });
           return;
         }
 
-        const list = Array.isArray(data?.courses) ? data.courses : [];
         setError("");
-        setCourses(list);
-        setSelectedId(list[0]?.id || "");
+        setData({
+          courses: Array.isArray(body?.courses) ? body.courses : [],
+          notes: Array.isArray(body?.notes) ? body.notes : [],
+          assignments: Array.isArray(body?.assignments) ? body.assignments : [],
+        });
       })
       .catch(() => {
         setError("تعذّر الاتصال بالخادم.");
-        setCourses([]);
-        setSelectedId("");
+        setData({ courses: [], notes: [], assignments: [] });
       })
       .finally(() => setLoading(false));
   }, []);
-
-  const selected = useMemo(() => {
-    if (!selectedId) return null;
-    return courses.find((c) => c.id === selectedId) || null;
-  }, [courses, selectedId]);
-
-  function selectCourse(course) {
-    const id = course?.id || "";
-    if (!id) return;
-    setSelectedId(id);
-    requestAnimationFrame(() => {
-      document.getElementById("video")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
 
   return (
     <div className="w-full" dir="rtl">
@@ -73,30 +57,18 @@ export default function FreeDashboardPage() {
             مرحباً بك في الحساب المجاني
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
-            اختر دورة لعرض الفيديو والمستندات المرتبطة بها.
+            دروسك وملخصاتك وفروضك في مكان واحد.
           </p>
         </header>
 
-        {/* 1. الدورات */}
-        <FreeCoursesSection
-          courses={courses}
-          loading={loading}
-          error={error}
-          selectedId={selectedId}
-          onSelect={selectCourse}
-        />
+        {/* 1. دروسي */}
+        <FreeCoursesSection courses={data.courses} loading={loading} error={error} />
 
-        {/* 2. الفيديو */}
-        <FreeVideoSection
-          courseTitle={selected?.title || ""}
-          videoUrl={selected?.videoUrl || ""}
-        />
+        {/* 2. ملخصاتي */}
+        <FreeNotesSection notes={data.notes} loading={loading} />
 
-        {/* 3. المستندات */}
-        <FreePdfsSection courseTitle={selected?.title || ""} pdfs={selected?.pdfs} />
-
-        {/* 4. الألعاب */}
-        <FreeLockedSection />
+        {/* 3. فروضي */}
+        <FreeAssignmentsSection assignments={data.assignments} />
       </div>
     </div>
   );

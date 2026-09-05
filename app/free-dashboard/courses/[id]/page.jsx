@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import FreePdfsSection from "@/components/student/free-dashboard/FreePdfsSection";
 import FreeVideoSection from "@/components/student/free-dashboard/FreeVideoSection";
 
 function progressKey(courseId) {
@@ -84,23 +83,17 @@ export default function FreeCoursePlayerPage() {
         className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 hover:underline"
       >
         <ArrowRight className="h-4 w-4" />
-        العودة لقائمة الدورات
+        العودة لقائمة الدروس
       </Link>
 
       <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">{course.title}</h1>
-          <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-extrabold text-emerald-800">
-            FREE
-          </span>
-        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">{course.title}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-          {(course.description || "").trim() || "دورة مجانية ضمن نظام التعلم المجاني."}
+          {(course.description || "").trim() || "درس مجاني ضمن نظام التعلم المجاني."}
         </p>
       </div>
 
       <FreeVideoSection courseTitle={course.title} videoUrl={course.videoUrl} />
-      <FreePdfsSection courseTitle={course.title} pdfs={course.pdfs} />
 
       <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm sm:p-6">
         <button
