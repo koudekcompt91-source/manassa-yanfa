@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import StudentAppShell from "@/components/student/StudentAppShell";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
+import { resolveStudentSubscription } from "@/lib/subscription-server";
+import { isFreeSubscription } from "@/lib/subscription";
 
 const title = "الدورات التعليمية";
 const description =
@@ -26,6 +28,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CoursesLayout({ children }: { children: React.ReactNode }) {
+/** FREE students browse courses without the paid StudentAppShell chrome. */
+export default async function CoursesLayout({ children }: { children: React.ReactNode }) {
+  const ctx = await resolveStudentSubscription();
+  if (ctx && isFreeSubscription(ctx.subscriptionType)) {
+    return <>{children}</>;
+  }
   return <StudentAppShell>{children}</StudentAppShell>;
 }

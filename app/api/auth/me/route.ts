@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   getStudentSessionFromCookies,
   getAdminSessionFromCookies,
+  setStudentSubscriptionCookie,
 } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
@@ -59,12 +60,19 @@ export async function GET(req: Request) {
       }),
     ]);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: { ...user, createdAt: user.createdAt.toISOString() },
       enrollments,
       transactions: transactions.map((t) => ({ ...t, createdAt: t.createdAt.toISOString() })),
       pendingRechargeCount,
     });
+
+    // Keep middleware routing cookie in sync with DB (JWT unchanged).
+    if (user.role === "STUDENT") {
+      setStudentSubscriptionCookie(response, user.subscriptionType);
+    }
+
+    return response;
   } catch (e) {
     console.error("[me] error:", e instanceof Error ? e.message : e);
     return NextResponse.json(EMPTY);

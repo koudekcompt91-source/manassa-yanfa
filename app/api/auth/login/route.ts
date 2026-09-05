@@ -5,6 +5,8 @@ import {
   setSessionCookie,
   clearOtherSessionCookie,
   clearAllSessionCookies,
+  setStudentSubscriptionCookie,
+  clearStudentSubscriptionCookie,
 } from "@/lib/auth/session";
 import type { SessionPayload } from "@/lib/auth/jwt";
 import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
@@ -114,6 +116,11 @@ export async function POST(req: Request) {
 
     await setSessionCookie(response, session);
     clearOtherSessionCookie(response, role);
+    if (role === "STUDENT") {
+      setStudentSubscriptionCookie(response, user.subscriptionType);
+    } else {
+      clearStudentSubscriptionCookie(response);
+    }
     return response;
   } catch (e) {
     console.error(`[login] failed at step="${step}"`);

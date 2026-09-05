@@ -72,6 +72,15 @@ export async function GET() {
             studentSeesPackage(viewer.academicLevel, course, viewer.level) &&
             studentSeesCourseBySubscription(viewer.subscriptionType, course.minSubscription)
         );
+        // FREE accounts: only free-priced / free-access catalog rows (defense in depth).
+        if (viewer.subscriptionType === "FREE") {
+          visible = visible.filter(
+            (course) =>
+              course.accessType === "FREE" ||
+              course.minSubscription === "FREE" ||
+              Number(course.price || 0) <= 0
+          );
+        }
       }
     }
 

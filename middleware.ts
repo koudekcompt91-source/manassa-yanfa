@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { STUDENT_SESSION_COOKIE, ADMIN_SESSION_COOKIE } from "@/lib/auth/constants";
+import {
+  STUDENT_SESSION_COOKIE,
+  ADMIN_SESSION_COOKIE,
+  STUDENT_SUBSCRIPTION_COOKIE,
+} from "@/lib/auth/constants";
 
 function encodedSecret(): Uint8Array | null {
   const s = process.env.AUTH_SECRET || "";
@@ -28,6 +32,17 @@ async function roleFromCookie(
   } catch {
     return null;
   }
+}
+
+/** FREE | PAID from routing cookie (not JWT). */
+function subscriptionFromCookie(request: NextRequest): "FREE" | "PAID" | null {
+  const raw = String(request.cookies.get(STUDENT_SUBSCRIPTION_COOKIE)?.value || "").toUpperCase();
+  if (raw === "FREE" || raw === "PAID") return raw;
+  return null;
+}
+
+function studentHomePath(sub: "FREE" | "PAID" | null): "/free-dashboard" | "/dashboard" {
+  return sub === "FREE" ? "/free-dashboard" : "/dashboard";
 }
 
 function applySecurityHeaders(response: NextResponse) {
@@ -80,22 +95,39 @@ export async function middleware(request: NextRequest) {
   if (path === "/login") {
     const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
     if (studentRole === "STUDENT") {
-      // Always land on /dashboard; server layout redirects FREE → /free-dashboard via DB.
+      const sub = subscriptionFromCookie(request);
+      return applySecurityHeaders(
+        NextResponse.redirect(new URL(studentHomePath(sub), request.url))
+      );
+    }
+    return applySecurityHeaders(NextResponse.next());
+  }
+
+  // Hard subscription separation (cookie hint + student session). Layouts also enforce via DB.
+  const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
+  const sub = subscriptionFromCookie(request);
+
+  if (path.startsWith("/dashboard") || path === "/store" || path.startsWith("/store/")) {
+    if (studentRole !== "STUDENT") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));
+    }
+    if (sub === "FREE") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/free-dashboard", request.url)));
+    }
+    return applySecurityHeaders(NextResponse.next());
+  }
+
+  if (path === "/free-dashboard" || path.startsWith("/free-dashboard/")) {
+    if (studentRole !== "STUDENT") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));
+    }
+    if (sub === "PAID") {
       return applySecurityHeaders(NextResponse.redirect(new URL("/dashboard", request.url)));
     }
     return applySecurityHeaders(NextResponse.next());
   }
 
-  if (
-    path.startsWith("/dashboard") ||
-    path === "/free-dashboard" ||
-    path.startsWith("/free-dashboard/") ||
-    path === "/profile" ||
-    path.startsWith("/profile/") ||
-    path === "/store" ||
-    path.startsWith("/store/")
-  ) {
-    const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
+  if (path === "/profile" || path.startsWith("/profile/")) {
     if (studentRole !== "STUDENT") {
       return applySecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));
     }

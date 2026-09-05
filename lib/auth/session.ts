@@ -3,9 +3,11 @@ import { NextResponse } from "next/server";
 import {
   STUDENT_SESSION_COOKIE,
   ADMIN_SESSION_COOKIE,
+  STUDENT_SUBSCRIPTION_COOKIE,
   SESSION_MAX_AGE_SEC,
 } from "./constants";
 import { signSessionToken, verifySessionToken, type SessionPayload } from "./jwt";
+import { normalizeSubscriptionType, type SubscriptionType } from "@/lib/subscription";
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -30,6 +32,32 @@ export async function setSessionCookie(
   });
 }
 
+/** Persist subscription type for middleware routing (separate from JWT). */
+export function setStudentSubscriptionCookie(
+  response: NextResponse,
+  subscriptionType: unknown,
+): void {
+  const value = normalizeSubscriptionType(subscriptionType);
+  response.cookies.set(STUDENT_SUBSCRIPTION_COOKIE, value, {
+    ...COOKIE_OPTS,
+    maxAge: SESSION_MAX_AGE_SEC,
+  });
+}
+
+export function clearStudentSubscriptionCookie(response: NextResponse): void {
+  response.cookies.set(STUDENT_SUBSCRIPTION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
+}
+
+export function readStudentSubscriptionCookie(
+  cookieStore: { get: (name: string) => { value: string } | undefined },
+): SubscriptionType | null {
+  const raw = cookieStore.get(STUDENT_SUBSCRIPTION_COOKIE)?.value;
+  if (!raw) return null;
+  const value = String(raw).toUpperCase();
+  if (value === "FREE" || value === "PAID") return value;
+  return null;
+}
+
 /** Clear the opposite role's cookie so sessions never collide. */
 export function clearOtherSessionCookie(
   response: NextResponse,
@@ -43,6 +71,7 @@ export function clearOtherSessionCookie(
 export function clearAllSessionCookies(response: NextResponse): void {
   response.cookies.set(STUDENT_SESSION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
   response.cookies.set(ADMIN_SESSION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
+  response.cookies.set(STUDENT_SUBSCRIPTION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
 }
 
 /** Read student session from request cookies. */
