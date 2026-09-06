@@ -1,33 +1,39 @@
 "use client";
 
-import { ClipboardList, Lock } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
-/** SECTION 4 — tests only. Locked placeholder while empty. */
-export default function FreeExamsSection({ exams }) {
+/** اختباراتي / فروضي — list items only (no lessons/PDFs). */
+export default function FreeExamsSection({
+  exams,
+  loading = false,
+  title = "اختباراتي",
+  emptyTitle = "لا توجد اختبارات حالياً",
+  emptySubtitle = "ستظهر العناصر المجانية هنا عند إضافتها.",
+}) {
   const list = Array.isArray(exams) ? exams : [];
 
   return (
     <section
-      aria-label="الاختبارات"
+      aria-label={title}
       className="rounded-2xl border border-slate-200/70 bg-white/60 p-4 sm:p-6"
     >
       <div id="exams" className="mb-5 flex scroll-mt-24 items-center gap-2">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
           <ClipboardList className="h-4 w-4" />
         </span>
-        <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">الاختبارات</h2>
+        <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">{title}</h2>
       </div>
 
-      {!list.length ? (
-        <div
-          className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center"
-          aria-disabled="true"
-        >
-          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-200 text-slate-500">
-            <Lock className="h-5 w-5" />
-          </span>
-          <p className="text-base font-extrabold text-slate-700">الاختبارات والفروض</p>
-          <p className="mt-2 text-sm font-semibold text-slate-500">مقفل — قريبًا</p>
+      {loading ? (
+        <div className="flex flex-col gap-3">
+          {[0, 1].map((i) => (
+            <div key={i} className="h-14 animate-pulse rounded-2xl bg-slate-100" />
+          ))}
+        </div>
+      ) : !list.length ? (
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-10 text-center">
+          <p className="text-base font-extrabold text-slate-700">{emptyTitle}</p>
+          <p className="mt-2 text-sm font-semibold text-slate-500">{emptySubtitle}</p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -40,14 +46,7 @@ export default function FreeExamsSection({ exams }) {
                     {exam?.title ?? ""}
                   </span>
                 </span>
-                {exam?.locked ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 text-xs font-extrabold text-slate-400">
-                    <Lock className="h-3.5 w-3.5" />
-                    مقفل
-                  </span>
-                ) : (
-                  <span className="shrink-0 text-xs font-extrabold text-brand-700">متاح</span>
-                )}
+                <span className="shrink-0 text-xs font-extrabold text-brand-700">متاح</span>
               </div>
             </li>
           ))}

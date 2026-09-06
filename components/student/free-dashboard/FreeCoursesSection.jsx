@@ -10,8 +10,14 @@ const TONES = [
   "from-sky-500 to-brand-600",
 ];
 
-/** SECTION 1 — course cards only: image, title, description, button. */
-export default function FreeCoursesSection({ courses, loading, error, selectedId, onSelect }) {
+/** الدورات — course cards only (no nested lessons/PDFs/exams). */
+export default function FreeCoursesSection({
+  courses,
+  loading,
+  error,
+  selectedId = "",
+  onSelect,
+}) {
   const list = Array.isArray(courses) ? courses : [];
 
   return (
@@ -44,7 +50,7 @@ export default function FreeCoursesSection({ courses, loading, error, selectedId
           role="status"
           className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-12 text-center text-sm font-semibold text-slate-500"
         >
-          لا توجد دورات حالياً
+          لا توجد دورات مجانية حالياً
         </p>
       ) : (
         <div className="flex flex-col gap-5 sm:gap-6">
@@ -54,7 +60,7 @@ export default function FreeCoursesSection({ courses, loading, error, selectedId
               className={`w-full rounded-2xl border bg-white p-5 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.2)] transition sm:p-6 ${
                 selectedId && selectedId === course?.id
                   ? "border-brand-400 ring-2 ring-brand-200"
-                  : "border-slate-200/90 hover:-translate-y-0.5 hover:border-brand-300/50 hover:shadow-md"
+                  : "border-slate-200/90 hover:border-brand-300/50 hover:shadow-md"
               }`}
             >
               <div dir="ltr" className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">

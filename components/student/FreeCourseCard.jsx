@@ -37,7 +37,7 @@ export default function FreeCourseCard({
   const gradient = TONE_MAP[tone] || TONE_MAP.blue;
 
   return (
-    <article className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300/50 hover:shadow-[0_16px_36px_-18px_rgba(37,99,235,0.25)] sm:p-6">
+    <article className="w-full rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.2)] transition hover:border-brand-300/50 sm:p-6">
       <div dir="ltr" className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
         {/* LEFT — icon */}
         <div
