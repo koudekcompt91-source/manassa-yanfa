@@ -31,14 +31,16 @@ export default function FreeExamsSection({ exams }) {
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
-          {list.map((exam) => (
-            <li key={exam.id}>
+          {list.map((exam, index) => (
+            <li key={exam?.id ?? index}>
               <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white px-4 py-4 shadow-sm">
                 <span className="inline-flex min-w-0 items-center gap-2">
                   <ClipboardList className="h-4 w-4 shrink-0 text-brand-700" />
-                  <span className="truncate text-sm font-bold text-slate-800">{exam.title}</span>
+                  <span className="truncate text-sm font-bold text-slate-800">
+                    {exam?.title ?? ""}
+                  </span>
                 </span>
-                {exam.locked ? (
+                {exam?.locked ? (
                   <span className="inline-flex shrink-0 items-center gap-1 text-xs font-extrabold text-slate-400">
                     <Lock className="h-3.5 w-3.5" />
                     مقفل

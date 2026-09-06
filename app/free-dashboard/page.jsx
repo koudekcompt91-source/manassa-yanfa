@@ -56,15 +56,15 @@ export default function FreeDashboardPage() {
 
   // Relational scoping only — each entity belongs to the active course.
   const activeLessons = useMemo(
-    () => data.lessons.filter((l) => l.courseId === selectedId),
+    () => (data.lessons ?? []).filter((l) => selectedId && l?.courseId === selectedId),
     [data.lessons, selectedId]
   );
   const activePdfs = useMemo(
-    () => data.pdfs.filter((p) => p.courseId === selectedId),
+    () => (data.pdfs ?? []).filter((p) => selectedId && p?.courseId === selectedId),
     [data.pdfs, selectedId]
   );
   const activeExams = useMemo(
-    () => data.exams.filter((e) => e.courseId === selectedId),
+    () => (data.exams ?? []).filter((e) => selectedId && e?.courseId === selectedId),
     [data.exams, selectedId]
   );
 

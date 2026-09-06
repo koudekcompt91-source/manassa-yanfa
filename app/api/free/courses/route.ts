@@ -9,10 +9,12 @@ export const runtime = "nodejs";
  * FREE dashboard data — normalized entities, never nested content.
  * ONLY filter: status = PUBLISHED. No system / subscription / accessType logic.
  *
- *   courses → { id, title, description, image }
+ *   courses → { id, title, description, image, system, videoUrl?, courseVideo?, status }
  *   lessons → { id, courseId, title, videoUrl }
  *   pdfs    → { id, courseId, title, url }
  *   exams   → { id, courseId, title, locked }
+ *
+ * courseVideo is a nullable relation: every read goes through optional chaining.
  */
 export async function GET() {
   const guard = await requireFreeStudentApi();
@@ -27,6 +29,8 @@ export async function GET() {
         title: true,
         description: true,
         thumbnailUrl: true,
+        system: true,
+        status: true,
         courseVideo: { select: { id: true, videoUrl: true } },
         coursePdfs: {
           orderBy: [{ order: "asc" }, { createdAt: "asc" }],
@@ -35,29 +39,50 @@ export async function GET() {
       },
     });
 
-    const courses = rows.map((c) => ({
-      id: c.id,
-      title: c.title,
-      description: c.description || "",
-      image: c.thumbnailUrl || "",
-    }));
+    const safeRows = Array.isArray(rows) ? rows : [];
 
-    const lessons = rows
-      .filter((c) => c.courseVideo?.videoUrl)
-      .map((c) => ({
-        id: c.courseVideo.id,
-        courseId: c.id,
-        title: c.title,
-        videoUrl: c.courseVideo.videoUrl,
-      }));
+    const courses = safeRows.map((c) => {
+      const videoUrl = c.courseVideo?.videoUrl ?? null;
+      const videoId = c.courseVideo?.id ?? null;
+      return {
+        id: c.id,
+        title: c.title ?? "",
+        description: c.description ?? "",
+        image: c.thumbnailUrl ?? "",
+        system: c.system ?? null,
+        videoUrl,
+        courseVideo: videoUrl ? { id: videoId, videoUrl } : null,
+        status: c.status ?? "PUBLISHED",
+      };
+    });
 
-    const pdfs = rows.flatMap((c) =>
-      c.coursePdfs.map((p) => ({
-        id: p.id,
-        courseId: c.id,
-        title: p.title,
-        url: p.url,
-      }))
+    // flatMap instead of filter+map: no narrowing assumptions on the nullable relation.
+    const lessons = safeRows.flatMap((c) => {
+      const videoUrl = c.courseVideo?.videoUrl ?? "";
+      if (!videoUrl) return [];
+      return [
+        {
+          id: c.courseVideo?.id ?? `${c.id}:video`,
+          courseId: c.id,
+          title: c.title ?? "",
+          videoUrl,
+        },
+      ];
+    });
+
+    const pdfs = safeRows.flatMap((c) =>
+      (c.coursePdfs ?? []).flatMap((p) => {
+        const url = p?.url ?? "";
+        if (!url) return [];
+        return [
+          {
+            id: p?.id ?? `${c.id}:pdf`,
+            courseId: c.id,
+            title: p?.title ?? "مستند",
+            url,
+          },
+        ];
+      })
     );
 
     console.log("FREE COURSES API RESPONSE:", {
@@ -69,6 +94,9 @@ export async function GET() {
     return NextResponse.json({ ok: true, courses, lessons, pdfs, exams: [] });
   } catch (e) {
     console.error("[free/courses][GET]", e);
-    return NextResponse.json({ ok: false, message: "تعذّر تحميل الدورات المجانية." }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, message: "تعذّر تحميل الدورات المجانية.", courses: [], lessons: [], pdfs: [], exams: [] },
+      { status: 500 }
+    );
   }
 }

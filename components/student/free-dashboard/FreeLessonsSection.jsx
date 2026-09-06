@@ -3,9 +3,9 @@
 import { PlayCircle } from "lucide-react";
 import FreeCourseVideoPlayer from "@/components/student/FreeCourseVideoPlayer";
 
-/** SECTION 2 — videos only, for the active course. */
+/** SECTION 2 — videos only, for the active course. Missing video never crashes. */
 export default function FreeLessonsSection({ lessons, courseSelected }) {
-  const list = Array.isArray(lessons) ? lessons : [];
+  const list = (Array.isArray(lessons) ? lessons : []).filter((l) => l?.videoUrl);
 
   return (
     <section
@@ -25,14 +25,17 @@ export default function FreeLessonsSection({ lessons, courseSelected }) {
         </p>
       ) : !list.length ? (
         <p className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm font-semibold text-slate-500">
-          لا توجد دروس لهذه الدورة.
+          لا يوجد فيديو لهذه الدورة
         </p>
       ) : (
         <div className="flex flex-col gap-6">
-          {list.map((lesson) => (
-            <div key={lesson.id} className="space-y-3">
-              <p className="text-sm font-bold text-slate-700">{lesson.title}</p>
-              <FreeCourseVideoPlayer videoUrl={lesson.videoUrl} title={lesson.title} />
+          {list.map((lesson, index) => (
+            <div key={lesson?.id ?? index} className="space-y-3">
+              <p className="text-sm font-bold text-slate-700">{lesson?.title ?? ""}</p>
+              <FreeCourseVideoPlayer
+                videoUrl={lesson?.videoUrl ?? ""}
+                title={lesson?.title ?? ""}
+              />
             </div>
           ))}
         </div>

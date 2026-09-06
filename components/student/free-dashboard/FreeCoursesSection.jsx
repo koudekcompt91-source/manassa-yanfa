@@ -12,6 +12,8 @@ const TONES = [
 
 /** SECTION 1 — course cards only: image, title, description, button. */
 export default function FreeCoursesSection({ courses, loading, error, selectedId, onSelect }) {
+  const list = Array.isArray(courses) ? courses : [];
+
   return (
     <section
       aria-label="الدورات"
@@ -37,7 +39,7 @@ export default function FreeCoursesSection({ courses, loading, error, selectedId
         >
           {error}
         </p>
-      ) : !courses?.length ? (
+      ) : !list.length ? (
         <p
           role="status"
           className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-12 text-center text-sm font-semibold text-slate-500"
@@ -46,17 +48,17 @@ export default function FreeCoursesSection({ courses, loading, error, selectedId
         </p>
       ) : (
         <div className="flex flex-col gap-5 sm:gap-6">
-          {courses.map((course, index) => (
+          {list.map((course, index) => (
             <article
-              key={course.id}
+              key={course?.id ?? index}
               className={`w-full rounded-2xl border bg-white p-5 shadow-[0_10px_28px_-18px_rgba(15,23,42,0.2)] transition sm:p-6 ${
-                selectedId === course.id
+                selectedId && selectedId === course?.id
                   ? "border-brand-400 ring-2 ring-brand-200"
                   : "border-slate-200/90 hover:-translate-y-0.5 hover:border-brand-300/50 hover:shadow-md"
               }`}
             >
               <div dir="ltr" className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-                {course.image ? (
+                {course?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element -- remote admin-provided URLs
                   <img
                     src={course.image}
@@ -75,15 +77,15 @@ export default function FreeCoursesSection({ courses, loading, error, selectedId
                 )}
                 <div dir="rtl" className="min-w-0 flex-1 text-right">
                   <h3 className="text-xl font-extrabold text-slate-900 sm:text-[1.35rem]">
-                    {course.title}
+                    {course?.title ?? ""}
                   </h3>
                   <p className="mt-1.5 text-sm leading-7 text-slate-500 line-clamp-2">
-                    {course.description}
+                    {course?.description ?? ""}
                   </p>
                   <div className="mt-4">
                     <button
                       type="button"
-                      onClick={() => onSelect?.(course.id)}
+                      onClick={() => onSelect?.(course?.id)}
                       className="touch-button-primary inline-flex h-11 w-full items-center justify-center px-5 text-sm font-extrabold sm:w-auto"
                     >
                       دخول الدورة
