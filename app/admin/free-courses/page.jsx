@@ -54,15 +54,15 @@ export default function AdminFreeCoursesPage() {
   }
 
   function openEdit(course) {
-    setEditingId(course.id);
+    setEditingId(course?.id ?? null);
     setForm({
-      title: course.title || "",
-      description: course.description || "",
-      videoUrl: course.videoUrl || "",
-      pdfUrls: course.pdfUrls || (Array.isArray(course.pdfs) ? course.pdfs.map((p) => p.url).join("\n") : ""),
-      thumbnailUrl: course.coverImage || "",
-      level: course.level || "",
-      status: course.status || "DRAFT",
+      title: course?.title || "",
+      description: course?.description || "",
+      videoUrl: course?.videoUrl || "",
+      pdfUrls: course?.pdfUrls || (Array.isArray(course?.pdfs) ? course.pdfs.map((p) => p?.url ?? "").filter(Boolean).join("\n") : ""),
+      thumbnailUrl: course?.coverImage || "",
+      level: course?.level || "",
+      status: course?.status || "DRAFT",
     });
     setError("");
   }
@@ -70,15 +70,16 @@ export default function AdminFreeCoursesPage() {
   async function save(e) {
     e.preventDefault();
     setError("");
-    if (!form.title.trim()) {
+    if (!String(form?.title ?? "").trim()) {
       setError("عنوان الدورة مطلوب.");
       return;
     }
-    if (form.videoUrl.trim() && !/youtube\.com|youtu\.be|\.mp4(\?|$)/i.test(form.videoUrl)) {
+    const videoUrl = String(form?.videoUrl ?? "").trim();
+    if (videoUrl && !/youtube\.com|youtu\.be|\.mp4(\?|$)/i.test(videoUrl)) {
       setError("يُقبل رابط YouTube أو ملف MP4 فقط.");
       return;
     }
-    if (form.status === "PUBLISHED" && !form.videoUrl.trim()) {
+    if (form?.status === "PUBLISHED" && !videoUrl) {
       setError("أضف رابط الفيديو قبل النشر.");
       return;
     }
@@ -225,22 +226,22 @@ export default function AdminFreeCoursesPage() {
                 </tr>
               </thead>
               <tbody>
-                {courses.map((c) => (
-                  <tr key={c.id} className="border-b border-slate-100 align-top">
+                {(Array.isArray(courses) ? courses : []).map((c) => (
+                  <tr key={c?.id} className="border-b border-slate-100 align-top">
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-900">{c.title}</p>
-                      <p className="mt-1 text-xs text-slate-500 line-clamp-2">{c.description}</p>
+                      <p className="font-semibold text-slate-900">{c?.title ?? ""}</p>
+                      <p className="mt-1 text-xs text-slate-500 line-clamp-2">{c?.description ?? ""}</p>
                     </td>
                     <td className="px-3 py-4 text-xs" dir="ltr">
-                      {c.videoUrl ? (
-                        <span className="break-all text-slate-600">{c.videoUrl.slice(0, 48)}…</span>
+                      {c?.videoUrl ? (
+                        <span className="break-all text-slate-600">{String(c.videoUrl).slice(0, 48)}…</span>
                       ) : (
                         <span className="text-amber-700">بدون فيديو</span>
                       )}
                     </td>
                     <td className="px-3 py-4">
-                      <AdminBadge tone={c.status === "PUBLISHED" ? "success" : "slate"}>
-                        {c.status === "PUBLISHED" ? "منشورة" : "مسودة"}
+                      <AdminBadge tone={c?.status === "PUBLISHED" ? "success" : "slate"}>
+                        {c?.status === "PUBLISHED" ? "منشورة" : "مسودة"}
                       </AdminBadge>
                     </td>
                     <td className="px-4 py-4">

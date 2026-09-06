@@ -10,7 +10,7 @@ function isDirectVideoUrl(url) {
 
 /** Watch-only player for FREE LMS — YouTube embed or MP4/direct video. */
 export default function FreeCourseVideoPlayer({ videoUrl, title }) {
-  const url = String(videoUrl || "").trim();
+  const url = String(videoUrl ?? "").trim();
   if (!url) {
     return (
       <div className="flex aspect-video w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-100 text-sm font-semibold text-slate-500">
@@ -19,19 +19,33 @@ export default function FreeCourseVideoPlayer({ videoUrl, title }) {
     );
   }
 
-  const ytId = extractYoutubeVideoId(url);
+  let ytId = null;
+  try {
+    ytId = extractYoutubeVideoId(url);
+  } catch {
+    ytId = null;
+  }
+
   if (ytId) {
-    return (
-      <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
-        <iframe
-          title={title || "فيديو الدورة"}
-          src={youtubeEmbedUrlFromId(ytId)}
-          className="h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
-    );
+    let embedSrc = "";
+    try {
+      embedSrc = youtubeEmbedUrlFromId(ytId);
+    } catch {
+      embedSrc = "";
+    }
+    if (embedSrc) {
+      return (
+        <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
+          <iframe
+            title={title || "فيديو الدورة"}
+            src={embedSrc}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      );
+    }
   }
 
   if (isDirectVideoUrl(url) || url.startsWith("http://") || url.startsWith("https://")) {

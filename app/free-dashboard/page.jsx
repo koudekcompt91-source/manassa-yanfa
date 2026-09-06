@@ -95,7 +95,7 @@ export default function FreeDashboardPage() {
 
         {/* 1. الدورات */}
         <FreeCoursesSection
-          courses={data.courses}
+          courses={data?.courses ?? []}
           loading={loading}
           error={error}
           selectedId={selectedId}
@@ -103,13 +103,13 @@ export default function FreeDashboardPage() {
         />
 
         {/* 2. الدروس */}
-        <FreeLessonsSection lessons={activeLessons} courseSelected={Boolean(selectedId)} />
+        <FreeLessonsSection lessons={activeLessons ?? []} courseSelected={Boolean(selectedId)} />
 
         {/* 3. المستندات */}
-        <FreePdfsSection pdfs={activePdfs} />
+        <FreePdfsSection pdfs={activePdfs ?? []} />
 
         {/* 4. الاختبارات */}
-        <FreeExamsSection exams={activeExams} />
+        <FreeExamsSection exams={activeExams ?? []} />
       </div>
     </div>
   );

@@ -35,14 +35,15 @@ async function normalizeWithMedia(course: {
   updatedAt: Date;
 }) {
   const media = await loadFreeCourseMedia(course.id);
+  const pdfs = Array.isArray(media?.pdfs) ? media.pdfs : [];
   return {
     id: course.id,
     slug: course.slug,
     title: course.title,
     description: course.description,
-    videoUrl: media.videoUrl,
-    pdfs: media.pdfs,
-    pdfUrls: media.pdfs.map((p) => p.url).join("\n"),
+    videoUrl: media?.videoUrl ?? "",
+    pdfs,
+    pdfUrls: pdfs.map((p) => p?.url ?? "").filter(Boolean).join("\n"),
     type: "FREE" as const,
     system: "FREE" as const,
     coverImage: course.thumbnailUrl,

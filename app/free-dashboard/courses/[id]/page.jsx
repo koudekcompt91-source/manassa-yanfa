@@ -99,15 +99,15 @@ export default function FreeCoursePlayerPage() {
       </Link>
 
       <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm sm:p-6">
-        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">{course.title}</h1>
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">{course?.title ?? ""}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-          {(course.description || "").trim() || "دورة مجانية ضمن نظام التعلم المجاني."}
+          {(course?.description || "").trim() || "دورة مجانية ضمن نظام التعلم المجاني."}
         </p>
       </div>
 
-      <FreeLessonsSection lessons={data.lessons} courseSelected />
-      <FreePdfsSection pdfs={data.pdfs} />
-      <FreeExamsSection exams={data.exams} />
+      <FreeLessonsSection lessons={data?.lessons ?? []} courseSelected />
+      <FreePdfsSection pdfs={data?.pdfs ?? []} />
+      <FreeExamsSection exams={data?.exams ?? []} />
 
       <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm sm:p-6">
         <button

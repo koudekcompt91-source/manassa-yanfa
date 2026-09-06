@@ -45,14 +45,15 @@ async function normalizeWithMedia(course: {
   updatedAt: Date;
 }) {
   const media = await loadFreeCourseMedia(course.id);
+  const pdfs = Array.isArray(media?.pdfs) ? media.pdfs : [];
   return {
     id: course.id,
     slug: course.slug,
     title: course.title,
     description: course.description,
-    videoUrl: media.videoUrl,
-    pdfs: media.pdfs,
-    pdfUrls: media.pdfs.map((p) => p.url).join("\n"),
+    videoUrl: media?.videoUrl ?? "",
+    pdfs,
+    pdfUrls: pdfs.map((p) => p?.url ?? "").filter(Boolean).join("\n"),
     type: "FREE" as const,
     system: "FREE" as const,
     coverImage: course.thumbnailUrl,
@@ -76,11 +77,15 @@ export async function GET() {
       where: { system: "FREE" },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
-    const mapped = await Promise.all(courses.map((c) => normalizeWithMedia(c)));
-    return NextResponse.json({ ok: true, courses: mapped });
+    const list = Array.isArray(courses) ? courses : [];
+    const mapped = await Promise.all(list.map((c) => normalizeWithMedia(c)));
+    return NextResponse.json({ ok: true, courses: mapped ?? [], data: mapped ?? [], error: null });
   } catch (e) {
     console.error("[admin/free-courses][GET]", e);
-    return NextResponse.json({ ok: false, message: "تعذّر تحميل الدورات المجانية." }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, message: "تعذّر تحميل الدورات المجانية.", courses: [], data: [], error: "db_unavailable" },
+      { status: 500 }
+    );
   }
 }
 
