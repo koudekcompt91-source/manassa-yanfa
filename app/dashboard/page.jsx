@@ -5,6 +5,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useDemoSection } from "@/lib/demo-store";
 import RechargeWalletModal from "@/components/student/RechargeWalletModal";
 import BrandWideBanner from "@/components/brand/BrandWideBanner";
+import StudentDashboardNav from "@/components/student/StudentDashboardNav";
 import { logoutSession } from "@/lib/admin-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatDzd, formatDzdOrDash, formatDzdSigned } from "@/lib/format-money";
@@ -559,6 +560,8 @@ function DashboardPageInner() {
           </div>
         </div>
       </header>
+
+      <StudentDashboardNav />
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4 xl:gap-6" aria-label="مؤشرات لوحة التحكم">
         {statCards.map((card, idx) => (

@@ -1,56 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 import { recordDailyLogin } from "@/lib/student-progress";
-import { formatDzd } from "@/lib/format-money";
-import BrandLogoMark from "@/components/brand/BrandLogoMark";
-import { BRAND_NAME } from "@/lib/brand";
-import {
-  Bell,
-  BookOpen,
-  Award,
-  Home,
-  ShoppingBag,
-  UserRound,
-  Wallet,
-} from "lucide-react";
-
-const NAV = [
-  { href: "/dashboard", label: "الرئيسية", id: "home", Icon: Home },
-  { href: "/dashboard#my-courses", label: "دوراتي", id: "my-courses", Icon: BookOpen },
-  { href: "/courses", label: "الدورات", id: "explore", Icon: BookOpen },
-  { href: "/store", label: "المتجر", id: "store", Icon: ShoppingBag },
-  { href: "/dashboard#wallet", label: "المحفظة", id: "wallet", Icon: Wallet },
-  { href: "/dashboard/notifications", label: "الإشعارات", id: "notifications", Icon: Bell },
-  { href: "/dashboard/certificates", label: "الشهادات", id: "certificates", Icon: Award },
-  { href: "/profile", label: "حسابي", id: "account", Icon: UserRound },
-];
-
-function useHash() {
-  const [hash, setHash] = useState("");
-  useEffect(() => {
-    const read = () => setHash(typeof window !== "undefined" ? window.location.hash || "" : "");
-    read();
-    window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
-  }, []);
-  return hash;
-}
-
-function navActive(pathname, hash, item) {
-  if (item.id === "explore")
-    return pathname === "/courses" || pathname.startsWith("/courses/") || pathname === "/packages" || pathname.startsWith("/packages/");
-  if (item.id === "store") return pathname === "/store" || pathname.startsWith("/store/");
-  if (item.id === "account") return pathname.startsWith("/profile");
-  if (item.id === "home") return pathname === "/dashboard" && (!hash || hash === "#");
-  if (item.id === "my-courses") return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
-  if (item.id === "wallet") return pathname === "/dashboard" && hash === "#wallet";
-  if (item.id === "notifications") return pathname === "/dashboard/notifications";
-  if (item.id === "certificates") return pathname === "/dashboard/certificates" || pathname.startsWith("/dashboard/certificates/");
-  return false;
-}
+import StudentDashboardNav from "@/components/student/StudentDashboardNav";
 
 function isStudentLockedRoute(pathname) {
   return (
@@ -72,16 +25,13 @@ function isPackagesRoute(pathname) {
   );
 }
 
-function avatarLetter(fullName, email) {
-  const s = (fullName || email || "?").trim();
-  return s ? s.charAt(0) : "?";
-}
-
+/**
+ * PAID student chrome — full-width content (no vertical sidebar).
+ * Horizontal nav lives on /dashboard (below welcome). Other shell routes keep a top nav strip.
+ */
 export default function StudentAppShell({ children }) {
   const pathname = usePathname() || "";
-  const hash = useHash();
   const [session, setSession] = useState(null);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const lockedStudentPath = isStudentLockedRoute(pathname);
   const packagesPath = isPackagesRoute(pathname);
 
@@ -110,101 +60,10 @@ export default function StudentAppShell({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    setMobileNavOpen(false);
-  }, [pathname, hash]);
-
   const role = session?.user?.role ?? "";
   const isStudent = role === "STUDENT";
-  const sessionResolved = session !== null;
-  const sessionLoading = !sessionResolved;
-
   const useShellLayout = lockedStudentPath || (packagesPath && isStudent);
-
-  const user = session?.user;
-  const walletNum = Number(user?.walletBalance);
-  const walletRounded = Number.isFinite(walletNum) && walletNum >= 0 ? Math.round(walletNum) : 0;
-
-  const renderNav = useCallback(
-    (onPick) => (
-      <nav className="flex flex-col gap-1.5 px-3 pb-4 pt-1" aria-label="تنقل لوحة الطالب">
-        {NAV.map((n) => {
-          const active = navActive(pathname, hash, n);
-          const isHash = n.href.includes("#");
-          const Icon = n.Icon;
-          return (
-            <Link
-              key={n.href}
-              href={n.href}
-              onClick={() => onPick?.()}
-              className={`group dashboard-sidebar-link ${active ? "dashboard-sidebar-link-active" : "dashboard-sidebar-link-idle"}`}
-            >
-              <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-[transform,background-color,box-shadow,color] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100 ${
-                  active ? "bg-white/18 text-white shadow-inner ring-1 ring-white/20" : "bg-slate-100 text-slate-500 shadow-sm"
-                }`}
-                aria-hidden
-              >
-                <Icon className="h-5 w-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                {n.label}
-                {isHash ? (
-                  <span className={`ms-1 text-[10px] font-medium ${active ? "text-white/70" : "text-slate-400"}`}>↓</span>
-                ) : null}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-    ),
-    [hash, pathname]
-  );
-
-  const sidebarBrand = (
-    <div className="relative shrink-0 border-b border-slate-200/70 bg-gradient-to-b from-white to-slate-50/70 px-4 py-5">
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-l from-transparent via-brand-200/70 to-transparent" aria-hidden />
-      <Link
-        href="/"
-        aria-label={BRAND_NAME}
-        className="flex flex-col items-center justify-center no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-xl"
-      >
-        <BrandLogoMark variant="footer" showWordmark className="justify-center" />
-      </Link>
-    </div>
-  );
-
-  const sidebarStudentCard =
-    user && isStudent ? (
-      <div className="mx-4 mb-3 rounded-xl border border-slate-200/70 bg-gradient-to-b from-white to-slate-50 p-4 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.28)]">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 text-sm font-extrabold text-white">
-            {avatarLetter(user.fullName, user.email)}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-extrabold text-slate-900">{(user.fullName || "").trim() || "طالب"}</p>
-            <p className="mt-0.5 text-xs font-bold text-brand-700 tabular-nums">{formatDzd(walletRounded)}</p>
-          </div>
-        </div>
-      </div>
-    ) : lockedStudentPath && sessionLoading ? (
-      <div className="mx-4 mb-3 h-[4.5rem] animate-pulse rounded-xl bg-slate-100" aria-hidden />
-    ) : lockedStudentPath && sessionResolved && !isStudent ? (
-      <div className="mx-4 mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-950">
-        لم نتمكن من تأكيد صلاحية الطالب.{" "}
-        <Link href="/login" className="font-bold text-brand-800 underline">
-          تسجيل الدخول
-        </Link>
-      </div>
-    ) : null;
-
-  const sidebarInner = (
-    <>
-      {sidebarBrand}
-      {sidebarStudentCard}
-      <div className="pb-4">{renderNav(() => setMobileNavOpen(false))}</div>
-    </>
-  );
+  const isDashboardHome = pathname === "/dashboard";
 
   if (!useShellLayout) {
     return <div className="min-h-0 w-full min-w-0 flex-1">{children}</div>;
@@ -212,37 +71,12 @@ export default function StudentAppShell({ children }) {
 
   return (
     <div className="dashboard-shell relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
-      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-3 py-2.5 backdrop-blur-sm md:hidden">
-        <span className="text-sm font-extrabold text-slate-900">القائمة</span>
-        <button
-          type="button"
-          className="touch-button-secondary magnetic-button px-3 py-2 text-sm font-bold text-slate-800"
-          aria-label={mobileNavOpen ? "إخفاء القائمة" : "فتح القائمة"}
-          aria-expanded={mobileNavOpen}
-          onClick={() => setMobileNavOpen((o) => !o)}
-        >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            {mobileNavOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </div>
-
-      <div className="flex min-h-0 w-full flex-1 flex-col md:flex-row">
-        <aside
-          className={`dashboard-sidebar relative z-0 w-full shrink-0 md:w-[272px] md:border-e ${mobileNavOpen ? "block border-b" : "hidden border-b md:block"}`}
-          aria-label="القائمة الجانبية"
-        >
-          {sidebarInner}
-        </aside>
-
-        <main className="relative z-10 min-h-0 min-w-0 flex-1">
-          <div className="relative z-10 mx-auto min-h-0 w-full min-w-0 max-w-[86rem] px-3 py-5 sm:px-4 sm:py-6 lg:px-6">{children}</div>
-        </main>
-      </div>
+      <main className="relative z-10 min-h-0 min-w-0 flex-1">
+        <div className="relative z-10 mx-auto flex min-h-0 w-full min-w-0 max-w-[86rem] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-4 sm:py-6 lg:px-6">
+          {!isDashboardHome ? <StudentDashboardNav /> : null}
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
