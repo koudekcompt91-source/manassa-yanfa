@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Crown, Gift, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { BookMarked, BookOpen, ClipboardCheck, Crown, FileCheck, FileText, Gift, LockKeyhole, Mail, UserRound } from "lucide-react";
 import AuthPageShell from "@/components/auth/AuthPageShell";
 import BrandLogoMark from "@/components/brand/BrandLogoMark";
 import {
@@ -36,6 +36,9 @@ const PLAN_CONTENT_LINES = [
 ] as const;
 
 const PLAN_CONTENT_NUMBERS = ["١", "٢", "٣", "٤", "٥"] as const;
+
+/** Icons for PAID card badges only — texts unchanged. */
+const PAID_PLAN_FEATURE_ICONS = [BookOpen, FileText, ClipboardCheck, FileCheck, BookMarked] as const;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -263,20 +266,23 @@ export default function RegisterPage() {
                 </p>
 
                 <ul className="mt-5 flex w-full flex-1 flex-col gap-2.5" aria-label="أقسام الحساب الكامل">
-                  {PLAN_CONTENT_LINES.map((line, index) => (
-                    <li
-                      key={`paid-${line}`}
-                      className="flex w-full items-start gap-3 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 text-sm font-semibold leading-7 text-slate-100"
-                    >
-                      <span
-                        className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-300/40 bg-amber-400/20 text-xs font-black text-amber-100"
-                        aria-hidden
+                  {PLAN_CONTENT_LINES.map((line, index) => {
+                    const FeatureIcon = PAID_PLAN_FEATURE_ICONS[index];
+                    return (
+                      <li
+                        key={`paid-${line}`}
+                        className="flex w-full items-start gap-3 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 text-sm font-semibold leading-7 text-slate-100"
                       >
-                        {PLAN_CONTENT_NUMBERS[index]}
-                      </span>
-                      <span className="min-w-0 flex-1 text-right">{line}</span>
-                    </li>
-                  ))}
+                        <span
+                          className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-300/40 bg-amber-400/20 text-amber-100"
+                          aria-hidden
+                        >
+                          <FeatureIcon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                        </span>
+                        <span className="min-w-0 flex-1 text-right">{line}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 <button
