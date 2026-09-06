@@ -26,6 +26,9 @@ const selectClass =
 const submitClass =
   "inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_16px_32px_-12px_rgba(24,117,245,0.5)] ring-1 ring-white/25 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_20px_38px_-12px_rgba(24,117,245,0.58)] active:translate-y-0 active:scale-[0.992] disabled:cursor-not-allowed disabled:opacity-60";
 
+/** Same five section labels on FREE + PAID plan cards — display only. */
+const PLAN_SECTION_LABELS = ["الدروس", "الملخصات", "الفروض", "الاختبارات", "الدورات"] as const;
+
 export default function RegisterPage() {
   const router = useRouter();
   const [plan, setPlan] = useState<Plan>("choose");
@@ -191,9 +194,20 @@ export default function RegisterPage() {
                 </div>
 
                 <h2 className="mt-6 text-2xl font-black text-white sm:text-3xl">حساب مجاني</h2>
-                <p className="mt-4 flex-1 text-sm leading-8 text-slate-200 sm:text-base sm:leading-8">
+                <p className="mt-4 text-sm leading-8 text-slate-200 sm:text-base sm:leading-8">
                   دورات مجانية، مستندات PDF، وألعاب تعليمية لاحقًا — بلا محفظة ولا متجر.
                 </p>
+
+                <ul className="mt-5 flex flex-1 flex-wrap gap-2" aria-label="أقسام الحساب المجاني">
+                  {PLAN_SECTION_LABELS.map((label) => (
+                    <li
+                      key={`free-${label}`}
+                      className="inline-flex rounded-full border border-emerald-300/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-extrabold text-emerald-50"
+                    >
+                      {label}
+                    </li>
+                  ))}
+                </ul>
 
                 <button
                   type="button"
@@ -230,9 +244,20 @@ export default function RegisterPage() {
                 </div>
 
                 <h2 className="mt-6 text-2xl font-black text-white sm:text-3xl">الحساب الكامل</h2>
-                <p className="mt-4 flex-1 text-sm leading-8 text-slate-200 sm:text-base sm:leading-8">
+                <p className="mt-4 text-sm leading-8 text-slate-200 sm:text-base sm:leading-8">
                   الوصول الكامل للمنصة كما هو اليوم: الدورات، المحفظة، المتجر، والشهادات.
                 </p>
+
+                <ul className="mt-5 flex flex-1 flex-wrap gap-2" aria-label="أقسام الحساب الكامل">
+                  {PLAN_SECTION_LABELS.map((label) => (
+                    <li
+                      key={`paid-${label}`}
+                      className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-extrabold text-sky-50"
+                    >
+                      {label}
+                    </li>
+                  ))}
+                </ul>
 
                 <button
                   type="button"
