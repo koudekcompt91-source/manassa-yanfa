@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * FREE course detail — same rule as catalog:
- * published only; no system / subscription / accessType logic.
+ * FREE course detail — normalized entities, never nested content.
+ * Same rule as catalog: published only, no system/subscription/accessType logic.
  */
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const guard = await requireFreeStudentApi();
@@ -19,49 +19,53 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       return NextResponse.json({ ok: false, message: "الدورة غير موجودة." }, { status: 404 });
     }
 
-    const course = await prisma.course.findFirst({
+    const row = await prisma.course.findFirst({
       where: {
         status: "PUBLISHED",
         OR: [{ id: ref }, { slug: ref }],
       },
       select: {
         id: true,
-        slug: true,
         title: true,
         description: true,
         thumbnailUrl: true,
-        level: true,
-        academicLevel: true,
-        courseVideo: { select: { videoUrl: true } },
+        courseVideo: { select: { id: true, videoUrl: true } },
         coursePdfs: {
           orderBy: [{ order: "asc" }, { createdAt: "asc" }],
-          select: { id: true, title: true, url: true, order: true },
+          select: { id: true, title: true, url: true },
         },
       },
     });
 
-    if (!course) {
+    if (!row) {
       return NextResponse.json({ ok: false, message: "الدورة غير متاحة." }, { status: 404 });
     }
 
     return NextResponse.json({
       ok: true,
       course: {
-        id: course.id,
-        slug: course.slug,
-        title: course.title,
-        description: course.description || "",
-        videoUrl: course.courseVideo?.videoUrl || "",
-        coverImage: course.thumbnailUrl || "",
-        level: course.level || "",
-        academicLevel: course.academicLevel || "",
-        pdfs: (course.coursePdfs || []).map((p) => ({
-          id: p.id,
-          title: p.title,
-          url: p.url,
-          order: p.order,
-        })),
+        id: row.id,
+        title: row.title,
+        description: row.description || "",
+        image: row.thumbnailUrl || "",
       },
+      lessons: row.courseVideo?.videoUrl
+        ? [
+            {
+              id: row.courseVideo.id,
+              courseId: row.id,
+              title: row.title,
+              videoUrl: row.courseVideo.videoUrl,
+            },
+          ]
+        : [],
+      pdfs: row.coursePdfs.map((p) => ({
+        id: p.id,
+        courseId: row.id,
+        title: p.title,
+        url: p.url,
+      })),
+      exams: [],
     });
   } catch (e) {
     console.error("[free/courses/:id][GET]", e);

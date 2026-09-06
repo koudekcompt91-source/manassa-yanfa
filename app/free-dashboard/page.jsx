@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FreeCoursesSection from "@/components/student/free-dashboard/FreeCoursesSection";
-import FreeNotesSection from "@/components/student/free-dashboard/FreeNotesSection";
-import FreeAssignmentsSection from "@/components/student/free-dashboard/FreeAssignmentsSection";
+import FreeLessonsSection from "@/components/student/free-dashboard/FreeLessonsSection";
+import FreePdfsSection from "@/components/student/free-dashboard/FreePdfsSection";
+import FreeExamsSection from "@/components/student/free-dashboard/FreeExamsSection";
+
+const EMPTY = { courses: [], lessons: [], pdfs: [], exams: [] };
 
 /**
  * LOCKED structure (do not change order):
- * 1 دروسي → 2 ملخصاتي → 3 فروضي
- * API → render. Each section is independent; no cross-rendering.
+ * 1 الدورات → 2 الدروس → 3 المستندات → 4 الاختبارات
+ * API returns normalized entities; sections render them independently.
  */
 export default function FreeDashboardPage() {
-  const [data, setData] = useState({ courses: [], notes: [], assignments: [] });
+  const [data, setData] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedId, setSelectedId] = useState("");
   // React StrictMode re-invokes effects in dev; fetch exactly once.
   const fetchedRef = useRef(false);
 
@@ -31,23 +35,46 @@ export default function FreeDashboardPage() {
 
         if (!okHttp || body?.ok === false) {
           setError(body?.message || "تعذّر تحميل المحتوى.");
-          setData({ courses: [], notes: [], assignments: [] });
+          setData(EMPTY);
           return;
         }
 
         setError("");
         setData({
           courses: Array.isArray(body?.courses) ? body.courses : [],
-          notes: Array.isArray(body?.notes) ? body.notes : [],
-          assignments: Array.isArray(body?.assignments) ? body.assignments : [],
+          lessons: Array.isArray(body?.lessons) ? body.lessons : [],
+          pdfs: Array.isArray(body?.pdfs) ? body.pdfs : [],
+          exams: Array.isArray(body?.exams) ? body.exams : [],
         });
       })
       .catch(() => {
         setError("تعذّر الاتصال بالخادم.");
-        setData({ courses: [], notes: [], assignments: [] });
+        setData(EMPTY);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Relational scoping only — each entity belongs to the active course.
+  const activeLessons = useMemo(
+    () => data.lessons.filter((l) => l.courseId === selectedId),
+    [data.lessons, selectedId]
+  );
+  const activePdfs = useMemo(
+    () => data.pdfs.filter((p) => p.courseId === selectedId),
+    [data.pdfs, selectedId]
+  );
+  const activeExams = useMemo(
+    () => data.exams.filter((e) => e.courseId === selectedId),
+    [data.exams, selectedId]
+  );
+
+  function selectCourse(id) {
+    if (!id) return;
+    setSelectedId(id);
+    requestAnimationFrame(() => {
+      document.getElementById("lessons")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   return (
     <div className="w-full" dir="rtl">
@@ -57,18 +84,27 @@ export default function FreeDashboardPage() {
             مرحباً بك في الحساب المجاني
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-slate-500 sm:text-base">
-            دروسك وملخصاتك وفروضك في مكان واحد.
+            اختر دورة لعرض دروسها ومستنداتها.
           </p>
         </header>
 
-        {/* 1. دروسي */}
-        <FreeCoursesSection courses={data.courses} loading={loading} error={error} />
+        {/* 1. الدورات */}
+        <FreeCoursesSection
+          courses={data.courses}
+          loading={loading}
+          error={error}
+          selectedId={selectedId}
+          onSelect={selectCourse}
+        />
 
-        {/* 2. ملخصاتي */}
-        <FreeNotesSection notes={data.notes} loading={loading} />
+        {/* 2. الدروس */}
+        <FreeLessonsSection lessons={activeLessons} courseSelected={Boolean(selectedId)} />
 
-        {/* 3. فروضي */}
-        <FreeAssignmentsSection assignments={data.assignments} />
+        {/* 3. المستندات */}
+        <FreePdfsSection pdfs={activePdfs} />
+
+        {/* 4. الاختبارات */}
+        <FreeExamsSection exams={activeExams} />
       </div>
     </div>
   );

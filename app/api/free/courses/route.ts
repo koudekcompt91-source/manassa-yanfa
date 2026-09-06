@@ -6,69 +6,67 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
- * FREE dashboard data — single source of truth.
+ * FREE dashboard data — normalized entities, never nested content.
  * ONLY filter: status = PUBLISHED. No system / subscription / accessType logic.
- * Returns pre-categorized structures so the UI renders without transforming:
- *   courses     → دروسي
- *   notes       → ملخصاتي (CoursePDF rows)
- *   assignments → فروضي
+ *
+ *   courses → { id, title, description, image }
+ *   lessons → { id, courseId, title, videoUrl }
+ *   pdfs    → { id, courseId, title, url }
+ *   exams   → { id, courseId, title, locked }
  */
 export async function GET() {
   const guard = await requireFreeStudentApi();
   if (!guard.ok) return guard.response;
 
   try {
-    const courses = await prisma.course.findMany({
+    const rows = await prisma.course.findMany({
       where: { status: "PUBLISHED" },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       select: {
         id: true,
-        slug: true,
         title: true,
         description: true,
         thumbnailUrl: true,
-        level: true,
-        academicLevel: true,
-        courseVideo: { select: { videoUrl: true } },
+        courseVideo: { select: { id: true, videoUrl: true } },
         coursePdfs: {
           orderBy: [{ order: "asc" }, { createdAt: "asc" }],
-          select: { id: true, title: true, url: true, order: true },
+          select: { id: true, title: true, url: true },
         },
       },
     });
 
-    const coursesPayload = courses.map((c) => ({
+    const courses = rows.map((c) => ({
       id: c.id,
-      slug: c.slug,
       title: c.title,
       description: c.description || "",
-      videoUrl: c.courseVideo?.videoUrl || "",
-      coverImage: c.thumbnailUrl || "",
-      level: c.level || "",
-      academicLevel: c.academicLevel || "",
+      image: c.thumbnailUrl || "",
     }));
 
-    const notes = courses.flatMap((c) =>
-      (c.coursePdfs || []).map((p) => ({
+    const lessons = rows
+      .filter((c) => c.courseVideo?.videoUrl)
+      .map((c) => ({
+        id: c.courseVideo.id,
+        courseId: c.id,
+        title: c.title,
+        videoUrl: c.courseVideo.videoUrl,
+      }));
+
+    const pdfs = rows.flatMap((c) =>
+      c.coursePdfs.map((p) => ({
         id: p.id,
+        courseId: c.id,
         title: p.title,
         url: p.url,
-        courseId: c.id,
-        courseTitle: c.title,
       }))
     );
 
     console.log("FREE COURSES API RESPONSE:", {
-      courses: coursesPayload.length,
-      notes: notes.length,
+      courses: courses.length,
+      lessons: lessons.length,
+      pdfs: pdfs.length,
     });
 
-    return NextResponse.json({
-      ok: true,
-      courses: coursesPayload,
-      notes,
-      assignments: [],
-    });
+    return NextResponse.json({ ok: true, courses, lessons, pdfs, exams: [] });
   } catch (e) {
     console.error("[free/courses][GET]", e);
     return NextResponse.json({ ok: false, message: "تعذّر تحميل الدورات المجانية." }, { status: 500 });
