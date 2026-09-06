@@ -40,8 +40,13 @@ export default function FreeDashboardPage() {
         }
 
         setError("");
+        const courses = Array.isArray(body?.courses)
+          ? body.courses
+          : Array.isArray(body?.data)
+            ? body.data
+            : [];
         setData({
-          courses: Array.isArray(body?.courses) ? body.courses : [],
+          courses: courses ?? [],
           lessons: Array.isArray(body?.lessons) ? body.lessons : [],
           pdfs: Array.isArray(body?.pdfs) ? body.pdfs : [],
           exams: Array.isArray(body?.exams) ? body.exams : [],
