@@ -26,17 +26,16 @@ const selectClass =
 const submitClass =
   "inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-l from-brand-600 via-blue-600 to-indigo-700 px-5 text-base font-extrabold text-white shadow-[0_16px_32px_-12px_rgba(24,117,245,0.5)] ring-1 ring-white/25 transition-[transform,filter,box-shadow] hover:-translate-y-px hover:brightness-[1.03] hover:shadow-[0_20px_38px_-12px_rgba(24,117,245,0.58)] active:translate-y-0 active:scale-[0.992] disabled:cursor-not-allowed disabled:opacity-60";
 
-/** Same five section labels on FREE plan card chips — display only. */
-const PLAN_SECTION_LABELS = ["الدروس", "الملخصات", "الفروض", "الاختبارات", "الدورات"] as const;
-
-/** Exact PAID plan content lines — copy literally; do not rephrase. */
-const PAID_PLAN_CONTENT_LINES = [
+/** Exact five content lines for FREE + PAID plan cards — copy literally; do not rephrase. */
+const PLAN_CONTENT_LINES = [
   "الدروس (دروسي): شروحات مفصلة لجميع مواد المنهاج",
   "الملخصات (ملخصاتي): خرائط ذهنية وبطاقات مراجعة مركزة PDF",
   "الفروض (فروضي): الفروض المحروسة والتقييمات للفصول الثلاثة",
   "الاختبارات (اختباراتي): الاختبارات الفصلية الرسمية وسلم التصحيح",
   "الدورات: دورات تكوينية ومراجعات شاملة للمنهاج وحل المواضيع",
 ] as const;
+
+const PLAN_CONTENT_NUMBERS = ["١", "٢", "٣", "٤", "٥"] as const;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -207,13 +206,19 @@ export default function RegisterPage() {
                   دورات مجانية، مستندات PDF، وألعاب تعليمية لاحقًا — بلا محفظة ولا متجر.
                 </p>
 
-                <ul className="mt-5 flex flex-1 flex-wrap gap-2" aria-label="أقسام الحساب المجاني">
-                  {PLAN_SECTION_LABELS.map((label) => (
+                <ul className="mt-5 flex w-full flex-1 flex-col gap-2.5" aria-label="أقسام الحساب المجاني">
+                  {PLAN_CONTENT_LINES.map((line, index) => (
                     <li
-                      key={`free-${label}`}
-                      className="inline-flex rounded-full border border-emerald-300/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-extrabold text-emerald-50"
+                      key={`free-${line}`}
+                      className="flex w-full items-start gap-3 rounded-xl border border-emerald-300/35 bg-emerald-500/15 px-3.5 py-2.5 text-sm font-semibold leading-7 text-emerald-50"
                     >
-                      {label}
+                      <span
+                        className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-emerald-300/45 bg-emerald-500/25 text-xs font-black text-emerald-50"
+                        aria-hidden
+                      >
+                        {PLAN_CONTENT_NUMBERS[index]}
+                      </span>
+                      <span className="min-w-0 flex-1 text-right">{line}</span>
                     </li>
                   ))}
                 </ul>
@@ -257,17 +262,17 @@ export default function RegisterPage() {
                   الوصول الكامل للمنصة كما هو اليوم: الدورات، المحفظة، المتجر، والشهادات.
                 </p>
 
-                <ul className="mt-5 flex flex-1 flex-col gap-2.5" aria-label="أقسام الحساب الكامل">
-                  {PAID_PLAN_CONTENT_LINES.map((line, index) => (
+                <ul className="mt-5 flex w-full flex-1 flex-col gap-2.5" aria-label="أقسام الحساب الكامل">
+                  {PLAN_CONTENT_LINES.map((line, index) => (
                     <li
-                      key={line}
-                      className="flex items-start gap-3 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 text-sm font-semibold leading-7 text-slate-100"
+                      key={`paid-${line}`}
+                      className="flex w-full items-start gap-3 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 text-sm font-semibold leading-7 text-slate-100"
                     >
                       <span
                         className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-300/40 bg-amber-400/20 text-xs font-black text-amber-100"
                         aria-hidden
                       >
-                        {["١", "٢", "٣", "٤", "٥"][index]}
+                        {PLAN_CONTENT_NUMBERS[index]}
                       </span>
                       <span className="min-w-0 flex-1 text-right">{line}</span>
                     </li>
