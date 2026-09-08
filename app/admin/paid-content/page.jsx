@@ -16,6 +16,7 @@ const ACTIVE_ADMIN_HREF = {
   summaries: "/admin/paid-content/summaries",
   homework: "/admin/paid-content/homework",
   assignments: "/admin/paid-content/assignments",
+  exams: "/admin/paid-content/exams",
   "electronic-exam": "/admin/paid-content/electronic-exam",
 };
 
@@ -29,6 +30,7 @@ function manageHint(sectionId) {
   if (sectionId === "summaries") return "PaidFileContent.SUMMARY · إدارة فعلية";
   if (sectionId === "homework") return "Assessment.ASSIGNMENT · إدارة فعلية";
   if (sectionId === "assignments") return "PaidFileContent.ASSIGNMENT · إدارة فعلية";
+  if (sectionId === "exams") return "PaidFileContent.EXAM · إدارة فعلية";
   if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
   return "واجهة أولية · بدون Database change";
 }
@@ -49,18 +51,24 @@ export default function AdminPaidContentPage() {
       let quiz = 0;
       let summaries = 0;
       let assignments = 0;
+      let exams = 0;
 
-      const [summariesRes, assignmentsRes] = await Promise.all([
+      const [summariesRes, assignmentsRes, examsRes] = await Promise.all([
         fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=ASSIGNMENT", { credentials: "include" }),
+        fetch("/api/admin/paid-content?contentType=EXAM", { credentials: "include" }),
       ]);
       const summariesData = await summariesRes.json().catch(() => ({}));
       const assignmentsData = await assignmentsRes.json().catch(() => ({}));
+      const examsData = await examsRes.json().catch(() => ({}));
       if (summariesRes.ok && summariesData?.ok && Array.isArray(summariesData.items)) {
         summaries = summariesData.items.length;
       }
       if (assignmentsRes.ok && assignmentsData?.ok && Array.isArray(assignmentsData.items)) {
         assignments = assignmentsData.items.length;
+      }
+      if (examsRes.ok && examsData?.ok && Array.isArray(examsData.items)) {
+        exams = examsData.items.length;
       }
 
       await Promise.all(
@@ -88,6 +96,7 @@ export default function AdminPaidContentPage() {
         summaries,
         homework,
         assignments,
+        exams,
         "electronic-exam": quiz,
       });
     } catch {
