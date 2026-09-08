@@ -7,7 +7,6 @@ import {
   MonitorPlay,
   PenLine,
   Radio,
-  Stethoscope,
 } from "lucide-react";
 
 /**
@@ -18,9 +17,9 @@ export const TEACHERS_SECTIONS = [
   {
     id: "diagnostic",
     href: "/dashboard/teachers/diagnostic",
-    title: "تقويات تشخيصية",
+    title: "تقويمات تشخيصية",
     description: "اختبارات وتقويمات تشخيصية لتحديد مستواك ونقاط القوة والضعف.",
-    Icon: Stethoscope,
+    Icon: ClipboardCheck,
     tone: "from-sky-500 to-brand-600",
     badges: ["VIP"],
   },

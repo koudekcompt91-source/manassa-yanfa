@@ -161,7 +161,7 @@ export default function AdminPaidDiagnosticPage() {
 
   return (
     <AdminShell
-      title="تقويات تشخيصية — المحتوى المدفوع"
+      title="تقويمات تشخيصية — المحتوى المدفوع"
       subtitle="إدارة PaidDiagnosticContent ضمن دورات Course.system = PAID فقط."
     >
       <div className="mb-4">
@@ -258,7 +258,7 @@ export default function AdminPaidDiagnosticPage() {
         </form>
       </AdminSectionCard>
 
-      <AdminSectionCard title="تقويات تشخيصية PAID" subtitle={`${items.length} عنصر · PaidDiagnosticContent`}>
+      <AdminSectionCard title="تقويمات تشخيصية PAID" subtitle={`${items.length} عنصر · PaidDiagnosticContent`}>
         {loading ? (
           <p className="text-sm text-slate-500">جاري التحميل…</p>
         ) : !items.length ? (

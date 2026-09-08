@@ -55,7 +55,7 @@ export default function TeachersSectionPage() {
       <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
         <p className="text-base font-extrabold text-slate-800">قريبًا — بانتظار تفعيل التخزين</p>
         <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">
-          التقويات التشخيصية ضمن الحساب المدفوع فقط. سيظهر المحتوى بعد اعتماد نموذج البيانات.
+          التقويمات التشخيصية ضمن الحساب المدفوع فقط. سيظهر المحتوى بعد اعتماد نموذج البيانات.
         </p>
       </section>
     );

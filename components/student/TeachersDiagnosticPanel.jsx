@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Stethoscope } from "lucide-react";
+import { ClipboardCheck } from "lucide-react";
 import { getDisplayLevelLabel } from "@/lib/student-level-codes";
 
 /**
@@ -59,13 +59,13 @@ export default function TeachersDiagnosticPanel() {
   if (!items.length) {
     return (
       <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
-        <p className="text-base font-extrabold text-slate-800">لا توجد تقويات تشخيصية متاحة حاليًا.</p>
+        <p className="text-base font-extrabold text-slate-800">لا توجد تقويمات تشخيصية متاحة حاليًا.</p>
       </section>
     );
   }
 
   return (
-    <section aria-label="تقويات تشخيصية" className="space-y-3">
+    <section aria-label="تقويمات تشخيصية" className="space-y-3">
       {items.map((item) => {
         const levelLabel = getDisplayLevelLabel(item);
         return (
@@ -78,7 +78,7 @@ export default function TeachersDiagnosticPanel() {
           >
             <div className="flex min-w-0 items-start gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white">
-                <Stethoscope className="h-7 w-7" strokeWidth={1.75} />
+                <ClipboardCheck className="h-7 w-7" strokeWidth={1.75} />
               </span>
               <div className="min-w-0">
                 <h2 className="text-base font-extrabold text-slate-900 sm:text-lg">{item.title}</h2>
