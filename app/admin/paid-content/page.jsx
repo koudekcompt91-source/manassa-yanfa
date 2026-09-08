@@ -15,6 +15,7 @@ const ACTIVE_ADMIN_HREF = {
   live: "/admin/paid-content/live",
   summaries: "/admin/paid-content/summaries",
   homework: "/admin/paid-content/homework",
+  assignments: "/admin/paid-content/assignments",
   "electronic-exam": "/admin/paid-content/electronic-exam",
 };
 
@@ -27,6 +28,7 @@ function manageHint(sectionId) {
   if (sectionId === "live") return "LiveSession · إدارة فعلية";
   if (sectionId === "summaries") return "PaidFileContent.SUMMARY · إدارة فعلية";
   if (sectionId === "homework") return "Assessment.ASSIGNMENT · إدارة فعلية";
+  if (sectionId === "assignments") return "PaidFileContent.ASSIGNMENT · إدارة فعلية";
   if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
   return "واجهة أولية · بدون Database change";
 }
@@ -46,11 +48,19 @@ export default function AdminPaidContentPage() {
       let homework = 0;
       let quiz = 0;
       let summaries = 0;
+      let assignments = 0;
 
-      const summariesRes = await fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" });
+      const [summariesRes, assignmentsRes] = await Promise.all([
+        fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" }),
+        fetch("/api/admin/paid-content?contentType=ASSIGNMENT", { credentials: "include" }),
+      ]);
       const summariesData = await summariesRes.json().catch(() => ({}));
+      const assignmentsData = await assignmentsRes.json().catch(() => ({}));
       if (summariesRes.ok && summariesData?.ok && Array.isArray(summariesData.items)) {
         summaries = summariesData.items.length;
+      }
+      if (assignmentsRes.ok && assignmentsData?.ok && Array.isArray(assignmentsData.items)) {
+        assignments = assignmentsData.items.length;
       }
 
       await Promise.all(
@@ -77,6 +87,7 @@ export default function AdminPaidContentPage() {
         live,
         summaries,
         homework,
+        assignments,
         "electronic-exam": quiz,
       });
     } catch {

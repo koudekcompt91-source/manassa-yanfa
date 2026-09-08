@@ -13,11 +13,6 @@ const PLACEHOLDER_META = {
     reuseNote: "لا يوجد Model تشخيصي مدفوع حاليًا. Assessment.QUIZ قريب وظيفيًا لكنه ليس مخصصًا للتقويم التشخيصي.",
     needsDatabase: true,
   },
-  assignments: {
-    plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للفروض", "الوصف", "النشر"],
-    reuseNote: "Assessment.ASSIGNMENT تفاعلي ويُدار تحت «واجباتي المنزلية». فروضي كملفات PDF تحتاج PaidFileContent.ASSIGNMENT.",
-    needsDatabase: false,
-  },
   exams: {
     plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للاختبار", "سلم التصحيح", "النشر"],
     reuseNote: "مختلفة عن الاختبار الإلكتروني (QUIZ). جاهزة عبر PaidFileContent.EXAM لاحقًا.",
