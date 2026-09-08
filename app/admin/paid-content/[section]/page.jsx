@@ -7,25 +7,16 @@ import AdminShell from "@/components/admin/AdminShell";
 import { AdminEmptyState, AdminSectionCard } from "@/components/admin/AdminUI";
 import Link from "next/link";
 
-const PLACEHOLDER_META = {
-  diagnostic: {
-    plannedFields: ["العنوان", "الوصف", "المستوى", "المادة", "رابط/ملف التشخيص", "النشر"],
-    reuseNote: "لا يوجد Model تشخيصي مدفوع حاليًا. Assessment.QUIZ قريب وظيفيًا لكنه ليس مخصصًا للتقويم التشخيصي.",
-    needsDatabase: true,
-  },
-};
-
 /**
- * Dynamic admin placeholder for unpaid/unimplemented paid-content sections.
- * Static routes (lessons/live/homework/electronic-exam) take precedence.
+ * Fallback for unknown paid-content sections.
+ * Known sections use dedicated static routes under /admin/paid-content/*.
  */
 export default function AdminPaidContentSectionPage() {
   const params = useParams();
   const sectionId = Array.isArray(params?.section) ? String(params.section[0] || "") : String(params?.section || "");
   const section = getTeachersSection(sectionId);
-  const meta = PLACEHOLDER_META[sectionId];
 
-  if (!section || !meta) {
+  if (!section) {
     return (
       <AdminShell title="قسم غير موجود" subtitle="تعذّر العثور على هذا القسم ضمن المحتوى المدفوع.">
         <AdminSectionCard title="خطأ">
@@ -46,9 +37,9 @@ export default function AdminPaidContentSectionPage() {
       description={section.description}
       tone={section.tone}
       Icon={section.Icon}
-      plannedFields={meta.plannedFields}
-      reuseNote={meta.reuseNote}
-      needsDatabase={meta.needsDatabase}
+      plannedFields={[]}
+      reuseNote="استخدم الصفحة الثابتة الخاصة بالقسم من قائمة إدارة المحتوى المدفوع."
+      needsDatabase={false}
     />
   );
 }

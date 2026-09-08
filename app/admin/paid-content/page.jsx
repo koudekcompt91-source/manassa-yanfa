@@ -11,6 +11,7 @@ import { TEACHERS_SECTIONS } from "@/lib/paid-teachers-sections";
  */
 
 const ACTIVE_ADMIN_HREF = {
+  diagnostic: "/admin/paid-content/diagnostic",
   lessons: "/admin/paid-content/lessons",
   live: "/admin/paid-content/live",
   summaries: "/admin/paid-content/summaries",
@@ -21,11 +22,25 @@ const ACTIVE_ADMIN_HREF = {
   library: "/admin/paid-content/library",
 };
 
+/** Sections with real CRUD. */
+const LIVE_ADMIN_SECTIONS = new Set([
+  "diagnostic",
+  "lessons",
+  "live",
+  "summaries",
+  "homework",
+  "assignments",
+  "exams",
+  "electronic-exam",
+  "library",
+]);
+
 function manageHref(sectionId) {
   return ACTIVE_ADMIN_HREF[sectionId] || `/admin/paid-content/${sectionId}`;
 }
 
 function manageHint(sectionId) {
+  if (sectionId === "diagnostic") return "PaidDiagnosticContent · إدارة فعلية";
   if (sectionId === "lessons") return "Course + Lesson · إدارة فعلية";
   if (sectionId === "live") return "LiveSession · إدارة فعلية";
   if (sectionId === "summaries") return "PaidFileContent.SUMMARY · إدارة فعلية";
@@ -34,7 +49,7 @@ function manageHint(sectionId) {
   if (sectionId === "exams") return "PaidFileContent.EXAM · إدارة فعلية";
   if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
   if (sectionId === "library") return "PaidFileContent.LIBRARY · إدارة فعلية";
-  return "واجهة أولية · بدون Database change";
+  return "واجهة أولية";
 }
 
 export default function AdminPaidContentPage() {
@@ -47,6 +62,7 @@ export default function AdminPaidContentPage() {
       if (!res.ok || !data?.ok) return;
       const courses = Array.isArray(data.courses) ? data.courses : [];
 
+      let diagnostic = 0;
       let lessons = 0;
       let live = 0;
       let homework = 0;
@@ -56,16 +72,21 @@ export default function AdminPaidContentPage() {
       let exams = 0;
       let library = 0;
 
-      const [summariesRes, assignmentsRes, examsRes, libraryRes] = await Promise.all([
+      const [diagnosticRes, summariesRes, assignmentsRes, examsRes, libraryRes] = await Promise.all([
+        fetch("/api/admin/paid-diagnostics", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=ASSIGNMENT", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=EXAM", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=LIBRARY", { credentials: "include" }),
       ]);
+      const diagnosticData = await diagnosticRes.json().catch(() => ({}));
       const summariesData = await summariesRes.json().catch(() => ({}));
       const assignmentsData = await assignmentsRes.json().catch(() => ({}));
       const examsData = await examsRes.json().catch(() => ({}));
       const libraryData = await libraryRes.json().catch(() => ({}));
+      if (diagnosticRes.ok && diagnosticData?.ok && Array.isArray(diagnosticData.items)) {
+        diagnostic = diagnosticData.items.length;
+      }
       if (summariesRes.ok && summariesData?.ok && Array.isArray(summariesData.items)) {
         summaries = summariesData.items.length;
       }
@@ -99,6 +120,7 @@ export default function AdminPaidContentPage() {
       );
 
       setCounts({
+        diagnostic,
         lessons,
         live,
         summaries,
@@ -124,13 +146,13 @@ export default function AdminPaidContentPage() {
     >
       <AdminSectionCard
         title="أقسام المحتوى المدفوع"
-        subtitle="الأقسام ذات البنية الجاهزة قابلة للإدارة فورًا. الباقي واجهات أولية بانتظار قرار الـ Model."
+        subtitle="كل أقسام أساتذتي التسعة قابلة للإدارة من هنا ضمن نظام PAID فقط."
       >
         <div className="grid gap-4" dir="rtl">
           {TEACHERS_SECTIONS.map((section) => {
             const Icon = section.Icon;
             const href = manageHref(section.id);
-            const active = Boolean(ACTIVE_ADMIN_HREF[section.id]);
+            const live = LIVE_ADMIN_SECTIONS.has(section.id);
             const count = counts[section.id];
 
             return (
@@ -148,7 +170,7 @@ export default function AdminPaidContentPage() {
                   <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-extrabold text-slate-900 sm:text-lg">{section.title}</h3>
-                      <AdminBadge tone={active ? "brand" : "warning"}>{active ? "يعمل" : "أولي"}</AdminBadge>
+                      <AdminBadge tone={live ? "brand" : "warning"}>{live ? "يعمل" : "بانتظار DB"}</AdminBadge>
                       {typeof count === "number" ? (
                         <AdminBadge tone="slate">{count} عنصر</AdminBadge>
                       ) : null}

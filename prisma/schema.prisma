@@ -312,15 +312,16 @@ model Course {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  lessons           Lesson[]
-  liveSessions      LiveSession[]
-  chatConversations ChatConversation[]
-  assessments       Assessment[]
-  lessonProgresses  LessonProgress[]
-  certificates      Certificate[]
-  courseVideo       CourseVideo?
-  coursePdfs        CoursePDF[]
-  paidFileContents  PaidFileContent[]
+  lessons                Lesson[]
+  liveSessions           LiveSession[]
+  chatConversations      ChatConversation[]
+  assessments            Assessment[]
+  lessonProgresses       LessonProgress[]
+  certificates           Certificate[]
+  courseVideo            CourseVideo?
+  coursePdfs             CoursePDF[]
+  paidFileContents       PaidFileContent[]
+  paidDiagnosticContents PaidDiagnosticContent[]
 
   @@index([status, minSubscription])
   @@index([system, status, order])
@@ -381,6 +382,29 @@ model PaidFileContent {
   @@index([courseId, contentType, isPublished])
   @@index([contentType, isPublished, level])
   @@index([isPublished, createdAt])
+}
+
+/**
+ * PAID diagnostic reinforcement content — not FREE LMS, not Assessment/Quiz.
+ */
+model PaidDiagnosticContent {
+  id            String   @id @default(cuid())
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title         String
+  description   String   @default("")
+  subject       String?
+  level         String?
+  academicLevel String?
+  fileUrl       String
+  isPublished   Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([courseId, order])
+  @@index([courseId, isPublished])
+  @@index([isPublished, level])
 }
 
 model Lesson {

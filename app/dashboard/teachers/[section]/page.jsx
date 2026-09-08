@@ -50,7 +50,16 @@ export default function TeachersSectionPage() {
   else if (section.id === "assignments") body = <TeachersAssignmentsPanel />;
   else if (section.id === "exams") body = <TeachersExamsPanel />;
   else if (section.id === "library") body = <TeachersLibraryPanel />;
-  else if (section.id === "homework") {
+  else if (section.id === "diagnostic") {
+    body = (
+      <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
+        <p className="text-base font-extrabold text-slate-800">قريبًا — بانتظار تفعيل التخزين</p>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">
+          التقويات التشخيصية ضمن الحساب المدفوع فقط. سيظهر المحتوى بعد اعتماد نموذج البيانات.
+        </p>
+      </section>
+    );
+  } else if (section.id === "homework") {
     body = <TeachersAssessmentsPanel assessmentType="ASSIGNMENT" emptyTitle="لا توجد واجبات منزلية متاحة حاليًا." />;
   } else if (section.id === "electronic-exam") {
     body = <TeachersAssessmentsPanel assessmentType="QUIZ" emptyTitle="لا توجد اختبارات إلكترونية متاحة حاليًا." />;

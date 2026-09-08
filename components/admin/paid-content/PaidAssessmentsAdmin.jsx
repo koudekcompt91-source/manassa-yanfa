@@ -280,6 +280,12 @@ export default function PaidAssessmentsAdmin({
                         <AdminActionButton type="button" tone="primary" onClick={() => togglePublish(row)}>
                           {row.isPublished ? "إخفاء" : "نشر"}
                         </AdminActionButton>
+                        <Link
+                          href="/admin/courses"
+                          className="inline-flex items-center rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 no-underline hover:bg-slate-50"
+                        >
+                          الأسئلة
+                        </Link>
                         <AdminActionButton type="button" tone="danger" onClick={() => removeRow(row.id)}>حذف</AdminActionButton>
                       </div>
                     </td>
