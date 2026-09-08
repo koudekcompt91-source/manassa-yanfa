@@ -18,6 +18,7 @@ const ACTIVE_ADMIN_HREF = {
   assignments: "/admin/paid-content/assignments",
   exams: "/admin/paid-content/exams",
   "electronic-exam": "/admin/paid-content/electronic-exam",
+  library: "/admin/paid-content/library",
 };
 
 function manageHref(sectionId) {
@@ -32,6 +33,7 @@ function manageHint(sectionId) {
   if (sectionId === "assignments") return "PaidFileContent.ASSIGNMENT · إدارة فعلية";
   if (sectionId === "exams") return "PaidFileContent.EXAM · إدارة فعلية";
   if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
+  if (sectionId === "library") return "PaidFileContent.LIBRARY · إدارة فعلية";
   return "واجهة أولية · بدون Database change";
 }
 
@@ -52,15 +54,18 @@ export default function AdminPaidContentPage() {
       let summaries = 0;
       let assignments = 0;
       let exams = 0;
+      let library = 0;
 
-      const [summariesRes, assignmentsRes, examsRes] = await Promise.all([
+      const [summariesRes, assignmentsRes, examsRes, libraryRes] = await Promise.all([
         fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=ASSIGNMENT", { credentials: "include" }),
         fetch("/api/admin/paid-content?contentType=EXAM", { credentials: "include" }),
+        fetch("/api/admin/paid-content?contentType=LIBRARY", { credentials: "include" }),
       ]);
       const summariesData = await summariesRes.json().catch(() => ({}));
       const assignmentsData = await assignmentsRes.json().catch(() => ({}));
       const examsData = await examsRes.json().catch(() => ({}));
+      const libraryData = await libraryRes.json().catch(() => ({}));
       if (summariesRes.ok && summariesData?.ok && Array.isArray(summariesData.items)) {
         summaries = summariesData.items.length;
       }
@@ -69,6 +74,9 @@ export default function AdminPaidContentPage() {
       }
       if (examsRes.ok && examsData?.ok && Array.isArray(examsData.items)) {
         exams = examsData.items.length;
+      }
+      if (libraryRes.ok && libraryData?.ok && Array.isArray(libraryData.items)) {
+        library = libraryData.items.length;
       }
 
       await Promise.all(
@@ -98,6 +106,7 @@ export default function AdminPaidContentPage() {
         assignments,
         exams,
         "electronic-exam": quiz,
+        library,
       });
     } catch {
       /* ignore count errors */

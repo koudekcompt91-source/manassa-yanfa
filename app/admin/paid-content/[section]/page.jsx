@@ -13,11 +13,6 @@ const PLACEHOLDER_META = {
     reuseNote: "لا يوجد Model تشخيصي مدفوع حاليًا. Assessment.QUIZ قريب وظيفيًا لكنه ليس مخصصًا للتقويم التشخيصي.",
     needsDatabase: true,
   },
-  library: {
-    plannedFields: ["عنوان المورد", "نوع الملف", "رابط التحميل", "المستوى", "المادة", "النشر"],
-    reuseNote: "جاهزة عبر PaidFileContent.LIBRARY لاحقًا.",
-    needsDatabase: false,
-  },
 };
 
 /**

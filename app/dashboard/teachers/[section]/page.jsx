@@ -9,11 +9,12 @@ import TeachersAssessmentsPanel from "@/components/student/TeachersAssessmentsPa
 import TeachersSummariesPanel from "@/components/student/TeachersSummariesPanel";
 import TeachersAssignmentsPanel from "@/components/student/TeachersAssignmentsPanel";
 import TeachersExamsPanel from "@/components/student/TeachersExamsPanel";
+import TeachersLibraryPanel from "@/components/student/TeachersLibraryPanel";
 import { getTeachersSection } from "@/lib/paid-teachers-sections";
 
 /**
  * Fallback dynamic section page.
- * Static routes own lessons/live/summaries/assignments/exams/homework/electronic-exam.
+ * Static routes own lessons/live/summaries/assignments/exams/library/homework/electronic-exam.
  */
 export default function TeachersSectionPage() {
   const params = useParams();
@@ -48,6 +49,7 @@ export default function TeachersSectionPage() {
   else if (section.id === "summaries") body = <TeachersSummariesPanel />;
   else if (section.id === "assignments") body = <TeachersAssignmentsPanel />;
   else if (section.id === "exams") body = <TeachersExamsPanel />;
+  else if (section.id === "library") body = <TeachersLibraryPanel />;
   else if (section.id === "homework") {
     body = <TeachersAssessmentsPanel assessmentType="ASSIGNMENT" emptyTitle="لا توجد واجبات منزلية متاحة حاليًا." />;
   } else if (section.id === "electronic-exam") {
