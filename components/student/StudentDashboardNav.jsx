@@ -35,7 +35,7 @@ export const STUDENT_NAV = [
   },
   {
     href: "/dashboard#my-courses",
-    label: "دوراتي",
+    label: "أساتذتي",
     description: "تابع الدورات المسجّل فيها وواصل من حيث توقفت.",
     id: "my-courses",
     Icon: BookOpen,
