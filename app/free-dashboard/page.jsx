@@ -122,20 +122,11 @@ function FreeDashboardInner() {
 
         // FREE isolation: only system=FREE rows (never PAID LMS).
         const courses = rawCourses.filter((c) => isFreeSystem(c?.system));
-        const freeIds = new Set(courses.map((c) => c?.id).filter(Boolean));
 
-        const lessons = (Array.isArray(body?.lessons) ? body.lessons : []).filter(
-          (l) => l?.courseId && freeIds.has(l.courseId)
-        );
-        const pdfs = (Array.isArray(body?.pdfs) ? body.pdfs : []).filter(
-          (p) => p?.courseId && freeIds.has(p.courseId)
-        );
-        const exams = (Array.isArray(body?.exams) ? body.exams : []).filter(
-          (e) => !e?.courseId || freeIds.has(e.courseId)
-        );
-        const assignments = (Array.isArray(body?.assignments) ? body.assignments : []).filter(
-          (a) => !a?.courseId || freeIds.has(a.courseId)
-        );
+        const lessons = Array.isArray(body?.lessons) ? body.lessons : [];
+        const pdfs = Array.isArray(body?.pdfs) ? body.pdfs : [];
+        const exams = Array.isArray(body?.exams) ? body.exams : [];
+        const assignments = Array.isArray(body?.assignments) ? body.assignments : [];
 
         setError("");
         setData({ courses, lessons, pdfs, exams, assignments });

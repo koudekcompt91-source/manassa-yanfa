@@ -2,7 +2,7 @@
 
 import { ClipboardList } from "lucide-react";
 
-/** اختباراتي / فروضي — list items only (no lessons/PDFs). */
+/** اختباراتي / فروضي — list items only (optional PDF link). */
 export default function FreeExamsSection({
   exams,
   loading = false,
@@ -37,19 +37,46 @@ export default function FreeExamsSection({
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
-          {list.map((exam, index) => (
-            <li key={exam?.id ?? index}>
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white px-4 py-4 shadow-sm">
+          {list.map((exam, index) => {
+            const url = String(exam?.url || "").trim();
+            const inner = (
+              <>
                 <span className="inline-flex min-w-0 items-center gap-2">
                   <ClipboardList className="h-4 w-4 shrink-0 text-brand-700" />
-                  <span className="truncate text-sm font-bold text-slate-800">
-                    {exam?.title ?? ""}
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-bold text-slate-800">
+                      {exam?.title ?? ""}
+                    </span>
+                    {exam?.subject ? (
+                      <span className="mt-0.5 block truncate text-xs text-slate-500">{exam.subject}</span>
+                    ) : null}
                   </span>
                 </span>
-                <span className="shrink-0 text-xs font-extrabold text-brand-700">متاح</span>
-              </div>
-            </li>
-          ))}
+                <span className="shrink-0 text-xs font-extrabold text-brand-700">
+                  {url ? "فتح" : "متاح"}
+                </span>
+              </>
+            );
+
+            return (
+              <li key={exam?.id ?? index}>
+                {url ? (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white px-4 py-4 shadow-sm transition hover:border-brand-300 hover:bg-brand-50/40"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white px-4 py-4 shadow-sm">
+                    {inner}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

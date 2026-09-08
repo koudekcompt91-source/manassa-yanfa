@@ -29,6 +29,15 @@ enum CourseAccessType {
   PAID
 }
 
+/** FREE LMS content discriminator — null on PAID-system courses. */
+enum FreeContentType {
+  LESSON
+  SUMMARY
+  ASSIGNMENT
+  EXAM
+  COURSE
+}
+
 enum CourseStatus {
   DRAFT
   PUBLISHED
@@ -269,6 +278,13 @@ model Course {
   order        Int              @default(0)
   academicLevel String?
   level         String?
+  /** Subject/material label for FREE LMS content (optional). */
+  subject       String?
+  /**
+   * FREE LMS only: which hub section this row belongs to.
+   * Null for PAID-system courses. Existing FREE rows backfill to COURSE.
+   */
+  freeContentType FreeContentType?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -283,6 +299,7 @@ model Course {
 
   @@index([status, minSubscription])
   @@index([system, status, order])
+  @@index([system, freeContentType, status])
 }
 
 /** Dedicated FREE LMS video row — one primary videoUrl per course. */

@@ -46,6 +46,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       row = (await prisma.course.findFirst({
         where: {
           status: "PUBLISHED",
+          system: "FREE",
           OR: [{ id: ref }, { slug: ref }],
         },
         select: {
@@ -69,6 +70,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         row = (await prisma.course.findFirst({
           where: {
             status: "PUBLISHED",
+            system: "FREE",
             OR: [{ id: ref }, { slug: ref }],
           },
           select: {
