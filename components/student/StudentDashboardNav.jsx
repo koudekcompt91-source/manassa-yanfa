@@ -34,7 +34,7 @@ export const STUDENT_NAV = [
     Icon: Home,
   },
   {
-    href: "/dashboard#my-courses",
+    href: "/dashboard/teachers",
     label: "أساتذتي",
     description: "تابع الدورات المسجّل فيها وواصل من حيث توقفت.",
     id: "my-courses",
@@ -107,7 +107,7 @@ export function studentNavActive(pathname, hash, item) {
   if (item.id === "account") return pathname.startsWith("/profile");
   if (item.id === "home") return pathname === "/dashboard" && (!hash || hash === "#");
   if (item.id === "my-courses")
-    return pathname === "/dashboard" && (hash === "#my-courses" || hash === "#my-packages");
+    return pathname === "/dashboard/teachers" || pathname.startsWith("/dashboard/teachers/");
   if (item.id === "wallet") return pathname === "/dashboard" && hash === "#wallet";
   if (item.id === "notifications") return pathname === "/dashboard/notifications";
   if (item.id === "certificates")
