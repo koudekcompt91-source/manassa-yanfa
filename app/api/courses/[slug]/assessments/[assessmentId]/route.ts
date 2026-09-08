@@ -48,6 +48,8 @@ export async function GET(_: Request, { params }: { params: { slug: string; asse
         type: assessment.type,
         dueDate: assessment.dueDate ? assessment.dueDate.toISOString() : null,
         allowRetake: assessment.allowRetake,
+        fileUrl: assessment.type === "ASSIGNMENT" ? assessment.fileUrl ?? null : null,
+        fileName: assessment.type === "ASSIGNMENT" ? assessment.fileName ?? null : null,
       },
       questions: assessment.questions.map((q) => ({
         id: q.id,

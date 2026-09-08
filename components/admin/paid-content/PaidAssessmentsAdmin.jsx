@@ -21,6 +21,8 @@ const EMPTY = {
   dueDate: "",
   allowRetake: false,
   isPublished: false,
+  fileUrl: "",
+  fileName: "",
 };
 
 /**
@@ -97,6 +99,8 @@ export default function PaidAssessmentsAdmin({
       dueDate: row.dueDate ? String(row.dueDate).slice(0, 16) : "",
       allowRetake: row.allowRetake === true,
       isPublished: row.isPublished === true,
+      fileUrl: row.fileUrl || "",
+      fileName: row.fileName || "",
     });
     setBanner(null);
     setError("");
@@ -131,6 +135,12 @@ export default function PaidAssessmentsAdmin({
         dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : null,
         allowRetake: Boolean(form.allowRetake),
         isPublished: Boolean(form.isPublished),
+        ...(assessmentType === "ASSIGNMENT"
+          ? {
+              fileUrl: String(form.fileUrl || "").trim() || null,
+              fileName: String(form.fileName || "").trim() || null,
+            }
+          : {}),
       };
       const isEdit = Boolean(editingId);
       const url = isEdit
@@ -194,6 +204,7 @@ export default function PaidAssessmentsAdmin({
   }
 
   const isQuiz = assessmentType === "QUIZ";
+  const isHomework = assessmentType === "ASSIGNMENT";
 
   return (
     <AdminShell title={pageTitle} subtitle={pageSubtitle}>
@@ -272,6 +283,30 @@ export default function PaidAssessmentsAdmin({
               <option value="1">{isQuiz ? "منشور (يتطلب 10 أسئلة)" : "منشور"}</option>
             </AdminSelect>
           </AdminFormField>
+
+          {isHomework ? (
+            <>
+              <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2">
+                <p className="text-sm font-extrabold text-slate-900">ملف الواجب</p>
+                <p className="mt-1 text-xs text-slate-500">اختياري — رابط PDF يظهر للطالب بزر «فتح ملف الواجب».</p>
+              </div>
+              <AdminFormField label="رابط ملف الواجب PDF" className="md:col-span-2">
+                <AdminInput
+                  value={form.fileUrl}
+                  onChange={(e) => setForm((s) => ({ ...s, fileUrl: e.target.value }))}
+                  placeholder="https://..."
+                />
+              </AdminFormField>
+              <AdminFormField label="اسم ملف الواجب (اختياري)" className="md:col-span-2">
+                <AdminInput
+                  value={form.fileName}
+                  onChange={(e) => setForm((s) => ({ ...s, fileName: e.target.value }))}
+                  placeholder="مثال: واجب الوحدة الأولى.pdf"
+                />
+              </AdminFormField>
+            </>
+          ) : null}
+
           {error ? <p className="md:col-span-2 text-sm font-semibold text-red-700">{error}</p> : null}
           <div className="md:col-span-2 flex flex-wrap gap-2">
             <AdminActionButton type="submit" tone="primary" disabled={saving || !courses.length}>

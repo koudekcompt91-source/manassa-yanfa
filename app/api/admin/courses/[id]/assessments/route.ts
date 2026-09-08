@@ -4,6 +4,7 @@ import { requireAdminApiSession } from "@/lib/auth/api-guards";
 import {
   ELECTRONIC_QUIZ_PUBLISH_MESSAGE,
   normalizeAssessmentType,
+  parseOptionalAssessmentFileFields,
 } from "@/lib/assessments";
 import { notifyNewPublishedAssessment } from "@/lib/server-notifications";
 
@@ -16,13 +17,23 @@ function normalizeAssessment(row: {
   isPublished: boolean;
   dueDate: Date | null;
   allowRetake: boolean;
+  fileUrl?: string | null;
+  fileName?: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count?: { questions: number; submissions: number };
 }) {
   return {
-    ...row,
+    id: row.id,
+    courseId: row.courseId,
+    title: row.title,
+    description: row.description,
+    type: row.type,
+    isPublished: row.isPublished,
     dueDate: row.dueDate ? row.dueDate.toISOString() : null,
+    allowRetake: row.allowRetake,
+    fileUrl: row.fileUrl ?? null,
+    fileName: row.fileName ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     questionsCount: row._count?.questions ?? 0,
@@ -66,6 +77,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       return NextResponse.json({ ok: false, message: ELECTRONIC_QUIZ_PUBLISH_MESSAGE }, { status: 400 });
     }
 
+    const fileFields = parseOptionalAssessmentFileFields(body);
+    if (!fileFields.ok) {
+      return NextResponse.json({ ok: false, message: fileFields.message }, { status: 400 });
+    }
+
     const course = await prisma.course.findUnique({
       where: { id: params.id },
       select: { id: true, slug: true },
@@ -81,6 +97,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         isPublished,
         dueDate,
         allowRetake,
+        fileUrl: type === "ASSIGNMENT" ? (fileFields.data.fileUrl ?? null) : null,
+        fileName: type === "ASSIGNMENT" ? (fileFields.data.fileName ?? null) : null,
       },
       include: { _count: { select: { questions: true, submissions: true } } },
     });

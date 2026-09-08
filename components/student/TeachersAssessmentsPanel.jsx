@@ -101,10 +101,9 @@ export default function TeachersAssessmentsPanel({
   return (
     <section className="space-y-3">
       {items.map((item) => (
-        <Link
+        <article
           key={item.id}
-          href={item.href}
-          className="group flex w-full flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 no-underline shadow-sm transition hover:border-brand-200 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+          className="flex w-full flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5"
         >
           <div className="flex min-w-0 items-start gap-3">
             <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white ${tone}`}>
@@ -116,12 +115,30 @@ export default function TeachersAssessmentsPanel({
               {item.description ? (
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{item.description}</p>
               ) : null}
+              {assessmentType === "ASSIGNMENT" && item.fileName ? (
+                <p className="mt-2 text-xs font-semibold text-slate-500">{item.fileName}</p>
+              ) : null}
             </div>
           </div>
-          <span className="inline-flex rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white group-hover:bg-brand-700">
-            فتح
-          </span>
-        </Link>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            {assessmentType === "ASSIGNMENT" && item.fileUrl ? (
+              <a
+                href={item.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm font-bold text-brand-700 no-underline hover:bg-brand-50"
+              >
+                فتح ملف الواجب
+              </a>
+            ) : null}
+            <Link
+              href={item.href}
+              className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white no-underline hover:bg-brand-700"
+            >
+              فتح
+            </Link>
+          </div>
+        </article>
       ))}
     </section>
   );

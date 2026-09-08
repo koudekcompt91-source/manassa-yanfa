@@ -5,6 +5,7 @@ import {
   ELECTRONIC_QUIZ_PUBLISH_MESSAGE,
   ELECTRONIC_QUIZ_QUESTION_COUNT,
   normalizeAssessmentType,
+  parseOptionalAssessmentFileFields,
 } from "@/lib/assessments";
 import { notifyNewPublishedAssessment } from "@/lib/server-notifications";
 
@@ -17,12 +18,22 @@ function normalizeAssessment(row: {
   isPublished: boolean;
   dueDate: Date | null;
   allowRetake: boolean;
+  fileUrl?: string | null;
+  fileName?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }) {
   return {
-    ...row,
+    id: row.id,
+    courseId: row.courseId,
+    title: row.title,
+    description: row.description,
+    type: row.type,
+    isPublished: row.isPublished,
     dueDate: row.dueDate ? row.dueDate.toISOString() : null,
+    allowRetake: row.allowRetake,
+    fileUrl: row.fileUrl ?? null,
+    fileName: row.fileName ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -66,6 +77,21 @@ export async function PATCH(req: Request, { params }: { params: { assessmentId: 
     }
 
     const nextType = (data.type as "QUIZ" | "ASSIGNMENT" | undefined) ?? existing.type;
+    if (body?.fileUrl !== undefined || body?.fileName !== undefined) {
+      const fileFields = parseOptionalAssessmentFileFields(body, { partial: true });
+      if (!fileFields.ok) {
+        return NextResponse.json({ ok: false, message: fileFields.message }, { status: 400 });
+      }
+      if (nextType === "ASSIGNMENT") {
+        if (fileFields.data.fileUrl !== undefined) data.fileUrl = fileFields.data.fileUrl;
+        if (fileFields.data.fileName !== undefined) data.fileName = fileFields.data.fileName;
+      } else if (data.type === "QUIZ") {
+        // Switching/keeping QUIZ: clear attachment fields.
+        data.fileUrl = null;
+        data.fileName = null;
+      }
+    }
+
     if (nextType === "QUIZ" && data.isPublished === true && existing._count.questions !== ELECTRONIC_QUIZ_QUESTION_COUNT) {
       return NextResponse.json({ ok: false, message: ELECTRONIC_QUIZ_PUBLISH_MESSAGE }, { status: 400 });
     }

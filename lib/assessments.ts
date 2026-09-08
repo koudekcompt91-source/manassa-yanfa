@@ -13,6 +13,35 @@ export function normalizeAssessmentType(value: unknown) {
   return raw === "ASSIGNMENT" ? "ASSIGNMENT" : "QUIZ";
 }
 
+/** Optional PDF attachment on Assessment (used by ASSIGNMENT homework). */
+export function parseOptionalAssessmentFileFields(
+  body: any,
+  { partial = false }: { partial?: boolean } = {}
+): { ok: true; data: { fileUrl?: string | null; fileName?: string | null } } | { ok: false; message: string } {
+  const data: { fileUrl?: string | null; fileName?: string | null } = {};
+
+  if (!partial || body?.fileUrl !== undefined) {
+    const fileUrl = String(body?.fileUrl || "").trim() || null;
+    if (fileUrl) {
+      try {
+        const url = new URL(fileUrl);
+        if (!/^https?:$/.test(url.protocol)) {
+          return { ok: false, message: "رابط ملف الواجب غير صالح." };
+        }
+      } catch {
+        return { ok: false, message: "رابط ملف الواجب غير صالح." };
+      }
+    }
+    data.fileUrl = fileUrl;
+  }
+
+  if (!partial || body?.fileName !== undefined) {
+    data.fileName = String(body?.fileName || "").trim() || null;
+  }
+
+  return { ok: true, data };
+}
+
 export function normalizeQuestionType(value: unknown): QuestionType {
   const raw = String(value || "").trim().toUpperCase();
   if (raw === "TRUE_FALSE") return "TRUE_FALSE";

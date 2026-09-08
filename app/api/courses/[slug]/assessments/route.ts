@@ -44,6 +44,8 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         isPublished: row.isPublished,
         dueDate: row.dueDate ? row.dueDate.toISOString() : null,
         allowRetake: row.allowRetake,
+        fileUrl: row.type === "ASSIGNMENT" ? row.fileUrl ?? null : null,
+        fileName: row.type === "ASSIGNMENT" ? row.fileName ?? null : null,
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
         questionsCount: row._count.questions,
