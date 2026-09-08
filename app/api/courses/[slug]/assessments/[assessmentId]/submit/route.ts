@@ -3,7 +3,11 @@ import { Prisma } from "@prisma/client";
 import { requireStudentApiSession } from "@/lib/auth/api-guards";
 import { resolveStudentCourseAccessByRef } from "@/lib/course-access";
 import { prisma } from "@/lib/prisma";
-import { sanitizeAssessmentAnswer } from "@/lib/assessments";
+import {
+  ELECTRONIC_QUIZ_QUESTION_COUNT,
+  gradeQuizQuestionAnswer,
+  sanitizeAssessmentAnswer,
+} from "@/lib/assessments";
 import { issueCertificateIfEligible } from "@/lib/certificates";
 
 export async function POST(req: Request, { params }: { params: { slug: string; assessmentId: string } }) {
@@ -54,6 +58,7 @@ export async function POST(req: Request, { params }: { params: { slug: string; a
       return NextResponse.json({ ok: false, message: "أدخل إجابة واحدة على الأقل قبل الإرسال." }, { status: 400 });
     }
 
+    const isQuiz = assessment.type === "QUIZ";
     let score = 0;
     let maxScore = 0;
     let hasWritten = false;
@@ -69,24 +74,31 @@ export async function POST(req: Request, { params }: { params: { slug: string; a
       });
 
       for (const row of preparedAnswers) {
-        const points = Number(row.question.points || 0);
-        maxScore += points;
-
         let isCorrect: boolean | null = null;
         let pointsAwarded = 0;
 
-        if (row.question.type === "WRITTEN") {
-          hasWritten = true;
-          isCorrect = null;
-          pointsAwarded = 0;
-        } else if (row.answer) {
-          if (row.question.type === "MULTIPLE_CHOICE") {
-            const correctOption = Number((row.question.correctAnswer as any)?.correctOption);
-            isCorrect = Number((row.answer as any)?.selectedOption) === correctOption;
-          } else if (row.question.type === "TRUE_FALSE") {
-            isCorrect = Boolean((row.answer as any)?.value) === Boolean((row.question.correctAnswer as any)?.value);
+        if (isQuiz) {
+          const graded = gradeQuizQuestionAnswer(row.question, row.answer);
+          isCorrect = graded.isCorrect;
+          pointsAwarded = graded.pointsAwarded;
+          if (graded.isWritten) hasWritten = true;
+        } else {
+          const points = Number(row.question.points || 0);
+          maxScore += points;
+
+          if (row.question.type === "WRITTEN") {
+            hasWritten = true;
+            isCorrect = null;
+            pointsAwarded = 0;
+          } else if (row.answer) {
+            if (row.question.type === "MULTIPLE_CHOICE") {
+              const correctOption = Number((row.question.correctAnswer as any)?.correctOption);
+              isCorrect = Number((row.answer as any)?.selectedOption) === correctOption;
+            } else if (row.question.type === "TRUE_FALSE") {
+              isCorrect = Boolean((row.answer as any)?.value) === Boolean((row.question.correctAnswer as any)?.value);
+            }
+            pointsAwarded = isCorrect ? points : 0;
           }
-          pointsAwarded = isCorrect ? points : 0;
         }
 
         score += pointsAwarded;
@@ -100,6 +112,11 @@ export async function POST(req: Request, { params }: { params: { slug: string; a
             pointsAwarded,
           },
         });
+      }
+
+      if (isQuiz) {
+        maxScore = ELECTRONIC_QUIZ_QUESTION_COUNT;
+        score = Math.min(ELECTRONIC_QUIZ_QUESTION_COUNT, Math.max(0, score));
       }
 
       const status = hasWritten ? "PENDING_CORRECTION" : "CORRECTED";

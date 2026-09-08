@@ -7,7 +7,7 @@ export default function AdminPaidElectronicExamPage() {
     <PaidAssessmentsAdmin
       assessmentType="QUIZ"
       pageTitle="اختبار إلكتروني — المحتوى المدفوع"
-      pageSubtitle="إدارة Assessment من نوع QUIZ ضمن الدورات المدفوعة."
+      pageSubtitle="Assessment.QUIZ · 10 أسئلة — 10 نقاط · النشر يتطلب اكتمال الأسئلة."
       createLabel="إنشاء اختبار إلكتروني"
     />
   );

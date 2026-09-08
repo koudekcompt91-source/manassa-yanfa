@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
-import { normalizeAssessmentType } from "@/lib/assessments";
+import {
+  ELECTRONIC_QUIZ_PUBLISH_MESSAGE,
+  ELECTRONIC_QUIZ_QUESTION_COUNT,
+  normalizeAssessmentType,
+} from "@/lib/assessments";
 import { notifyNewPublishedAssessment } from "@/lib/server-notifications";
 
 function normalizeAssessment(row: {
@@ -31,7 +35,10 @@ export async function PATCH(req: Request, { params }: { params: { assessmentId: 
   try {
     const existing = await prisma.assessment.findUnique({
       where: { id: params.assessmentId },
-      include: { course: { select: { id: true, slug: true } } },
+      include: {
+        course: { select: { id: true, slug: true } },
+        _count: { select: { questions: true } },
+      },
     });
     if (!existing) return NextResponse.json({ ok: false, message: "الواجب/الاختبار غير موجود." }, { status: 404 });
 
@@ -56,6 +63,11 @@ export async function PATCH(req: Request, { params }: { params: { assessmentId: 
         }
         data.dueDate = date;
       }
+    }
+
+    const nextType = (data.type as "QUIZ" | "ASSIGNMENT" | undefined) ?? existing.type;
+    if (nextType === "QUIZ" && data.isPublished === true && existing._count.questions !== ELECTRONIC_QUIZ_QUESTION_COUNT) {
+      return NextResponse.json({ ok: false, message: ELECTRONIC_QUIZ_PUBLISH_MESSAGE }, { status: 400 });
     }
 
     const assessment = await prisma.assessment.update({

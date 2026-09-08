@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
-import { normalizeAssessmentType } from "@/lib/assessments";
+import {
+  ELECTRONIC_QUIZ_PUBLISH_MESSAGE,
+  normalizeAssessmentType,
+} from "@/lib/assessments";
 import { notifyNewPublishedAssessment } from "@/lib/server-notifications";
 
 function normalizeAssessment(row: {
@@ -57,6 +60,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!title) return NextResponse.json({ ok: false, message: "عنوان الواجب/الاختبار مطلوب." }, { status: 400 });
     if (dueDateRaw && (!dueDate || Number.isNaN(dueDate.getTime()))) {
       return NextResponse.json({ ok: false, message: "تاريخ الاستحقاق غير صالح." }, { status: 400 });
+    }
+    // New QUIZ always starts with 0 questions — cannot publish until exactly 10.
+    if (type === "QUIZ" && isPublished) {
+      return NextResponse.json({ ok: false, message: ELECTRONIC_QUIZ_PUBLISH_MESSAGE }, { status: 400 });
     }
 
     const course = await prisma.course.findUnique({

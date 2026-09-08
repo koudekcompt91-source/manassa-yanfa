@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
-import { validateQuestionPayload } from "@/lib/assessments";
+import {
+  ELECTRONIC_QUIZ_POINTS_PER_QUESTION,
+  ELECTRONIC_QUIZ_QUESTION_COUNT,
+  validateQuestionPayload,
+} from "@/lib/assessments";
 
 function normalizeQuestion(row: {
   id: string;
@@ -41,11 +45,20 @@ export async function POST(req: Request, { params }: { params: { assessmentId: s
   try {
     const assessment = await prisma.assessment.findUnique({
       where: { id: params.assessmentId },
-      select: { id: true },
+      select: { id: true, type: true, _count: { select: { questions: true } } },
     });
     if (!assessment) return NextResponse.json({ ok: false, message: "الواجب/الاختبار غير موجود." }, { status: 404 });
 
-    const valid = validateQuestionPayload(await req.json());
+    if (assessment.type === "QUIZ" && assessment._count.questions >= ELECTRONIC_QUIZ_QUESTION_COUNT) {
+      return NextResponse.json(
+        { ok: false, message: "الاختبار الإلكتروني محدود بـ 10 أسئلة بالضبط. احذف سؤالًا قبل إضافة آخر." },
+        { status: 400 }
+      );
+    }
+
+    const valid = validateQuestionPayload(await req.json(), {
+      forcePoints: assessment.type === "QUIZ" ? ELECTRONIC_QUIZ_POINTS_PER_QUESTION : undefined,
+    });
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
 
     const question = await prisma.assessmentQuestion.create({

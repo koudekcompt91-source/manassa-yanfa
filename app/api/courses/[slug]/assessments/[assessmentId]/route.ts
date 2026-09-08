@@ -53,7 +53,7 @@ export async function GET(_: Request, { params }: { params: { slug: string; asse
         id: q.id,
         questionText: q.questionText,
         type: q.type,
-        points: q.points,
+        points: assessment.type === "QUIZ" ? 1 : q.points,
         order: q.order,
         options: q.type === "MULTIPLE_CHOICE" ? q.options : null,
       })),
@@ -63,7 +63,7 @@ export async function GET(_: Request, { params }: { params: { slug: string; asse
             id: latestSubmission.id,
             status: latestSubmission.status,
             score: latestSubmission.score,
-            maxScore: latestSubmission.maxScore,
+            maxScore: assessment.type === "QUIZ" ? 10 : latestSubmission.maxScore,
             submittedAt: latestSubmission.submittedAt ? latestSubmission.submittedAt.toISOString() : null,
             correctedAt: latestSubmission.correctedAt ? latestSubmission.correctedAt.toISOString() : null,
             answers: latestSubmission.answers.map((ans) => ({

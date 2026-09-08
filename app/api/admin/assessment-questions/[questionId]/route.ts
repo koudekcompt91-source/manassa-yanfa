@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApiSession } from "@/lib/auth/api-guards";
-import { validateQuestionPayload } from "@/lib/assessments";
+import {
+  ELECTRONIC_QUIZ_POINTS_PER_QUESTION,
+  ELECTRONIC_QUIZ_PUBLISH_MESSAGE,
+  validateQuestionPayload,
+} from "@/lib/assessments";
 
 function normalizeQuestion(row: {
   id: string;
@@ -28,7 +32,18 @@ export async function PATCH(req: Request, { params }: { params: { questionId: st
   if (!guard.ok) return guard.response;
 
   try {
-    const valid = validateQuestionPayload(await req.json());
+    const existing = await prisma.assessmentQuestion.findUnique({
+      where: { id: params.questionId },
+      select: {
+        id: true,
+        assessment: { select: { type: true } },
+      },
+    });
+    if (!existing) return NextResponse.json({ ok: false, message: "السؤال غير موجود." }, { status: 404 });
+
+    const valid = validateQuestionPayload(await req.json(), {
+      forcePoints: existing.assessment.type === "QUIZ" ? ELECTRONIC_QUIZ_POINTS_PER_QUESTION : undefined,
+    });
     if (!valid.ok) return NextResponse.json({ ok: false, message: valid.message }, { status: 400 });
 
     const question = await prisma.assessmentQuestion.update({
@@ -54,6 +69,26 @@ export async function DELETE(_: Request, { params }: { params: { questionId: str
   if (!guard.ok) return guard.response;
 
   try {
+    const existing = await prisma.assessmentQuestion.findUnique({
+      where: { id: params.questionId },
+      select: {
+        id: true,
+        assessmentId: true,
+        assessment: { select: { type: true, isPublished: true } },
+      },
+    });
+    if (!existing) return NextResponse.json({ ok: false, message: "السؤال غير موجود." }, { status: 404 });
+
+    if (existing.assessment.type === "QUIZ" && existing.assessment.isPublished) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: `${ELECTRONIC_QUIZ_PUBLISH_MESSAGE} ألغِ نشر الاختبار أولًا قبل حذف سؤال.`,
+        },
+        { status: 400 }
+      );
+    }
+
     await prisma.assessmentQuestion.delete({ where: { id: params.questionId } });
     return NextResponse.json({ ok: true, message: "تم حذف السؤال." });
   } catch (e) {

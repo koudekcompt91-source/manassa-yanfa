@@ -2,6 +2,12 @@ import { QuestionType } from "@prisma/client";
 
 export const MAX_TEXT_LEN = 2000;
 
+/** PAID electronic exam (Assessment.QUIZ): fixed size and scoring. */
+export const ELECTRONIC_QUIZ_QUESTION_COUNT = 10;
+export const ELECTRONIC_QUIZ_POINTS_PER_QUESTION = 1;
+export const ELECTRONIC_QUIZ_PUBLISH_MESSAGE =
+  "يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.";
+
 export function normalizeAssessmentType(value: unknown) {
   const raw = String(value || "").trim().toUpperCase();
   return raw === "ASSIGNMENT" ? "ASSIGNMENT" : "QUIZ";
@@ -14,10 +20,14 @@ export function normalizeQuestionType(value: unknown): QuestionType {
   return "MULTIPLE_CHOICE";
 }
 
-export function validateQuestionPayload(body: any) {
+export function validateQuestionPayload(body: any, opts?: { forcePoints?: number }) {
   const questionText = String(body?.questionText || "").trim();
   const type = normalizeQuestionType(body?.type);
-  const points = Math.max(0, Number(body?.points) || 0);
+  const forced = opts?.forcePoints;
+  const points =
+    forced !== undefined
+      ? Math.max(0, Number(forced) || 0)
+      : Math.max(0, Number(body?.points) || 0);
   const order = Math.max(1, Number(body?.order) || 1);
   if (!questionText) return { ok: false as const, message: "نص السؤال مطلوب." };
   if (questionText.length > MAX_TEXT_LEN) return { ok: false as const, message: "نص السؤال طويل جدًا." };
@@ -74,4 +84,31 @@ export function sanitizeAssessmentAnswer(type: QuestionType, value: any) {
   if (!text) return null;
   if (text.length > MAX_TEXT_LEN) return null;
   return { text };
+}
+
+/** Server-side grade for one QUIZ question — 1 point if correct, else 0. */
+export function gradeQuizQuestionAnswer(
+  question: { type: QuestionType; correctAnswer: unknown },
+  answer: unknown
+): { isCorrect: boolean | null; pointsAwarded: number; isWritten: boolean } {
+  if (question.type === "WRITTEN") {
+    return { isCorrect: null, pointsAwarded: 0, isWritten: true };
+  }
+  if (!answer) {
+    return { isCorrect: false, pointsAwarded: 0, isWritten: false };
+  }
+
+  let isCorrect = false;
+  if (question.type === "MULTIPLE_CHOICE") {
+    const correctOption = Number((question.correctAnswer as any)?.correctOption);
+    isCorrect = Number((answer as any)?.selectedOption) === correctOption;
+  } else if (question.type === "TRUE_FALSE") {
+    isCorrect = Boolean((answer as any)?.value) === Boolean((question.correctAnswer as any)?.value);
+  }
+
+  return {
+    isCorrect,
+    pointsAwarded: isCorrect ? ELECTRONIC_QUIZ_POINTS_PER_QUESTION : 0,
+    isWritten: false,
+  };
 }

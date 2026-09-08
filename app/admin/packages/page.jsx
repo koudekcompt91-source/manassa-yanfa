@@ -650,6 +650,15 @@ export default function AdminPackagesPage() {
     e.preventDefault();
     if (!lessonCourse) return;
     setAssessmentError("");
+    if (assessmentForm.type === "QUIZ" && assessmentForm.isPublished) {
+      const count = editingAssessmentId
+        ? Number(assessments.find((a) => a.id === editingAssessmentId)?.questionsCount ?? 0)
+        : 0;
+      if (count !== 10) {
+        setAssessmentError("يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.");
+        return;
+      }
+    }
     setAssessmentSaving(true);
     try {
       const payload = {
@@ -710,6 +719,13 @@ export default function AdminPackagesPage() {
   }
 
   async function toggleAssessmentPublish(assessment) {
+    if (assessment.type === "QUIZ" && !assessment.isPublished) {
+      const count = Number(assessment.questionsCount ?? 0);
+      if (count !== 10) {
+        setAssessmentError("يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.");
+        return;
+      }
+    }
     const res = await fetch(`/api/admin/assessments/${assessment.id}`, {
       method: "PATCH",
       credentials: "include",
@@ -730,6 +746,7 @@ export default function AdminPackagesPage() {
 
   function openQuestionEdit(question) {
     const options = Array.isArray(question.options) && question.options.length ? question.options.map((v) => String(v)) : ["", ""];
+    const selected = assessments.find((a) => a.id === selectedAssessmentId);
     setEditingQuestionId(question.id);
     setQuestionForm({
       questionText: question.questionText || "",
@@ -737,7 +754,7 @@ export default function AdminPackagesPage() {
       options,
       correctOption: Number(question?.correctAnswer?.correctOption ?? 0) || 0,
       trueFalseAnswer: Boolean(question?.correctAnswer?.value ?? true),
-      points: Number(question.points || 1) || 1,
+      points: selected?.type === "QUIZ" ? 1 : Number(question.points || 1) || 1,
       order: Number(question.order || 1) || 1,
     });
     setQuestionError("");
@@ -755,10 +772,16 @@ export default function AdminPackagesPage() {
     setQuestionError("");
     setQuestionSaving(true);
     try {
+      const selected = assessments.find((a) => a.id === selectedAssessmentId);
+      const isQuiz = selected?.type === "QUIZ";
+      if (isQuiz && !editingQuestionId && questions.length >= 10) {
+        setQuestionError("الاختبار الإلكتروني محدود بـ 10 أسئلة بالضبط.");
+        return;
+      }
       const payload = {
         questionText: questionForm.questionText,
         type: questionForm.type,
-        points: Math.max(0, Number(questionForm.points) || 0),
+        points: isQuiz ? 1 : Math.max(0, Number(questionForm.points) || 0),
         order: Math.max(1, Number(questionForm.order) || 1),
         options: questionForm.type === "MULTIPLE_CHOICE" ? questionForm.options : null,
         correctOption: questionForm.type === "MULTIPLE_CHOICE" ? Number(questionForm.correctOption) || 0 : null,
@@ -782,6 +805,11 @@ export default function AdminPackagesPage() {
       }
       await loadQuestions(selectedAssessmentId);
       resetQuestionForm();
+      if (lessonCourse) {
+        await openLessonsManager(lessonCourse);
+        setManagerTab("ASSESSMENTS");
+        setSelectedAssessmentId(selectedAssessmentId);
+      }
     } finally {
       setQuestionSaving(false);
     }
@@ -1478,7 +1506,11 @@ export default function AdminPackagesPage() {
                       {assessments.map((assessment) => (
                         <div key={assessment.id} className={`rounded-xl border px-3 py-3 text-sm ${selectedAssessmentId === assessment.id ? "border-brand-500 bg-brand-50/30" : "border-slate-200 bg-white"}`}>
                           <p className="font-semibold text-slate-900">{assessment.title}</p>
-                          <p className="mt-1 text-xs text-slate-500">{assessment.type === "QUIZ" ? "اختبار" : "واجب"} - {assessment.questionsCount} سؤال</p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {assessment.type === "QUIZ"
+                              ? `اختبار إلكتروني — ${assessment.questionsCount}/10 أسئلة · 10 نقاط`
+                              : `واجب - ${assessment.questionsCount} سؤال`}
+                          </p>
                           <p className="mt-1 text-xs text-slate-500">الموعد: {assessment.dueDate ? new Date(assessment.dueDate).toLocaleString("ar-DZ") : "بدون تاريخ"}</p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <AdminBadge tone={assessment.isPublished ? "success" : "warning"}>{assessment.isPublished ? "منشور" : "مخفي"}</AdminBadge>
@@ -1499,6 +1531,18 @@ export default function AdminPackagesPage() {
                       {!selectedAssessmentId ? <p className="text-xs text-slate-500">اختر تقييمًا لعرض الأسئلة والإجابات.</p> : null}
                       {selectedAssessmentId ? (
                         <>
+                          {(() => {
+                            const selectedAssessment = assessments.find((a) => a.id === selectedAssessmentId);
+                            const isQuiz = selectedAssessment?.type === "QUIZ";
+                            const qCount = questions.length;
+                            return isQuiz ? (
+                              <p className={`rounded-xl px-3 py-2 text-xs font-semibold ${qCount === 10 ? "border border-emerald-200 bg-emerald-50 text-emerald-800" : "border border-amber-200 bg-amber-50 text-amber-900"}`}>
+                                {qCount === 10
+                                  ? "اكتمل الاختبار — 10/10"
+                                  : `${qCount} / 10 أسئلة · كل سؤال = 1 نقطة · المجموع 10/10`}
+                              </p>
+                            ) : null;
+                          })()}
                           <form className="grid gap-2 rounded-xl border border-slate-200 bg-white p-3" onSubmit={saveQuestion}>
                             <AdminFormField label="نص السؤال">
                               <AdminInput value={questionForm.questionText} onChange={(e) => setQuestionForm((s) => ({ ...s, questionText: e.target.value }))} required />
@@ -1511,9 +1555,16 @@ export default function AdminPackagesPage() {
                                   <option value="WRITTEN">سؤال كتابي</option>
                                 </AdminSelect>
                               </AdminFormField>
-                              <AdminFormField label="النقاط">
-                                <AdminInput type="number" min="0" value={questionForm.points} onChange={(e) => setQuestionForm((s) => ({ ...s, points: Number(e.target.value) || 0 }))} />
-                              </AdminFormField>
+                              {assessments.find((a) => a.id === selectedAssessmentId)?.type === "QUIZ" ? (
+                                <AdminFormField label="النقاط">
+                                  <AdminInput type="number" value={1} disabled readOnly />
+                                  <p className="mt-1 text-[11px] text-slate-500">ثابت: 1 نقطة لكل سؤال في الاختبار الإلكتروني</p>
+                                </AdminFormField>
+                              ) : (
+                                <AdminFormField label="النقاط">
+                                  <AdminInput type="number" min="0" value={questionForm.points} onChange={(e) => setQuestionForm((s) => ({ ...s, points: Number(e.target.value) || 0 }))} />
+                                </AdminFormField>
+                              )}
                               <AdminFormField label="الترتيب">
                                 <AdminInput type="number" min="1" value={questionForm.order} onChange={(e) => setQuestionForm((s) => ({ ...s, order: Number(e.target.value) || 1 }))} />
                               </AdminFormField>
@@ -1543,7 +1594,18 @@ export default function AdminPackagesPage() {
                             ) : null}
                             {questionError ? <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{questionError}</p> : null}
                             <div className="flex flex-wrap gap-2">
-                              <AdminActionButton type="submit" tone="primary" disabled={questionSaving}>{questionSaving ? "..." : editingQuestionId ? "تحديث السؤال" : "إضافة سؤال"}</AdminActionButton>
+                              <AdminActionButton
+                                type="submit"
+                                tone="primary"
+                                disabled={
+                                  questionSaving ||
+                                  (assessments.find((a) => a.id === selectedAssessmentId)?.type === "QUIZ" &&
+                                    !editingQuestionId &&
+                                    questions.length >= 10)
+                                }
+                              >
+                                {questionSaving ? "..." : editingQuestionId ? "تحديث السؤال" : "إضافة سؤال"}
+                              </AdminActionButton>
                               {editingQuestionId ? <AdminActionButton type="button" onClick={resetQuestionForm}>إلغاء</AdminActionButton> : null}
                             </div>
                           </form>

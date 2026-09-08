@@ -103,6 +103,16 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
   };
 
   const selected = useMemo(() => state.rows.find((row) => row.id === activeAssessmentId) || null, [activeAssessmentId, state.rows]);
+  const isQuiz = detail.assessment?.type === "QUIZ";
+  const quizTotal = 10;
+  const quizScoreSummary = useMemo(() => {
+    if (!isQuiz || !detail.submission) return null;
+    const answers = Array.isArray(detail.submission.answers) ? detail.submission.answers : [];
+    const correct = answers.filter((a) => a.isCorrect === true).length;
+    const wrong = answers.filter((a) => a.isCorrect === false).length;
+    const score = Math.min(quizTotal, Math.max(0, Number(detail.submission.score) || correct));
+    return { correct, wrong, score, maxScore: quizTotal };
+  }, [detail.submission, isQuiz]);
 
   if (!authedStudent) {
     return (
@@ -135,9 +145,13 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
               className={`interactive-card w-full rounded-xl border px-3 py-2 text-start text-sm ${activeAssessmentId === row.id ? "border-brand-500 bg-brand-50/40" : "border-slate-200 bg-slate-50/40 hover:bg-slate-50"}`}
             >
               <p className="font-bold text-slate-900">{row.title}</p>
-              <p className="mt-1 text-[11px] text-slate-500">{row.type === "QUIZ" ? "اختبار" : "واجب"} - {fmtDate(row.dueDate)}</p>
+              <p className="mt-1 text-[11px] text-slate-500">{row.type === "QUIZ" ? "اختبار إلكتروني · من 10" : "واجب"} - {fmtDate(row.dueDate)}</p>
               <p className="mt-1 text-[11px] text-slate-500">{statusLabel(row.mySubmission?.status || "")}</p>
-              {row.mySubmission ? <p className="mt-1 text-[11px] font-semibold text-brand-700">النتيجة: {row.mySubmission.score}/{row.mySubmission.maxScore}</p> : null}
+              {row.mySubmission ? (
+                <p className="mt-1 text-[11px] font-semibold text-brand-700">
+                  النتيجة: {row.type === "QUIZ" ? `${row.mySubmission.score}/10` : `${row.mySubmission.score}/${row.mySubmission.maxScore}`}
+                </p>
+              ) : null}
             </button>
           ))}
         </div>
@@ -152,15 +166,33 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
             <header className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
               <h4 className="text-lg font-extrabold text-slate-900">{detail.assessment.title}</h4>
               <p className="mt-1 text-sm text-slate-600">{detail.assessment.description || "بدون وصف."}</p>
-              <p className="mt-1 text-xs text-slate-500">الموعد: {fmtDate(detail.assessment.dueDate)} - النوع: {detail.assessment.type === "QUIZ" ? "اختبار" : "واجب"}</p>
-              {detail.submission ? <p className="mt-1 text-xs font-semibold text-brand-700">الحالة: {statusLabel(detail.submission.status)} - النتيجة: {detail.submission.score}/{detail.submission.maxScore}</p> : <p className="mt-1 text-xs text-slate-500">الحالة: لم يتم الحل</p>}
+              <p className="mt-1 text-xs text-slate-500">
+                الموعد: {fmtDate(detail.assessment.dueDate)} - النوع:{" "}
+                {detail.assessment.type === "QUIZ" ? "اختبار إلكتروني (10 أسئلة — 10 نقاط)" : "واجب"}
+              </p>
+              {detail.submission ? (
+                <p className="mt-1 text-xs font-semibold text-brand-700">
+                  الحالة: {statusLabel(detail.submission.status)} - النتيجة:{" "}
+                  {isQuiz ? `${detail.submission.score}/10` : `${detail.submission.score}/${detail.submission.maxScore}`}
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-slate-500">الحالة: لم يتم الحل</p>
+              )}
             </header>
 
             <div className="space-y-3">
               {detail.questions.map((q, idx) => (
                 <article key={q.id} className="interactive-card rounded-xl border border-slate-200 bg-white p-3">
-                  <p className="font-bold text-slate-900">{idx + 1}. {q.questionText}</p>
-                  <p className="mt-1 text-xs text-slate-500">النقاط: {q.points}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-bold text-slate-900">
+                      {isQuiz ? `${idx + 1}/10` : `${idx + 1}.`} {q.questionText}
+                    </p>
+                    {isQuiz ? (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">1 نقطة</span>
+                    ) : (
+                      <span className="text-xs text-slate-500">النقاط: {q.points}</span>
+                    )}
+                  </div>
                   {detail.canSubmit ? (
                     <div className="mt-2">
                       {q.type === "MULTIPLE_CHOICE" ? (
@@ -195,9 +227,13 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
                   ) : (
                     <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
                       <p>تم الإرسال.</p>
-                      <p className="mt-1 text-xs">
-                        النقاط الممنوحة: {q.id ? (detail.submission?.answers?.find((a) => a.questionId === q.id)?.pointsAwarded ?? 0) : 0}
-                      </p>
+                      {(() => {
+                        const ans = detail.submission?.answers?.find((a) => a.questionId === q.id);
+                        if (!ans) return <p className="mt-1 text-xs">بدون إجابة</p>;
+                        if (ans.isCorrect === true) return <p className="mt-1 text-xs font-semibold text-emerald-700">إجابة صحيحة (+1)</p>;
+                        if (ans.isCorrect === false) return <p className="mt-1 text-xs font-semibold text-red-700">إجابة خاطئة (0)</p>;
+                        return <p className="mt-1 text-xs">النقاط الممنوحة: {ans.pointsAwarded ?? 0}</p>;
+                      })()}
                       {detail.submission?.answers?.find((a) => a.questionId === q.id)?.correctionNote ? (
                         <p className="mt-1 text-xs text-slate-600">ملاحظة المصحح: {detail.submission.answers.find((a) => a.questionId === q.id)?.correctionNote}</p>
                       ) : null}
@@ -214,15 +250,19 @@ export default function CourseAssessmentsPanel({ courseSlug, authedStudent, canA
                 disabled={submitting}
                 className="touch-button-primary px-4 py-2"
               >
-                {submitting ? "جاري الإرسال..." : "ابدأ"}
+                {submitting ? "جاري الإرسال..." : isQuiz ? "إرسال الاختبار" : "ابدأ"}
               </button>
             ) : null}
-            {detail.submission && !detail.canSubmit ? (
-              <p className="text-sm font-semibold text-slate-600">
-                {detail.submission.status === "PENDING_CORRECTION" ? "في انتظار التصحيح" : "عرض النتيجة"}
-              </p>
+            {quizScoreSummary ? (
+              <div className="rounded-xl border border-brand-200 bg-brand-50/50 px-4 py-3 text-sm text-brand-900">
+                <p className="text-base font-extrabold">النتيجة: {quizScoreSummary.score}/10</p>
+                <p className="mt-1">الإجابات الصحيحة: {quizScoreSummary.correct}</p>
+                <p>الإجابات الخاطئة: {quizScoreSummary.wrong}</p>
+                <p className="mt-1 font-semibold">النتيجة النهائية من 10: {quizScoreSummary.score}/10</p>
+              </div>
+            ) : detail.submission ? (
+              <p className="text-sm font-semibold text-brand-700">النتيجة: {detail.submission.score}/{detail.submission.maxScore}</p>
             ) : null}
-            {detail.submission ? <p className="text-sm font-semibold text-brand-700">النتيجة: {detail.submission.score}/{detail.submission.maxScore}</p> : null}
           </div>
         ) : null}
       </section>

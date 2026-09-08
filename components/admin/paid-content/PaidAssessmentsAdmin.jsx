@@ -111,6 +111,17 @@ export default function PaidAssessmentsAdmin({
       setError("اختر الدورة المدفوعة.");
       return;
     }
+    if (assessmentType === "QUIZ" && form.isPublished) {
+      if (!editingId) {
+        setError("يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.");
+        return;
+      }
+      const current = rows.find((r) => r.id === editingId);
+      if (Number(current?.questionsCount ?? 0) !== 10) {
+        setError("يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.");
+        return;
+      }
+    }
     setSaving(true);
     try {
       const payload = {
@@ -160,6 +171,13 @@ export default function PaidAssessmentsAdmin({
   }
 
   async function togglePublish(row) {
+    if (assessmentType === "QUIZ" && !row.isPublished) {
+      const count = Number(row.questionsCount ?? 0);
+      if (count !== 10) {
+        setError("يجب أن يحتوي الاختبار الإلكتروني على 10 أسئلة بالضبط قبل النشر.");
+        return;
+      }
+    }
     const res = await fetch(`/api/admin/assessments/${row.id}`, {
       method: "PATCH",
       credentials: "include",
@@ -175,6 +193,8 @@ export default function PaidAssessmentsAdmin({
     await load();
   }
 
+  const isQuiz = assessmentType === "QUIZ";
+
   return (
     <AdminShell title={pageTitle} subtitle={pageSubtitle}>
       <div className="mb-4">
@@ -187,13 +207,26 @@ export default function PaidAssessmentsAdmin({
         </Link>
       </div>
 
+      {isQuiz ? (
+        <p className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-semibold text-sky-900">
+          الاختبار الإلكتروني: 10 أسئلة — 10 نقاط (كل سؤال = نقطة واحدة). المسودة مسموحة قبل اكتمال الأسئلة، والنشر يتطلب 10/10.
+        </p>
+      ) : null}
+
       {banner?.text ? (
         <p className={`rounded-xl px-4 py-3 text-sm font-semibold ${banner.type === "ok" ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-700"}`}>
           {banner.text}
         </p>
       ) : null}
 
-      <AdminSectionCard title={`إضافة / تعديل · ${assessmentType}`} subtitle="مرتبط بدورة مدفوعة. إدارة الأسئلة التفصيلية متاحة أيضًا من إدارة الدورات.">
+      <AdminSectionCard
+        title={`إضافة / تعديل · ${assessmentType}`}
+        subtitle={
+          isQuiz
+            ? "أنشئ الاختبار كمسودة، أضف 10 أسئلة من إدارة الدورات، ثم انشره عندما يصبح 10/10."
+            : "مرتبط بدورة مدفوعة. إدارة الأسئلة التفصيلية متاحة أيضًا من إدارة الدورات."
+        }
+      >
         {!courses.length && !loading ? (
           <AdminEmptyState title="لا توجد دورات مدفوعة" description="أنشئ دورة مدفوعة أولًا من إدارة الدورات." />
         ) : null}
@@ -230,9 +263,13 @@ export default function PaidAssessmentsAdmin({
             </AdminSelect>
           </AdminFormField>
           <AdminFormField label="النشر">
-            <AdminSelect className="w-full" value={form.isPublished ? "1" : "0"} onChange={(e) => setForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}>
-              <option value="0">مخفي</option>
-              <option value="1">منشور</option>
+            <AdminSelect
+              className="w-full"
+              value={form.isPublished ? "1" : "0"}
+              onChange={(e) => setForm((s) => ({ ...s, isPublished: e.target.value === "1" }))}
+            >
+              <option value="0">مخفي (مسودة)</option>
+              <option value="1">{isQuiz ? "منشور (يتطلب 10 أسئلة)" : "منشور"}</option>
             </AdminSelect>
           </AdminFormField>
           {error ? <p className="md:col-span-2 text-sm font-semibold text-red-700">{error}</p> : null}
@@ -248,7 +285,10 @@ export default function PaidAssessmentsAdmin({
         </form>
       </AdminSectionCard>
 
-      <AdminSectionCard title="العناصر" subtitle={`${rows.length} عنصر · النوع ${assessmentType}`}>
+      <AdminSectionCard
+        title="العناصر"
+        subtitle={isQuiz ? `${rows.length} اختبار · 10 أسئلة — 10 نقاط` : `${rows.length} عنصر · النوع ${assessmentType}`}
+      >
         {loading ? (
           <p className="text-sm text-slate-500">جاري التحميل…</p>
         ) : !rows.length ? (
@@ -266,11 +306,22 @@ export default function PaidAssessmentsAdmin({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {rows.map((row) => {
+                  const qCount = Number(row.questionsCount ?? 0);
+                  const quizReady = !isQuiz || qCount === 10;
+                  return (
                   <tr key={row.id} className="border-b border-slate-100">
                     <td className="px-3 py-3 font-extrabold text-slate-900">{row.title}</td>
                     <td className="px-3 py-3">{row.courseTitle}</td>
-                    <td className="px-3 py-3">{row.questionsCount ?? "—"}</td>
+                    <td className="px-3 py-3">
+                      {isQuiz ? (
+                        <span className={quizReady ? "font-semibold text-emerald-700" : "font-semibold text-amber-700"}>
+                          {qCount === 10 ? "اكتمل الاختبار — 10/10" : `${qCount} / 10 أسئلة`}
+                        </span>
+                      ) : (
+                        row.questionsCount ?? "—"
+                      )}
+                    </td>
                     <td className="px-3 py-3">
                       <AdminBadge tone={row.isPublished ? "success" : "warning"}>{row.isPublished ? "منشور" : "مخفي"}</AdminBadge>
                     </td>
@@ -290,7 +341,8 @@ export default function PaidAssessmentsAdmin({
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
