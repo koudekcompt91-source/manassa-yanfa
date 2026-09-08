@@ -31,6 +31,7 @@ function normalizeCourse(course: {
   order: number;
   academicLevel: string | null;
   level: string | null;
+  subject?: string | null;
   createdAt: Date;
   updatedAt: Date;
   lessons?: { id: string }[];
@@ -56,6 +57,7 @@ function normalizeCourse(course: {
     order: course.order,
     academicLevel: course.academicLevel,
     level: course.level,
+    subject: course.subject ?? null,
     lessonsCount,
     createdAt: course.createdAt.toISOString(),
     updatedAt: course.updatedAt.toISOString(),
@@ -69,6 +71,7 @@ function validateCoursePayload(body: any) {
   const teacherId = String(body?.teacherId || "").trim() || null;
   const thumbnailUrl = String(body?.thumbnailUrl || body?.coverImage || "").trim() || null;
   const level = String(body?.level || "").trim() || null;
+  const subject = String(body?.subject || "").trim() || null;
   const statusRaw = String(body?.status || "").trim().toUpperCase();
   const accessRaw = String(body?.accessType || "").trim().toUpperCase();
   const status = statusRaw === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
@@ -106,6 +109,7 @@ function validateCoursePayload(body: any) {
       thumbnailUrl,
       academicLevel,
       level,
+      subject,
       status: status as CourseStatus,
       accessType: accessType as CourseAccessType,
       minSubscription: minSubscription as SubscriptionType,

@@ -3,16 +3,20 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
+import TeachersLessonsPanel from "@/components/student/TeachersLessonsPanel";
+import TeachersLivePanel from "@/components/student/TeachersLivePanel";
+import TeachersAssessmentsPanel from "@/components/student/TeachersAssessmentsPanel";
 import { getTeachersSection } from "@/lib/paid-teachers-sections";
 
 /**
- * PAID أساتذتي section shell — structural page ready for future paid-content admin.
- * No FREE APIs. Protected by dashboard layout.
+ * Fallback dynamic section page. Static routes own lessons/live/homework/electronic-exam.
  */
 export default function TeachersSectionPage() {
   const params = useParams();
-  const sectionId = String(params?.section || "");
-  const section = getTeachersSection(sectionId);
+  const normalizedSection = Array.isArray(params?.section)
+    ? String(params.section[0] || "")
+    : String(params?.section || "");
+  const section = getTeachersSection(normalizedSection);
 
   if (!section) {
     return (
@@ -26,6 +30,22 @@ export default function TeachersSectionPage() {
   }
 
   const Icon = section.Icon;
+  let body = (
+    <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
+      <p className="text-base font-extrabold text-slate-800">المحتوى قيد التجهيز</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">
+        هذا القسم جاهز للربط لاحقًا مع إدارة المحتوى المدفوع. سيظهر هنا محتوى أساتذتك الخاص بهذا القسم فقط.
+      </p>
+    </section>
+  );
+
+  if (section.id === "lessons") body = <TeachersLessonsPanel />;
+  else if (section.id === "live") body = <TeachersLivePanel />;
+  else if (section.id === "homework") {
+    body = <TeachersAssessmentsPanel assessmentType="ASSIGNMENT" emptyTitle="لا توجد واجبات منزلية متاحة حاليًا." />;
+  } else if (section.id === "electronic-exam") {
+    body = <TeachersAssessmentsPanel assessmentType="QUIZ" emptyTitle="لا توجد اختبارات إلكترونية متاحة حاليًا." />;
+  }
 
   return (
     <div className="w-full" dir="rtl">
@@ -47,20 +67,13 @@ export default function TeachersSectionPage() {
               <Icon className="h-8 w-8" strokeWidth={1.75} />
             </span>
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                {section.title}
-              </h1>
+              <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{section.title}</h1>
               <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">{section.description}</p>
             </div>
           </div>
         </header>
 
-        <section className="rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
-          <p className="text-base font-extrabold text-slate-800">المحتوى قيد التجهيز</p>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-slate-500">
-            هذا القسم جاهز للربط لاحقًا مع إدارة المحتوى المدفوع. سيظهر هنا محتوى أساتذتك الخاص بهذا القسم فقط.
-          </p>
-        </section>
+        {body}
       </div>
     </div>
   );

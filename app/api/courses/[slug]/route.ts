@@ -47,6 +47,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
         order: true,
         academicLevel: true,
         level: true,
+        subject: true,
       },
     });
 

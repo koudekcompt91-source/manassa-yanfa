@@ -1,49 +1,98 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
 import { AdminBadge, AdminSectionCard } from "@/components/admin/AdminUI";
 import { TEACHERS_SECTIONS } from "@/lib/paid-teachers-sections";
 
 /**
- * Phase-1 PAID content admin hub — UI + navigation only.
- * Reuses existing /admin/courses for lessons, live sessions, and QUIZ assessments.
- * No FREE APIs / FreeContentType.
+ * Central PAID content admin hub — 9 sections in أساتذتي order.
  */
 
-/** Sections already managed inside the PAID courses admin UI. */
-const EXISTING_ADMIN_HREF = {
-  lessons: "/admin/courses",
-  live: "/admin/courses",
-  "electronic-exam": "/admin/courses",
+const ACTIVE_ADMIN_HREF = {
+  lessons: "/admin/paid-content/lessons",
+  live: "/admin/paid-content/live",
+  homework: "/admin/paid-content/homework",
+  "electronic-exam": "/admin/paid-content/electronic-exam",
 };
 
 function manageHref(sectionId) {
-  return EXISTING_ADMIN_HREF[sectionId] || `/admin/paid-content/${sectionId}`;
+  return ACTIVE_ADMIN_HREF[sectionId] || `/admin/paid-content/${sectionId}`;
 }
 
 function manageHint(sectionId) {
-  if (sectionId === "lessons") return "عبر إدارة الدورات · الدروس";
-  if (sectionId === "live") return "عبر إدارة الدورات · البث المباشر";
-  if (sectionId === "electronic-exam") return "عبر إدارة الدورات · الاختبارات";
-  return "قيد التجهيز";
+  if (sectionId === "lessons") return "Course + Lesson · إدارة فعلية";
+  if (sectionId === "live") return "LiveSession · إدارة فعلية";
+  if (sectionId === "homework") return "Assessment.ASSIGNMENT · إدارة فعلية";
+  if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
+  return "واجهة أولية · بدون Database change";
 }
 
 export default function AdminPaidContentPage() {
+  const [counts, setCounts] = useState({});
+
+  const loadCounts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/courses", { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) return;
+      const courses = Array.isArray(data.courses) ? data.courses : [];
+
+      let lessons = 0;
+      let live = 0;
+      let homework = 0;
+      let quiz = 0;
+
+      await Promise.all(
+        courses.map(async (course) => {
+          const [lr, sr, ar] = await Promise.all([
+            fetch(`/api/admin/courses/${course.id}/lessons`, { credentials: "include" }),
+            fetch(`/api/admin/courses/${course.id}/live-sessions`, { credentials: "include" }),
+            fetch(`/api/admin/courses/${course.id}/assessments`, { credentials: "include" }),
+          ]);
+          const ld = await lr.json().catch(() => ({}));
+          const sd = await sr.json().catch(() => ({}));
+          const ad = await ar.json().catch(() => ({}));
+          if (lr.ok && ld?.ok) lessons += Array.isArray(ld.lessons) ? ld.lessons.length : 0;
+          if (sr.ok && sd?.ok) live += Array.isArray(sd.liveSessions) ? sd.liveSessions.length : 0;
+          if (ar.ok && ad?.ok && Array.isArray(ad.assessments)) {
+            homework += ad.assessments.filter((x) => x.type === "ASSIGNMENT").length;
+            quiz += ad.assessments.filter((x) => x.type === "QUIZ").length;
+          }
+        })
+      );
+
+      setCounts({
+        lessons,
+        live,
+        homework,
+        "electronic-exam": quiz,
+      });
+    } catch {
+      /* ignore count errors */
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCounts();
+  }, [loadCounts]);
+
   return (
     <AdminShell
       title="إدارة المحتوى المدفوع"
-      subtitle="إدارة أقسام أساتذتي للحساب الكامل فقط — بنفس ترتيب لوحة الطالب."
+      subtitle="مركز إدارة أقسام أساتذتي للحساب الكامل فقط — بنفس ترتيب لوحة الطالب."
     >
       <AdminSectionCard
         title="أقسام المحتوى المدفوع"
-        subtitle="اختر قسمًا لإدارته. الأقسام المرتبطة بالدورات تفتح إدارة الدورات الحالية؛ الباقي جاهز للربط لاحقًا."
+        subtitle="الأقسام ذات البنية الجاهزة قابلة للإدارة فورًا. الباقي واجهات أولية بانتظار قرار الـ Model."
       >
         <div className="grid gap-4" dir="rtl">
           {TEACHERS_SECTIONS.map((section) => {
             const Icon = section.Icon;
             const href = manageHref(section.id);
-            const linked = Boolean(EXISTING_ADMIN_HREF[section.id]);
+            const active = Boolean(ACTIVE_ADMIN_HREF[section.id]);
+            const count = counts[section.id];
 
             return (
               <article
@@ -60,9 +109,10 @@ export default function AdminPaidContentPage() {
                   <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-extrabold text-slate-900 sm:text-lg">{section.title}</h3>
-                      <AdminBadge tone={linked ? "brand" : "warning"}>
-                        {linked ? "مرتبط" : "لاحقًا"}
-                      </AdminBadge>
+                      <AdminBadge tone={active ? "brand" : "warning"}>{active ? "يعمل" : "أولي"}</AdminBadge>
+                      {typeof count === "number" ? (
+                        <AdminBadge tone="slate">{count} عنصر</AdminBadge>
+                      ) : null}
                     </div>
                     <p className="text-sm leading-7 text-slate-600">{section.description}</p>
                     <p className="text-xs font-semibold text-slate-500">{manageHint(section.id)}</p>

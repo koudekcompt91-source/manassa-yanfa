@@ -21,6 +21,7 @@ function normalizeCourse(course: {
   order: number;
   academicLevel: string | null;
   level: string | null;
+  subject?: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count?: { lessons: number };
@@ -44,6 +45,7 @@ function normalizeCourse(course: {
     order: course.order,
     academicLevel: course.academicLevel,
     level: course.level,
+    subject: course.subject ?? null,
     lessonsCount: course._count?.lessons ?? 0,
     createdAt: course.createdAt.toISOString(),
     updatedAt: course.updatedAt.toISOString(),
@@ -88,6 +90,9 @@ function validatePatch(body: any) {
     }
   } else if (body?.academicLevel !== undefined) {
     data.academicLevel = String(body.academicLevel || "").trim() || null;
+  }
+  if (body?.subject !== undefined) {
+    data.subject = String(body.subject || "").trim() || null;
   }
   if (status !== undefined) data.status = status as CourseStatus;
   if (accessType !== undefined) data.accessType = accessType as CourseAccessType;

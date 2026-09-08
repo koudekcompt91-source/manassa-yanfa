@@ -1,29 +1,55 @@
 "use client";
 
-import Link from "next/link";
+import PaidSectionScaffold from "@/components/admin/paid-content/PaidSectionScaffold";
+import { getTeachersSection } from "@/lib/paid-teachers-sections";
 import { useParams } from "next/navigation";
-import { ArrowRight } from "lucide-react";
 import AdminShell from "@/components/admin/AdminShell";
 import { AdminEmptyState, AdminSectionCard } from "@/components/admin/AdminUI";
-import { getTeachersSection } from "@/lib/paid-teachers-sections";
+import Link from "next/link";
+
+const PLACEHOLDER_META = {
+  diagnostic: {
+    plannedFields: ["العنوان", "الوصف", "المستوى", "المادة", "رابط/ملف التشخيص", "النشر"],
+    reuseNote: "لا يوجد Model تشخيصي مدفوع حاليًا. Assessment.QUIZ قريب وظيفيًا لكنه ليس مخصصًا للتقويم التشخيصي.",
+    needsDatabase: true,
+  },
+  summaries: {
+    plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF", "الوصف", "النشر"],
+    reuseNote: "CoursePDF موجود لكنه مخصص لـ FREE LMS حسب تصميم المشروع — لا يُعاد استخدامه للمحتوى المدفوع هنا.",
+    needsDatabase: true,
+  },
+  assignments: {
+    plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للفروض", "الوصف", "النشر"],
+    reuseNote: "Assessment.ASSIGNMENT تفاعلي ويُدار تحت «واجباتي المنزلية». فروضي كملفات PDF تحتاج كيانًا منفصلًا لاحقًا.",
+    needsDatabase: true,
+  },
+  exams: {
+    plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للاختبار", "سلم التصحيح", "النشر"],
+    reuseNote: "مختلفة عن الاختبار الإلكتروني (QUIZ). لا يوجد model لاختبارات PDF المدفوعة بعد.",
+    needsDatabase: true,
+  },
+  library: {
+    plannedFields: ["عنوان المورد", "نوع الملف", "رابط التحميل", "المستوى", "المادة", "النشر"],
+    reuseNote: "لا توجد مكتبة مدفوعة في الـ schema الحالي.",
+    needsDatabase: true,
+  },
+};
 
 /**
- * Placeholder admin shell for PAID sections not yet wired to real CMS.
- * Protected by existing admin layout / AdminRouteGuard.
+ * Dynamic admin placeholder for unpaid/unimplemented paid-content sections.
+ * Static routes (lessons/live/homework/electronic-exam) take precedence.
  */
 export default function AdminPaidContentSectionPage() {
   const params = useParams();
-  const sectionId = String(params?.section || "");
+  const sectionId = Array.isArray(params?.section) ? String(params.section[0] || "") : String(params?.section || "");
   const section = getTeachersSection(sectionId);
+  const meta = PLACEHOLDER_META[sectionId];
 
-  if (!section) {
+  if (!section || !meta) {
     return (
       <AdminShell title="قسم غير موجود" subtitle="تعذّر العثور على هذا القسم ضمن المحتوى المدفوع.">
         <AdminSectionCard title="خطأ">
-          <AdminEmptyState
-            title="القسم غير موجود"
-            description="تأكد من الرابط أو ارجع إلى قائمة إدارة المحتوى المدفوع."
-          />
+          <AdminEmptyState title="القسم غير موجود" description="ارجع إلى قائمة إدارة المحتوى المدفوع." />
           <div className="mt-4">
             <Link href="/admin/paid-content" className="text-sm font-bold text-brand-700 underline">
               العودة إلى إدارة المحتوى المدفوع
@@ -34,40 +60,15 @@ export default function AdminPaidContentSectionPage() {
     );
   }
 
-  const Icon = section.Icon;
-
   return (
-    <AdminShell
+    <PaidSectionScaffold
       title={section.title}
-      subtitle="هذا القسم ضمن المحتوى المدفوع وجاهز للربط لاحقًا مع نظام الإدارة الكامل."
-    >
-      <div className="mb-4">
-        <Link
-          href="/admin/paid-content"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 no-underline hover:underline"
-        >
-          <ArrowRight className="h-4 w-4" />
-          العودة إلى إدارة المحتوى المدفوع
-        </Link>
-      </div>
-
-      <AdminSectionCard
-        title={section.title}
-        subtitle={section.description}
-        action={
-          <span
-            className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-white ${section.tone}`}
-            aria-hidden
-          >
-            <Icon className="h-5 w-5" strokeWidth={1.75} />
-          </span>
-        }
-      >
-        <AdminEmptyState
-          title="القسم جاهز للربط لاحقًا"
-          description="واجهة إدارية مؤقتة للمحتوى المدفوع فقط. لم يُبنَ نظام إدارة المحتوى لهذا القسم بعد، ولن يُستخدم أي محتوى مجاني هنا."
-        />
-      </AdminSectionCard>
-    </AdminShell>
+      description={section.description}
+      tone={section.tone}
+      Icon={section.Icon}
+      plannedFields={meta.plannedFields}
+      reuseNote={meta.reuseNote}
+      needsDatabase={meta.needsDatabase}
+    />
   );
 }
