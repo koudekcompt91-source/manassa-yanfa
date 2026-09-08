@@ -124,6 +124,11 @@ export default function LoginPage() {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+          <p className="pt-1 text-end">
+            <Link href="/forgot-password" className="text-sm font-bold text-brand-700 underline underline-offset-2 hover:text-brand-800">
+              نسيت كلمة المرور؟
+            </Link>
+          </p>
         </div>
 
         {error ? (
