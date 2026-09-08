@@ -6,10 +6,11 @@ import { ArrowRight } from "lucide-react";
 import TeachersLessonsPanel from "@/components/student/TeachersLessonsPanel";
 import TeachersLivePanel from "@/components/student/TeachersLivePanel";
 import TeachersAssessmentsPanel from "@/components/student/TeachersAssessmentsPanel";
+import TeachersSummariesPanel from "@/components/student/TeachersSummariesPanel";
 import { getTeachersSection } from "@/lib/paid-teachers-sections";
 
 /**
- * Fallback dynamic section page. Static routes own lessons/live/homework/electronic-exam.
+ * Fallback dynamic section page. Static routes own lessons/live/summaries/homework/electronic-exam.
  */
 export default function TeachersSectionPage() {
   const params = useParams();
@@ -41,6 +42,7 @@ export default function TeachersSectionPage() {
 
   if (section.id === "lessons") body = <TeachersLessonsPanel />;
   else if (section.id === "live") body = <TeachersLivePanel />;
+  else if (section.id === "summaries") body = <TeachersSummariesPanel />;
   else if (section.id === "homework") {
     body = <TeachersAssessmentsPanel assessmentType="ASSIGNMENT" emptyTitle="لا توجد واجبات منزلية متاحة حاليًا." />;
   } else if (section.id === "electronic-exam") {

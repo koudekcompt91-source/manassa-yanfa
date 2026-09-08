@@ -13,25 +13,20 @@ const PLACEHOLDER_META = {
     reuseNote: "لا يوجد Model تشخيصي مدفوع حاليًا. Assessment.QUIZ قريب وظيفيًا لكنه ليس مخصصًا للتقويم التشخيصي.",
     needsDatabase: true,
   },
-  summaries: {
-    plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF", "الوصف", "النشر"],
-    reuseNote: "CoursePDF موجود لكنه مخصص لـ FREE LMS حسب تصميم المشروع — لا يُعاد استخدامه للمحتوى المدفوع هنا.",
-    needsDatabase: true,
-  },
   assignments: {
     plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للفروض", "الوصف", "النشر"],
-    reuseNote: "Assessment.ASSIGNMENT تفاعلي ويُدار تحت «واجباتي المنزلية». فروضي كملفات PDF تحتاج كيانًا منفصلًا لاحقًا.",
-    needsDatabase: true,
+    reuseNote: "Assessment.ASSIGNMENT تفاعلي ويُدار تحت «واجباتي المنزلية». فروضي كملفات PDF تحتاج PaidFileContent.ASSIGNMENT.",
+    needsDatabase: false,
   },
   exams: {
     plannedFields: ["العنوان", "المستوى", "المادة", "رابط PDF للاختبار", "سلم التصحيح", "النشر"],
-    reuseNote: "مختلفة عن الاختبار الإلكتروني (QUIZ). لا يوجد model لاختبارات PDF المدفوعة بعد.",
-    needsDatabase: true,
+    reuseNote: "مختلفة عن الاختبار الإلكتروني (QUIZ). جاهزة عبر PaidFileContent.EXAM لاحقًا.",
+    needsDatabase: false,
   },
   library: {
     plannedFields: ["عنوان المورد", "نوع الملف", "رابط التحميل", "المستوى", "المادة", "النشر"],
-    reuseNote: "لا توجد مكتبة مدفوعة في الـ schema الحالي.",
-    needsDatabase: true,
+    reuseNote: "جاهزة عبر PaidFileContent.LIBRARY لاحقًا.",
+    needsDatabase: false,
   },
 };
 

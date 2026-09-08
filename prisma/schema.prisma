@@ -18,7 +18,9 @@ enum UserStatus {
   DISABLED
 }
 
-/** Account plan: FREE = limited free-dashboard; PAID = full dashboard (default for legacy users). */
+/**
+ * Account plan: FREE = limited free-dashboard; PAID = full dashboard (default for legacy users).
+ */
 enum SubscriptionType {
   FREE
   PAID
@@ -29,13 +31,25 @@ enum CourseAccessType {
   PAID
 }
 
-/** FREE LMS content discriminator — null on PAID-system courses. */
+/**
+ * FREE LMS content discriminator — null on PAID-system courses.
+ */
 enum FreeContentType {
   LESSON
   SUMMARY
   ASSIGNMENT
   EXAM
   COURSE
+}
+
+/**
+ * PAID file-based hub sections only — never FreeContentType.
+ */
+enum PaidFileContentType {
+  SUMMARY
+  ASSIGNMENT
+  EXAM
+  LIBRARY
 }
 
 enum CourseStatus {
@@ -110,52 +124,58 @@ enum StoreOrderStatus {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  passwordHash   String
-  fullName       String
-  role           Role          @default(STUDENT)
-  /** Arabic label: الثالثة متوسط | الرابعة متوسط | الأولى ثانوي | الثانية ثانوي — students only */
-  academicLevel  String?
-  /** School year code: 3AM | 4AM | 1AS | 2AS — default unknown for legacy users */
-  level            String        @default("unknown")
+  id               String           @id @default(cuid())
+  email            String           @unique
+  passwordHash     String
+  fullName         String
+  role             Role             @default(STUDENT)
+  /**
+   * Arabic label: الثالثة متوسط | الرابعة متوسط | الأولى ثانوي | الثانية ثانوي — students only
+   */
+  academicLevel    String?
+  /**
+   * School year code: 3AM | 4AM | 1AS | 2AS — default unknown for legacy users
+   */
+  level            String           @default("unknown")
   phone            String?
-  walletBalance  Int           @default(0)
-  /** FREE → /free-dashboard; PAID → /dashboard. Default PAID keeps existing users unchanged. */
+  walletBalance    Int              @default(0)
+  /**
+   * FREE → /free-dashboard; PAID → /dashboard. Default PAID keeps existing users unchanged.
+   */
   subscriptionType SubscriptionType @default(PAID)
-  status         UserStatus    @default(ACTIVE)
-  createdAt      DateTime      @default(now())
+  status           UserStatus       @default(ACTIVE)
+  createdAt        DateTime         @default(now())
 
-  rechargeRequests   RechargeRequest[]
-  walletTransactions WalletTransaction[]
-  enrollments        Enrollment[]
-  notifications      Notification[]
-  sentChatMessages   ChatMessage[]       @relation("ChatMessageSender")
-  chatConversations  ChatConversation[]  @relation("ChatConversationStudent")
+  rechargeRequests      RechargeRequest[]
+  walletTransactions    WalletTransaction[]
+  enrollments           Enrollment[]
+  notifications         Notification[]
+  sentChatMessages      ChatMessage[]          @relation("ChatMessageSender")
+  chatConversations     ChatConversation[]     @relation("ChatConversationStudent")
   assessmentSubmissions AssessmentSubmission[]
-  lessonProgresses   LessonProgress[]
-  certificates       Certificate[]
-  storeItems         StoreItem[]         @relation("StoreItemTeacher")
-  storeOrders        StoreOrder[]        @relation("StoreOrderStudent")
+  lessonProgresses      LessonProgress[]
+  certificates          Certificate[]
+  storeItems            StoreItem[]            @relation("StoreItemTeacher")
+  storeOrders           StoreOrder[]           @relation("StoreOrderStudent")
 }
 
 model RechargeRequest {
-  id             String    @id @default(cuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paymentMethod  String
-  firstName      String
-  lastName       String
-  wilaya         String
-  baladiya       String
-  phone          String
-  amount         Int
-  receiptImage   String
-  note           String    @default("")
-  status         String    @default("pending")
-  rejectionNote  String?
-  reviewedAt     DateTime?
-  createdAt      DateTime  @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentMethod String
+  firstName     String
+  lastName      String
+  wilaya        String
+  baladiya      String
+  phone         String
+  amount        Int
+  receiptImage  String
+  note          String    @default("")
+  status        String    @default("pending")
+  rejectionNote String?
+  reviewedAt    DateTime?
+  createdAt     DateTime  @default(now())
 }
 
 model WalletTransaction {
@@ -200,34 +220,34 @@ model LearningPath {
 }
 
 model HomepageBanner {
-  id         String   @id @default(cuid())
-  title      String
-  subtitle   String?
-  imageUrl   String?
-  buttonText String?
-  buttonUrl  String?
-  isPublished Boolean @default(true)
-  order      Int      @default(0)
-  startsAt   DateTime?
-  endsAt     DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String    @id @default(cuid())
+  title       String
+  subtitle    String?
+  imageUrl    String?
+  buttonText  String?
+  buttonUrl   String?
+  isPublished Boolean   @default(true)
+  order       Int       @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([isPublished, order])
   @@index([startsAt, endsAt])
 }
 
 model NewsItem {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   summary     String
   icon        String?
   link        String?
-  isPublished Boolean  @default(true)
-  order       Int      @default(0)
+  isPublished Boolean   @default(true)
+  order       Int       @default(0)
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([isPublished, order])
   @@index([publishedAt])
@@ -250,16 +270,16 @@ model Announcement {
 }
 
 model Course {
-  id           String           @id @default(cuid())
-  slug         String           @unique
-  title        String
-  description  String           @default("")
-  accessType   CourseAccessType @default(FREE)
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  description     String           @default("")
+  accessType      CourseAccessType @default(FREE)
   /**
    * Learning system isolation: FREE LMS vs PAID platform.
    * Default PAID keeps existing courses in the paid system.
    */
-  system        SubscriptionType @default(PAID)
+  system          SubscriptionType @default(PAID)
   /**
    * Minimum student subscription required to see this course.
    * FREE  → visible to FREE and PAID (shared / "both")
@@ -267,42 +287,49 @@ model Course {
    * Default FREE keeps new courses open; migration backfills PAID courses from accessType.
    */
   minSubscription SubscriptionType @default(FREE)
-  /** Primary video for FREE LMS courses (YouTube URL only). */
-  videoUrl     String?
-  price        Int              @default(0)
-  status       CourseStatus     @default(DRAFT)
-  categoryId   String?
-  teacherId    String?
-  thumbnailUrl String?
-  isFeatured   Boolean          @default(false)
-  order        Int              @default(0)
-  academicLevel String?
-  level         String?
-  /** Subject/material label for FREE LMS content (optional). */
-  subject       String?
+  /**
+   * Primary video for FREE LMS courses (YouTube URL only).
+   */
+  videoUrl        String?
+  price           Int              @default(0)
+  status          CourseStatus     @default(DRAFT)
+  categoryId      String?
+  teacherId       String?
+  thumbnailUrl    String?
+  isFeatured      Boolean          @default(false)
+  order           Int              @default(0)
+  academicLevel   String?
+  level           String?
+  /**
+   * Subject/material label for FREE LMS content (optional).
+   */
+  subject         String?
   /**
    * FREE LMS only: which hub section this row belongs to.
    * Null for PAID-system courses. Existing FREE rows backfill to COURSE.
    */
   freeContentType FreeContentType?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
-  lessons      Lesson[]
-  liveSessions LiveSession[]
+  lessons           Lesson[]
+  liveSessions      LiveSession[]
   chatConversations ChatConversation[]
-  assessments  Assessment[]
-  lessonProgresses LessonProgress[]
+  assessments       Assessment[]
+  lessonProgresses  LessonProgress[]
   certificates      Certificate[]
-  courseVideo  CourseVideo?
-  coursePdfs   CoursePDF[]
+  courseVideo       CourseVideo?
+  coursePdfs        CoursePDF[]
+  paidFileContents  PaidFileContent[]
 
   @@index([status, minSubscription])
   @@index([system, status, order])
   @@index([system, freeContentType, status])
 }
 
-/** Dedicated FREE LMS video row — one primary videoUrl per course. */
+/**
+ * Dedicated FREE LMS video row — one primary videoUrl per course.
+ */
 model CourseVideo {
   id        String   @id @default(cuid())
   courseId  String   @unique
@@ -314,7 +341,9 @@ model CourseVideo {
   @@index([courseId])
 }
 
-/** Dedicated FREE LMS PDF documents — never derived from description. */
+/**
+ * Dedicated FREE LMS PDF documents — never derived from description.
+ */
 model CoursePDF {
   id        String   @id @default(cuid())
   courseId  String
@@ -328,22 +357,48 @@ model CoursePDF {
   @@index([courseId, order])
 }
 
-model Lesson {
-  id            String   @id @default(cuid())
+/**
+ * PAID file content (summaries / PDF assignments / exams / library) — not FREE LMS.
+ */
+model PaidFileContent {
+  id            String              @id @default(cuid())
   courseId      String
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course        Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  contentType   PaidFileContentType
   title         String
-  youtubeUrl    String
-  youtubeVideoId String
-  description   String   @default("")
-  order         Int
-  isPublished   Boolean  @default(false)
-  durationSec   Int?
-  isFreePreview Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  description   String              @default("")
+  subject       String?
+  level         String?
+  academicLevel String?
+  fileUrl       String
+  fileName      String?
+  isPublished   Boolean             @default(false)
+  order         Int                 @default(0)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
-  progresses    LessonProgress[]
+  @@index([courseId, contentType, order])
+  @@index([courseId, contentType, isPublished])
+  @@index([contentType, isPublished, level])
+  @@index([isPublished, createdAt])
+}
+
+model Lesson {
+  id             String   @id @default(cuid())
+  courseId       String
+  course         Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title          String
+  youtubeUrl     String
+  youtubeVideoId String
+  description    String   @default("")
+  order          Int
+  isPublished    Boolean  @default(false)
+  durationSec    Int?
+  isFreePreview  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  progresses LessonProgress[]
 
   @@index([courseId, order])
 }
@@ -383,17 +438,17 @@ model Notification {
 }
 
 model ChatConversation {
-  id            String       @id @default(cuid())
-  courseId       String
-  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  studentId      String
-  student        User         @relation("ChatConversationStudent", fields: [studentId], references: [id], onDelete: Cascade)
-  status         ChatStatus   @default(OPEN)
-  lastMessageAt  DateTime?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id            String     @id @default(cuid())
+  courseId      String
+  course        Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       User       @relation("ChatConversationStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  status        ChatStatus @default(OPEN)
+  lastMessageAt DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  messages       ChatMessage[]
+  messages ChatMessage[]
 
   @@unique([courseId, studentId])
   @@index([courseId, lastMessageAt])
@@ -401,31 +456,31 @@ model ChatConversation {
 }
 
 model ChatMessage {
-  id              String            @id @default(cuid())
-  conversationId  String
-  conversation    ChatConversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  senderId        String
-  sender          User              @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  body            String
-  isRead          Boolean           @default(false)
-  createdAt       DateTime          @default(now())
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User             @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  isRead         Boolean          @default(false)
+  createdAt      DateTime         @default(now())
 
   @@index([conversationId, createdAt])
   @@index([conversationId, isRead])
 }
 
 model Assessment {
-  id          String           @id @default(cuid())
+  id          String         @id @default(cuid())
   courseId    String
-  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   title       String
-  description String           @default("")
+  description String         @default("")
   type        AssessmentType
-  isPublished Boolean          @default(false)
+  isPublished Boolean        @default(false)
   dueDate     DateTime?
-  allowRetake Boolean          @default(false)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  allowRetake Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   questions   AssessmentQuestion[]
   submissions AssessmentSubmission[]
@@ -434,38 +489,38 @@ model Assessment {
 }
 
 model AssessmentQuestion {
-  id            String        @id @default(cuid())
+  id            String       @id @default(cuid())
   assessmentId  String
-  assessment    Assessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessment    Assessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   questionText  String
   type          QuestionType
   options       Json?
   correctAnswer Json?
-  points        Int           @default(1)
-  order         Int           @default(1)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  points        Int          @default(1)
+  order         Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-  answers       AssessmentAnswer[]
+  answers AssessmentAnswer[]
 
   @@index([assessmentId, order])
 }
 
 model AssessmentSubmission {
-  id          String           @id @default(cuid())
+  id           String           @id @default(cuid())
   assessmentId String
-  assessment  Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  studentId   String
-  student     User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  status      SubmissionStatus @default(SUBMITTED)
-  score       Int              @default(0)
-  maxScore    Int              @default(0)
-  submittedAt DateTime?
-  correctedAt DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  assessment   Assessment       @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status       SubmissionStatus @default(SUBMITTED)
+  score        Int              @default(0)
+  maxScore     Int              @default(0)
+  submittedAt  DateTime?
+  correctedAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
-  answers     AssessmentAnswer[]
+  answers AssessmentAnswer[]
 
   @@index([assessmentId, studentId, createdAt])
 }
@@ -531,9 +586,13 @@ model StoreItem {
   price       Int             @default(0)
   isFree      Boolean         @default(false)
   imageUrl    String?
-  /** Optional wilaya tag for geographic filtering on the storefront. */
+  /**
+   * Optional wilaya tag for geographic filtering on the storefront.
+   */
   wilaya      String?
-  /** Owning teacher (User with role TEACHER). Nullable so deleting a teacher keeps the item. */
+  /**
+   * Owning teacher (User with role TEACHER). Nullable so deleting a teacher keeps the item.
+   */
   teacherId   String?
   teacher     User?           @relation("StoreItemTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
   status      StoreItemStatus @default(DRAFT)
@@ -541,7 +600,7 @@ model StoreItem {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
-  orders      StoreOrder[]
+  orders StoreOrder[]
 
   @@index([status, order])
   @@index([teacherId, status])
@@ -551,13 +610,17 @@ model StoreOrder {
   id          String           @id @default(cuid())
   storeItemId String
   storeItem   StoreItem        @relation(fields: [storeItemId], references: [id], onDelete: Cascade)
-  /** Requesting student (nullable so deleting a user keeps the order record). */
+  /**
+   * Requesting student (nullable so deleting a user keeps the order record).
+   */
   studentId   String?
   student     User?            @relation("StoreOrderStudent", fields: [studentId], references: [id], onDelete: SetNull)
   fullName    String
   lastName    String
   phone       String
-  /** Student wilaya captured at request time (required at app level; default '' keeps legacy rows safe). */
+  /**
+   * Student wilaya captured at request time (required at app level; default '' keeps legacy rows safe).
+   */
   wilaya      String           @default("")
   status      StoreOrderStatus @default(PENDING)
   note        String?

@@ -13,6 +13,7 @@ import { TEACHERS_SECTIONS } from "@/lib/paid-teachers-sections";
 const ACTIVE_ADMIN_HREF = {
   lessons: "/admin/paid-content/lessons",
   live: "/admin/paid-content/live",
+  summaries: "/admin/paid-content/summaries",
   homework: "/admin/paid-content/homework",
   "electronic-exam": "/admin/paid-content/electronic-exam",
 };
@@ -24,6 +25,7 @@ function manageHref(sectionId) {
 function manageHint(sectionId) {
   if (sectionId === "lessons") return "Course + Lesson · إدارة فعلية";
   if (sectionId === "live") return "LiveSession · إدارة فعلية";
+  if (sectionId === "summaries") return "PaidFileContent.SUMMARY · إدارة فعلية";
   if (sectionId === "homework") return "Assessment.ASSIGNMENT · إدارة فعلية";
   if (sectionId === "electronic-exam") return "Assessment.QUIZ · إدارة فعلية";
   return "واجهة أولية · بدون Database change";
@@ -43,6 +45,13 @@ export default function AdminPaidContentPage() {
       let live = 0;
       let homework = 0;
       let quiz = 0;
+      let summaries = 0;
+
+      const summariesRes = await fetch("/api/admin/paid-content?contentType=SUMMARY", { credentials: "include" });
+      const summariesData = await summariesRes.json().catch(() => ({}));
+      if (summariesRes.ok && summariesData?.ok && Array.isArray(summariesData.items)) {
+        summaries = summariesData.items.length;
+      }
 
       await Promise.all(
         courses.map(async (course) => {
@@ -66,6 +75,7 @@ export default function AdminPaidContentPage() {
       setCounts({
         lessons,
         live,
+        summaries,
         homework,
         "electronic-exam": quiz,
       });
