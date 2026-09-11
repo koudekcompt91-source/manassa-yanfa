@@ -18,6 +18,7 @@ import {
   ShoppingBag,
   UserRound,
   Users,
+  UserCheck,
 } from "lucide-react";
 
 const adminLinks = [
@@ -28,6 +29,7 @@ const adminLinks = [
   { href: "/admin/store", label: "المتجر", Icon: ShoppingBag },
   { href: "/admin/teachers", label: "الأساتذة", Icon: UserRound },
   { href: "/admin/students", label: "الطلاب", Icon: Users },
+  { href: "/admin/student-activation", label: "تفعيل حسابات الطلاب", Icon: UserCheck },
   { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
   { href: "/admin/categories", label: "التصنيفات", Icon: Shapes },
   { href: "/admin/learning-paths", label: "المسارات التعليمية", Icon: Shapes },
@@ -49,6 +51,9 @@ function isActiveLink(pathname, href) {
   }
   if (href === "/admin/paid-content") {
     return pathname === "/admin/paid-content" || pathname.startsWith("/admin/paid-content/");
+  }
+  if (href === "/admin/student-activation") {
+    return pathname === "/admin/student-activation" || pathname.startsWith("/admin/student-activation/");
   }
   if (href === "/admin/courses") {
     // Keep old route compatibility while showing the new label.

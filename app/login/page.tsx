@@ -46,6 +46,10 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok || !data.ok) {
         const adminPortal = data.code === "STUDENT_PORTAL_ADMIN_ACCOUNT";
+        if (data.code === "ACCOUNT_PENDING") {
+          router.push("/account-pending");
+          return;
+        }
         setShowAdminPortalLink(adminPortal);
         setError(adminPortal ? "هذا الحساب خاص بالإدارة" : data.message || "بيانات الدخول غير صحيحة");
         setLoading(false);

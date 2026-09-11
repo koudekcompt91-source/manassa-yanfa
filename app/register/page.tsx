@@ -118,8 +118,9 @@ export default function RegisterPage() {
         return;
       }
 
-      setSuccess("تم إنشاء الحساب بنجاح! جاري التحويل لتسجيل الدخول…");
-      setTimeout(() => router.push("/login"), 1200);
+      setSuccess("تم إنشاء حسابك بنجاح، وهو بانتظار التفعيل. جاري التحويل…");
+      setTimeout(() => router.push("/account-pending"), 900);
+      return;
     } catch {
       setError("تعذّر الاتصال بالخادم.");
       setLoading(false);

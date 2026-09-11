@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Role } from "@prisma/client";
+import { Role, type UserStatus } from "@prisma/client";
 import { getAdminSessionFromCookies } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
@@ -17,7 +17,7 @@ function mapTeacher(user: {
   email: string;
   fullName: string;
   phone: string | null;
-  status: "ACTIVE" | "DISABLED";
+  status: UserStatus;
   createdAt: Date;
 }) {
   return {

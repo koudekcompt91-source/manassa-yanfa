@@ -81,6 +81,7 @@ export async function POST(req: Request) {
     const passwordHash = await hashPassword(password);
 
     step = "create-user";
+    const initialStatus = subscriptionType === "PAID" ? "PENDING" : "ACTIVE";
     const user = await prisma.user.create({
       data: {
         email,
@@ -91,14 +92,25 @@ export async function POST(req: Request) {
         academicLevel,
         subscriptionType,
         walletBalance: 0,
-        status: "ACTIVE",
+        status: initialStatus,
       },
     });
+
+    if (user.subscriptionType === "PAID" && user.status === "PENDING") {
+      return NextResponse.json({
+        ok: true,
+        message: "تم إنشاء حسابك بنجاح، وهو بانتظار تفعيل الأستاذ.",
+        subscriptionType: user.subscriptionType,
+        status: user.status,
+        code: "ACCOUNT_PENDING",
+      });
+    }
 
     return NextResponse.json({
       ok: true,
       message: "تم إنشاء الحساب بنجاح. سجّل دخولك الآن.",
       subscriptionType: user.subscriptionType,
+      status: user.status,
     });
   } catch (e) {
     console.error(`[register] failed at step="${step}"`);

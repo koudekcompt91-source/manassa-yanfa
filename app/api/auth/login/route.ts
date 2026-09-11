@@ -68,14 +68,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "بيانات الدخول غير صحيحة." }, { status: 401 });
     }
 
-    if (user.status !== "ACTIVE") {
-      return NextResponse.json({ ok: false, message: "الحساب غير مفعّل." }, { status: 403 });
-    }
-
     step = "verify-password";
     const passwordOk = await verifyPassword(password, user.passwordHash);
     if (!passwordOk) {
       return NextResponse.json({ ok: false, message: "بيانات الدخول غير صحيحة." }, { status: 401 });
+    }
+
+    if (user.status !== "ACTIVE") {
+      if (user.status === "PENDING" && user.subscriptionType === "PAID" && intent === "student") {
+        return NextResponse.json(
+          {
+            ok: false,
+            code: "ACCOUNT_PENDING",
+            message: "حسابك في انتظار التفعيل من الأستاذ.",
+          },
+          { status: 403 }
+        );
+      }
+      return NextResponse.json({ ok: false, message: "الحساب غير مفعّل." }, { status: 403 });
     }
 
     step = "check-intent";

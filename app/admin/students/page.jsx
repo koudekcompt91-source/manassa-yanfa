@@ -78,7 +78,21 @@ export default function AdminStudentsPage() {
                     <td className="px-3 py-3 font-semibold">{formatDzd(student.walletBalance)}</td>
                     <td className="px-3 py-3">{student.enrollmentsCount}</td>
                     <td className="px-3 py-3">
-                      <AdminBadge tone={student.status === "ACTIVE" ? "success" : "warning"}>{student.status === "ACTIVE" ? "نشط" : "معطّل"}</AdminBadge>
+                      <AdminBadge
+                        tone={
+                          student.status === "ACTIVE"
+                            ? "success"
+                            : student.status === "PENDING"
+                              ? "warning"
+                              : "slate"
+                        }
+                      >
+                        {student.status === "ACTIVE"
+                          ? "نشط"
+                          : student.status === "PENDING"
+                            ? "بانتظار التفعيل"
+                            : "معطّل"}
+                      </AdminBadge>
                     </td>
                     <td className="px-4 py-3 text-xs">{student.createdAt ? new Date(student.createdAt).toLocaleDateString("ar-DZ") : "—"}</td>
                   </tr>
