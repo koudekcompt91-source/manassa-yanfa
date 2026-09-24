@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
     const record = await prisma.passwordResetToken.findUnique({
       where: { tokenHash },
-      include: { user: { select: { id: true, status: true } } },
+      include: { user: { select: { id: true } } },
     });
 
     if (!record || record.usedAt || record.expiresAt.getTime() <= now.getTime()) {
@@ -57,9 +57,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    if (record.user.status !== "ACTIVE") {
-      return NextResponse.json({ ok: false, message: "الحساب غير مفعّل." }, { status: 403 });
-    }
+    // Valid one-time token is sufficient to set a new passwordHash.
+    // Login remains gated by User.status (ACTIVE) — no access-control bypass.
+    // Allows admin-triggered resets for DISABLED / PENDING students.
 
     const passwordHash = await hashPassword(password);
 

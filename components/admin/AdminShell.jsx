@@ -28,7 +28,7 @@ const adminLinks = [
   { href: "/admin/paid-content", label: "إدارة المحتوى المدفوع", Icon: Layers },
   { href: "/admin/store", label: "المتجر", Icon: ShoppingBag },
   { href: "/admin/teachers", label: "الأساتذة", Icon: UserRound },
-  { href: "/admin/students", label: "الطلاب", Icon: Users },
+  { href: "/admin/students", label: "إدارة حسابات الطلاب", Icon: Users },
   { href: "/admin/student-activation", label: "تفعيل حسابات الطلاب", Icon: UserCheck },
   { href: "/admin/recharge-requests", label: "طلبات الشحن", Icon: CreditCard },
   { href: "/admin/categories", label: "التصنيفات", Icon: Shapes },
