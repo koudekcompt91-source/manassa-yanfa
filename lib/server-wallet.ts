@@ -265,3 +265,163 @@ export async function purchaseOrEnrollPackageDb(userId: string, packageRef: stri
     return { ok: true as const, code: "purchased" as const };
   });
 }
+
+/** Max DZD credited in a single admin manual-credit operation. */
+export const MANUAL_CREDIT_MAX_DZD = 1_000_000;
+
+export type ManualCreditAmountResult =
+  | { ok: true; amount: number }
+  | { ok: false; message: string };
+
+/**
+ * Parse a positive whole-dinar credit amount. Rejects decimals, NaN, Infinity, 0, negatives, oversized values.
+ * Never trust client-provided balance fields.
+ */
+export function parseManualCreditAmount(raw: unknown): ManualCreditAmountResult {
+  if (typeof raw === "number") {
+    if (!Number.isFinite(raw) || !Number.isInteger(raw)) {
+      return { ok: false, message: "المبلغ يجب أن يكون رقمًا صحيحًا بدون كسور." };
+    }
+    if (raw <= 0) {
+      return { ok: false, message: "المبلغ يجب أن يكون أكبر من صفر." };
+    }
+    if (raw > MANUAL_CREDIT_MAX_DZD) {
+      return {
+        ok: false,
+        message: `الحد الأقصى للعملية الواحدة هو ${MANUAL_CREDIT_MAX_DZD.toLocaleString("ar-DZ")} دج.`,
+      };
+    }
+    return { ok: true, amount: raw };
+  }
+
+  const s = String(raw ?? "").trim();
+  if (!s) {
+    return { ok: false, message: "أدخل المبلغ المراد إضافته." };
+  }
+  // Digits only — rejects decimals, signs, scientific notation, currency text.
+  if (!/^\d+$/.test(s)) {
+    return { ok: false, message: "المبلغ يجب أن يكون رقمًا صحيحًا موجبًا بدون كسور." };
+  }
+
+  const amount = Number(s);
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    return { ok: false, message: "المبلغ يجب أن يكون أكبر من صفر." };
+  }
+  if (amount > MANUAL_CREDIT_MAX_DZD) {
+    return {
+      ok: false,
+      message: `الحد الأقصى للعملية الواحدة هو ${MANUAL_CREDIT_MAX_DZD.toLocaleString("ar-DZ")} دج.`,
+    };
+  }
+  return { ok: true, amount };
+}
+
+/**
+ * Atomic admin manual credit for a STUDENT wallet.
+ * Uses PostgreSQL row-locked `increment` so concurrent credits both apply.
+ * Does not change role, status, or subscriptionType.
+ */
+export async function manualCreditStudentWalletDb(studentId: string, amount: number) {
+  const id = String(studentId || "").trim();
+  if (!id) {
+    return { ok: false as const, message: "معرّف الطالب غير صالح." };
+  }
+
+  const parsed = parseManualCreditAmount(amount);
+  if (!parsed.ok) {
+    return { ok: false as const, message: parsed.message };
+  }
+  const credit = parsed.amount;
+
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const target = await tx.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          status: true,
+          subscriptionType: true,
+          academicLevel: true,
+          level: true,
+          walletBalance: true,
+        },
+      });
+
+      if (!target) {
+        return { ok: false as const, message: "الطالب غير موجود." };
+      }
+      if (target.role === Role.ADMIN) {
+        return { ok: false as const, message: "لا يمكن إضافة رصيد لحساب إدارة." };
+      }
+      if (target.role === Role.TEACHER) {
+        return { ok: false as const, message: "لا يمكن إضافة رصيد لحساب أستاذ." };
+      }
+      if (target.role !== Role.STUDENT) {
+        return { ok: false as const, message: "يمكن إضافة الرصيد لحسابات الطلاب فقط." };
+      }
+
+      // Atomic increment constrained to STUDENT — concurrent credits both apply (row lock).
+      const bumped = await tx.user.updateMany({
+        where: { id: target.id, role: Role.STUDENT },
+        data: { walletBalance: { increment: credit } },
+      });
+      if (bumped.count !== 1) {
+        return { ok: false as const, message: "تعذّرت العملية. صلاحية الحساب تغيّرت." };
+      }
+
+      const updated = await tx.user.findUnique({
+        where: { id: target.id },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          status: true,
+          subscriptionType: true,
+          academicLevel: true,
+          level: true,
+          walletBalance: true,
+        },
+      });
+      if (!updated) {
+        throw new Error("USER_MISSING_AFTER_CREDIT");
+      }
+
+      const balanceAfter = updated.walletBalance;
+
+      const txRow = await tx.walletTransaction.create({
+        data: {
+          userId: target.id,
+          type: "MANUAL_CREDIT",
+          amount: credit,
+          labelAr: "إضافة رصيد يدوي",
+          balanceAfter,
+          note: "إضافة رصيد من لوحة الإدارة",
+        },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          labelAr: true,
+          balanceAfter: true,
+          note: true,
+          createdAt: true,
+        },
+      });
+
+      return {
+        ok: true as const,
+        user: updated,
+        transaction: txRow,
+        previousBalance: balanceAfter - credit,
+      };
+    });
+  } catch (e) {
+    if (e instanceof Error && e.message === "USER_MISSING_AFTER_CREDIT") {
+      return { ok: false as const, message: "تعذّرت إضافة الرصيد." };
+    }
+    throw e;
+  }
+}

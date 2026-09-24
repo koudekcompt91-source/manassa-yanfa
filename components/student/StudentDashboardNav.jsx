@@ -34,7 +34,7 @@ export const STUDENT_NAV = [
     Icon: Home,
   },
   {
-    href: "/dashboard/teachers",
+    href: "/dashboard/teachers#teachers-section",
     label: "أساتذتي",
     description: "تابع الدورات المسجّل فيها وواصل من حيث توقفت.",
     id: "my-courses",
@@ -134,11 +134,24 @@ export default function StudentDashboardNav({ className = "" }) {
         const Icon = n.Icon;
         const tone = ICON_TONES[index % ICON_TONES.length];
 
+        const isTeachersNav = n.id === "my-courses";
+
         return (
           <Link
             key={n.href}
             href={n.href}
             className={`dashboard-nav-row group ${active ? "dashboard-nav-row-active" : ""}`}
+            onClick={(e) => {
+              // Same-page: smooth-scroll to أساتذتي hub below the nav cards (no reload).
+              if (!isTeachersNav || pathname !== "/dashboard/teachers") return;
+              const el = document.getElementById("teachers-section");
+              if (!el) return;
+              e.preventDefault();
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+              if (window.location.hash !== "#teachers-section") {
+                window.history.pushState(null, "", "#teachers-section");
+              }
+            }}
           >
             {/* Right (RTL start): icon */}
             <span
