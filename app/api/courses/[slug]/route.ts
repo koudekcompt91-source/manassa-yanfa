@@ -94,8 +94,6 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
       select: {
         id: true,
         title: true,
-        youtubeUrl: true,
-        youtubeVideoId: true,
         description: true,
         order: true,
         isPublished: true,
@@ -108,9 +106,13 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     const mappedLessons = lessons.map((lesson) => {
       const canWatch = canAccessPaid || lesson.isFreePreview;
       return {
-        ...lesson,
-        youtubeUrl: canWatch ? lesson.youtubeUrl : null,
-        youtubeVideoId: canWatch ? lesson.youtubeVideoId : null,
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description,
+        order: lesson.order,
+        isPublished: lesson.isPublished,
+        durationSec: lesson.durationSec,
+        isFreePreview: lesson.isFreePreview,
         locked: !canWatch,
       };
     });

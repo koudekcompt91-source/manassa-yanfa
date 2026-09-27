@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import VideoPlayer from "@/components/VideoPlayer";
+import ProtectedPaidVideo from "@/components/student/ProtectedPaidVideo";
 import { addPointsForLessonComplete } from "@/lib/student-progress";
 
 export default function PackageLessonPage() {
@@ -176,7 +176,7 @@ export default function PackageLessonPage() {
               <p className="max-w-md text-xs text-slate-400">اضغط لفتح نافذة الاشتراك أو الانتقال لصفحة الدورة.</p>
             </button>
           ) : (
-            <VideoPlayer videoUrl={current.youtubeUrl || `https://www.youtube.com/watch?v=${current.youtubeVideoId}`} title={current.title} />
+            <ProtectedPaidVideo slug={pkg.slug} lessonId={current.id} title={current.title} />
           )}
         </div>
         <div className="interactive-card rounded-2xl border border-slate-200 bg-white p-5">
