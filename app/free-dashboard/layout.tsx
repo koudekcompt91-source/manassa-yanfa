@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import GlobalContentProtection from "@/components/student/GlobalContentProtection";
 import { requireFreeStudentPage } from "@/lib/subscription-server";
 
 export const metadata: Metadata = {
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 /** Auth gate only — no nested navbar (root layout already renders Navbar). */
 export default async function FreeDashboardLayout({ children }: { children: React.ReactNode }) {
   await requireFreeStudentPage();
-  return children;
+  return <GlobalContentProtection>{children}</GlobalContentProtection>;
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { recordDailyLogin } from "@/lib/student-progress";
 import StudentDashboardNav from "@/components/student/StudentDashboardNav";
+import GlobalContentProtection from "@/components/student/GlobalContentProtection";
 
 function isStudentLockedRoute(pathname) {
   return (
@@ -70,13 +71,15 @@ export default function StudentAppShell({ children }) {
   }
 
   return (
-    <div className="dashboard-shell relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
-      <main className="relative z-10 min-h-0 min-w-0 flex-1">
-        <div className="relative z-10 mx-auto flex min-h-0 w-full min-w-0 max-w-[86rem] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-4 sm:py-6 lg:px-6">
-          {!isDashboardHome ? <StudentDashboardNav /> : null}
-          {children}
-        </div>
-      </main>
-    </div>
+    <GlobalContentProtection active={isStudent}>
+      <div className="dashboard-shell relative isolate flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50">
+        <main className="relative z-10 min-h-0 min-w-0 flex-1">
+          <div className="relative z-10 mx-auto flex min-h-0 w-full min-w-0 max-w-[86rem] flex-col gap-5 px-3 py-5 sm:gap-6 sm:px-4 sm:py-6 lg:px-6">
+            {!isDashboardHome ? <StudentDashboardNav /> : null}
+            {children}
+          </div>
+        </main>
+      </div>
+    </GlobalContentProtection>
   );
 }

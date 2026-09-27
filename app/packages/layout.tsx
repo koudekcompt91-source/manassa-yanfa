@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import StudentAppShell from "@/components/student/StudentAppShell";
+import GlobalContentProtection from "@/components/student/GlobalContentProtection";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
 import { resolveStudentSubscription } from "@/lib/subscription-server";
 import { isFreeSubscription } from "@/lib/subscription";
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
 export default async function PackagesLayout({ children }: { children: React.ReactNode }) {
   const ctx = await resolveStudentSubscription();
   if (ctx && isFreeSubscription(ctx.subscriptionType)) {
-    return <>{children}</>;
+    return <GlobalContentProtection>{children}</GlobalContentProtection>;
   }
   return <StudentAppShell>{children}</StudentAppShell>;
 }
