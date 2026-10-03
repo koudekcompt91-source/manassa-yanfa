@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
+import AdminCourseEnrollmentPanel from "@/components/admin/AdminCourseEnrollmentPanel";
 import {
   Award,
   Bell,
@@ -137,6 +138,8 @@ export default function AdminOverviewPage() {
           ))}
         </div>
       </section>
+
+      <AdminCourseEnrollmentPanel />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section className="interactive-card rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
