@@ -4,6 +4,7 @@ import { jwtVerify } from "jose";
 import {
   STUDENT_SESSION_COOKIE,
   ADMIN_SESSION_COOKIE,
+  TEACHER_SESSION_COOKIE,
   STUDENT_SUBSCRIPTION_COOKIE,
 } from "@/lib/auth/constants";
 
@@ -71,6 +72,28 @@ export async function middleware(request: NextRequest) {
         NextResponse.json({ ok: false, message: "غير مصرح لك بهذه العملية." }, { status: 403 })
       );
     }
+    const teacherRole = await roleFromCookie(request, TEACHER_SESSION_COOKIE, "TEACHER");
+    if (teacherRole === "TEACHER") {
+      return applySecurityHeaders(
+        NextResponse.json({ ok: false, message: "غير مصرح لك بهذه العملية." }, { status: 403 })
+      );
+    }
+    return applySecurityHeaders(
+      NextResponse.json({ ok: false, message: "يجب تسجيل الدخول أولًا." }, { status: 401 })
+    );
+  }
+
+  if (path.startsWith("/api/teacher/") && path !== "/api/teacher/login") {
+    const teacherRole = await roleFromCookie(request, TEACHER_SESSION_COOKIE, "TEACHER");
+    if (teacherRole === "TEACHER") return applySecurityHeaders(NextResponse.next());
+
+    const studentRole = await roleFromCookie(request, STUDENT_SESSION_COOKIE, "STUDENT");
+    const adminRoleOnTeacherApi = await roleFromCookie(request, ADMIN_SESSION_COOKIE, "ADMIN");
+    if (studentRole === "STUDENT" || adminRoleOnTeacherApi === "ADMIN") {
+      return applySecurityHeaders(
+        NextResponse.json({ ok: false, message: "غير مصرح لك بهذه العملية." }, { status: 403 })
+      );
+    }
     return applySecurityHeaders(
       NextResponse.json({ ok: false, message: "يجب تسجيل الدخول أولًا." }, { status: 401 })
     );
@@ -88,6 +111,22 @@ export async function middleware(request: NextRequest) {
     const adminRole = await roleFromCookie(request, ADMIN_SESSION_COOKIE, "ADMIN");
     if (adminRole !== "ADMIN") {
       return applySecurityHeaders(NextResponse.redirect(new URL("/admin/login", request.url)));
+    }
+    return applySecurityHeaders(NextResponse.next());
+  }
+
+  if (path === "/teacher/login" || path.startsWith("/teacher/login/")) {
+    const teacherRole = await roleFromCookie(request, TEACHER_SESSION_COOKIE, "TEACHER");
+    if (teacherRole === "TEACHER") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/teacher/dashboard", request.url)));
+    }
+    return applySecurityHeaders(NextResponse.next());
+  }
+
+  if (path === "/teacher" || path.startsWith("/teacher/")) {
+    const teacherRole = await roleFromCookie(request, TEACHER_SESSION_COOKIE, "TEACHER");
+    if (teacherRole !== "TEACHER") {
+      return applySecurityHeaders(NextResponse.redirect(new URL("/teacher/login", request.url)));
     }
     return applySecurityHeaders(NextResponse.next());
   }

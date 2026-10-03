@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAdminSessionFromCookies, getStudentSessionFromCookies } from "@/lib/auth/session";
+import {
+  getAdminSessionFromCookies,
+  getStudentSessionFromCookies,
+  getTeacherSessionFromCookies,
+} from "@/lib/auth/session";
 import type { SessionPayload } from "@/lib/auth/jwt";
 
 type GuardResult =
@@ -29,6 +33,24 @@ export async function requireStudentApiSession(): Promise<GuardResult> {
 
   const admin = await getAdminSessionFromCookies();
   if (admin) {
+    return {
+      ok: false,
+      response: NextResponse.json({ ok: false, message: "غير مصرح لك بهذه العملية." }, { status: 403 }),
+    };
+  }
+  return {
+    ok: false,
+    response: NextResponse.json({ ok: false, message: "يجب تسجيل الدخول أولًا." }, { status: 401 }),
+  };
+}
+
+export async function requireTeacherApiSession(): Promise<GuardResult> {
+  const teacher = await getTeacherSessionFromCookies();
+  if (teacher) return { ok: true, session: teacher };
+
+  const student = await getStudentSessionFromCookies();
+  const admin = await getAdminSessionFromCookies();
+  if (student || admin) {
     return {
       ok: false,
       response: NextResponse.json({ ok: false, message: "غير مصرح لك بهذه العملية." }, { status: 403 }),

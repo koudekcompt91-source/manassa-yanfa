@@ -10,9 +10,11 @@ function getSecretKey() {
   throw new Error("AUTH_SECRET must be at least 32 characters in production");
 }
 
+export type SessionRole = "STUDENT" | "ADMIN" | "TEACHER";
+
 export type SessionPayload = {
   sub: string;
-  role: "STUDENT" | "ADMIN";
+  role: SessionRole;
   email: string;
 };
 
@@ -31,7 +33,7 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
     const sub = String(payload.sub || "");
     const role = payload.role as SessionPayload["role"];
     const email = String(payload.email || "");
-    if (!sub || (role !== "STUDENT" && role !== "ADMIN") || !email) return null;
+    if (!sub || (role !== "STUDENT" && role !== "ADMIN" && role !== "TEACHER") || !email) return null;
     return { sub, role, email };
   } catch {
     return null;

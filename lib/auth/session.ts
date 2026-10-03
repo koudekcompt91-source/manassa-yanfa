@@ -3,10 +3,11 @@ import { NextResponse } from "next/server";
 import {
   STUDENT_SESSION_COOKIE,
   ADMIN_SESSION_COOKIE,
+  TEACHER_SESSION_COOKIE,
   STUDENT_SUBSCRIPTION_COOKIE,
   SESSION_MAX_AGE_SEC,
 } from "./constants";
-import { signSessionToken, verifySessionToken, type SessionPayload } from "./jwt";
+import { signSessionToken, verifySessionToken, type SessionPayload, type SessionRole } from "./jwt";
 import { normalizeSubscriptionType, type SubscriptionType } from "@/lib/subscription";
 
 const COOKIE_OPTS = {
@@ -16,8 +17,10 @@ const COOKIE_OPTS = {
   path: "/",
 };
 
-function cookieNameForRole(role: "STUDENT" | "ADMIN") {
-  return role === "ADMIN" ? ADMIN_SESSION_COOKIE : STUDENT_SESSION_COOKIE;
+function cookieNameForRole(role: SessionRole) {
+  if (role === "ADMIN") return ADMIN_SESSION_COOKIE;
+  if (role === "TEACHER") return TEACHER_SESSION_COOKIE;
+  return STUDENT_SESSION_COOKIE;
 }
 
 /** Set the correct session cookie based on the payload role. */
@@ -67,11 +70,16 @@ export function clearOtherSessionCookie(
   response.cookies.set(other, "", { ...COOKIE_OPTS, maxAge: 0 });
 }
 
-/** Clear both session cookies. */
+/** Clear student and admin session cookies (unchanged). Teacher cookie is separate. */
 export function clearAllSessionCookies(response: NextResponse): void {
   response.cookies.set(STUDENT_SESSION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
   response.cookies.set(ADMIN_SESSION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
   response.cookies.set(STUDENT_SUBSCRIPTION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
+}
+
+/** Clear only the teacher session cookie. */
+export function clearTeacherSessionCookie(response: NextResponse): void {
+  response.cookies.set(TEACHER_SESSION_COOKIE, "", { ...COOKIE_OPTS, maxAge: 0 });
 }
 
 /** Read student session from request cookies. */
@@ -94,6 +102,19 @@ export async function getAdminSessionFromCookies(): Promise<SessionPayload | nul
     if (!token) return null;
     const session = await verifySessionToken(token);
     if (session && session.role !== "ADMIN") return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+/** Read teacher session from request cookies. Never treats STUDENT/ADMIN tokens as TEACHER. */
+export async function getTeacherSessionFromCookies(): Promise<SessionPayload | null> {
+  try {
+    const token = cookies().get(TEACHER_SESSION_COOKIE)?.value;
+    if (!token) return null;
+    const session = await verifySessionToken(token);
+    if (session && session.role !== "TEACHER") return null;
     return session;
   } catch {
     return null;
