@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.manassayanfa.app",
+      "sha256_cert_fingerprints": [
+        "5C:91:BF:7B:1C:A7:B7:B6:FD:B0:0E:11:95:1A:CE:C9:94:DE:71:0D:74:8F:6E:44:41:44:CE:6B:23:50:B3:64"
+      ]
+    }
+  }
+]
